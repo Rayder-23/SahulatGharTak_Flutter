@@ -3,6 +3,9 @@ set -e
 
 # Script: export_ipa.sh
 # Purpose: Package a downloaded Runner.xcarchive into a deliverable .ipa file for Transporter.
+# Paste in Terminal (inside 'archive' folder): 
+# /Users/mc/develop/projects/app_sahulatghartak/scripts/export_ipa.sh
+
 
 TARGET_DIR="${1:-.}"
 OUTPUT_IPA="SahulatGharTak.ipa"
