@@ -809,6 +809,8 @@ class _DetailHeader extends StatelessWidget {
                                     size: 12, color: Colors.white),
                                 const SizedBox(width: 4),
                                 Text(displayStatus,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,

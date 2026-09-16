@@ -204,7 +204,10 @@ class _BookingCard extends StatelessWidget {
                                   children: [
                                     Icon(statusIcon(booking.status), size: 13, color: color),
                                     const SizedBox(width: 4),
-                                    Text(booking.status, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 11.5)),
+                                    Text(booking.status,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 11.5)),
                                   ],
                                 ),
                               ),

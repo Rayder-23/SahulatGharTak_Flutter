@@ -402,6 +402,8 @@ class _RequestCard extends StatelessWidget {
                                         size: 13, color: statusColor),
                                     const SizedBox(width: 4),
                                     Text(_displayStatus,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                             color: statusColor,
                                             fontWeight: FontWeight.w700,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -465,7 +466,10 @@ class _DetailHeader extends StatelessWidget {
                               children: [
                                 Icon(statusIcon(booking.status), size: 12, color: Colors.white),
                                 const SizedBox(width: 4),
-                                Text(booking.status, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 11)),
+                                Text(booking.status,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 11)),
                               ],
                             ),
                           ),
@@ -703,6 +707,7 @@ class _CompletionDialogState extends State<_CompletionDialog> {
                         controller: _passcodeController,
                         keyboardType: TextInputType.number,
                         maxLength: 4,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, letterSpacing: 4),
                         decoration: _dialogFieldDecoration(
                           hint: '••••',
@@ -715,6 +720,7 @@ class _CompletionDialogState extends State<_CompletionDialog> {
                       TextField(
                         controller: _amountController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$'))],
                         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                         decoration: _dialogFieldDecoration(hint: '0'),
                       ),

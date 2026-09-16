@@ -96,14 +96,23 @@ class StatusProgressBar extends StatelessWidget {
             SizedBox(height: compact ? 3 : 5),
             SizedBox(
               width: circleSize + (compact ? 34 : 44),
-              child: Text(
-                steps[stepIndex],
-                textAlign: TextAlign.center,
-                softWrap: true,
-                style: TextStyle(
-                  fontSize: labelSize,
-                  fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                  color: done || active ? const Color(0xFF1A2233) : Colors.grey[400],
+              // FittedBox scales the whole word down to fit rather than
+              // letting Text wrap it — a fixed-width box plus a single-word
+              // label (e.g. "Completed") has no space to break on, so plain
+              // wrapping forces a mid-word split (the last letter drops to
+              // its own line) instead of shrinking to fit on one line.
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  steps[stepIndex],
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  softWrap: false,
+                  style: TextStyle(
+                    fontSize: labelSize,
+                    fontWeight: active ? FontWeight.w800 : FontWeight.w600,
+                    color: done || active ? const Color(0xFF1A2233) : Colors.grey[400],
+                  ),
                 ),
               ),
             ),
