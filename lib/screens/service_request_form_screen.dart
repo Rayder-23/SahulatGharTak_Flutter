@@ -4,11 +4,13 @@ import 'package:provider/provider.dart';
 
 import '../models/category.dart';
 import '../models/client_address.dart';
+import '../models/service_title.dart';
 import '../providers/auth_provider.dart';
 import '../providers/client_address_provider.dart';
 import '../providers/customer_service_request_provider.dart';
 import '../providers/service_title_provider.dart';
 import '../utils/constants.dart';
+import '../utils/input_formatters.dart';
 import '../utils/platform_date_picker.dart';
 import '../widgets/auth_card_scaffold.dart';
 import '../widgets/themed_dropdown.dart';
@@ -43,12 +45,13 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
   final _descriptionController = TextEditingController();
   final _contactPersonController = TextEditingController();
   final _contactNoController = TextEditingController();
-  final _budgetController = TextEditingController();
   final _remarksController = TextEditingController();
 
   Category? _category;
   Color _accentColor = kPrimaryColor;
   String? _selectedServiceTitle;
+  int? _selectedServiceTitleUid;
+  double? _selectedBasePrice;
   ClientAddress? _selectedAddress;
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
@@ -73,7 +76,7 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
     _ownContactPerson = user?.username ?? '';
     _ownContactNo = user?.mobileNo ?? '';
     _contactPersonController.text = _ownContactPerson;
-    _contactNoController.text = _ownContactNo;
+    _contactNoController.text = formatMobileForDisplay(_ownContactNo);
 
     // didChangeDependencies() runs during the build phase, so calling these
     // synchronously here would notify listeners (via each provider's
@@ -98,13 +101,27 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
 
   bool get _isOtherServiceTitle => _selectedServiceTitle == _otherServiceTitleValue;
 
+  void _selectServiceTitle(String? value, List<ServiceTitle> titles) {
+    ServiceTitle? match;
+    for (final t in titles) {
+      if (t.title == value) {
+        match = t;
+        break;
+      }
+    }
+    setState(() {
+      _selectedServiceTitle = value;
+      _selectedServiceTitleUid = match?.id;
+      _selectedBasePrice = match?.basePrice;
+    });
+  }
+
   @override
   void dispose() {
     _otherTitleController.dispose();
     _descriptionController.dispose();
     _contactPersonController.dispose();
     _contactNoController.dispose();
-    _budgetController.dispose();
     _remarksController.dispose();
     super.dispose();
   }
@@ -127,7 +144,7 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
       _useOwnContact = value;
       if (value) {
         _contactPersonController.text = _ownContactPerson;
-        _contactNoController.text = _ownContactNo;
+        _contactNoController.text = formatMobileForDisplay(_ownContactNo);
       } else {
         _contactPersonController.clear();
         _contactNoController.clear();
@@ -156,8 +173,8 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
       preferredServiceTime: _selectedTime == null ? '' : _formatTime(_selectedTime!),
       isUrgent: _isUrgent,
       contactPerson: _contactPersonController.text.trim(),
-      contactNo: _contactNoController.text.trim(),
-      estimatedBudget: double.tryParse(_budgetController.text.trim()),
+      contactNo: digitsOnlyMobile(_contactNoController.text),
+      serviceTitleUid: _selectedServiceTitleUid,
       remarks: _remarksController.text.trim().isEmpty ? null : _remarksController.text.trim(),
     );
 
@@ -187,6 +204,36 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            authFieldLabel('Estimated Budget'),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: _accentColor.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: _accentColor.withValues(alpha: 0.25)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.payments_outlined, size: 18, color: _accentColor),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _selectedBasePrice != null
+                          ? 'Rs ${_selectedBasePrice!.toStringAsFixed(0)}'
+                          : _selectedServiceTitle == null
+                              ? 'Select a service title below to see the estimate'
+                              : 'No estimate set for this service yet',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: _selectedBasePrice != null ? Colors.black87 : Colors.black54,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
             if (addressState.loading)
               const Center(child: CircularProgressIndicator())
             else if (addressState.addresses.isEmpty)
@@ -240,7 +287,7 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
                   ...titleState.serviceTitles.map((t) => ThemedDropdownItem(value: t.title, label: t.title)),
                   const ThemedDropdownItem(value: _otherServiceTitleValue, label: 'Other (not listed)'),
                 ],
-                onChanged: (v) => setState(() => _selectedServiceTitle = v),
+                onChanged: (v) => _selectServiceTitle(v, titleState.serviceTitles),
                 validator: (v) => v == null ? 'Required' : null,
               ),
             if (_isOtherServiceTitle) ...[
@@ -317,15 +364,9 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
               controller: _contactNoController,
               enabled: !_useOwnContact,
               keyboardType: TextInputType.phone,
-              decoration: authFieldDecoration(hint: 'Enter contact number'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
-            ),
-            const SizedBox(height: 20),
-            authFieldLabel('Estimated Budget (optional)'),
-            TextFormField(
-              controller: _budgetController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: authFieldDecoration(hint: 'Enter estimated budget'),
+              inputFormatters: [MobileNumberInputFormatter()],
+              decoration: authFieldDecoration(hint: '03XX-XXXXXXX'),
+              validator: !_useOwnContact ? mobileNumberValidator : null,
             ),
             const SizedBox(height: 20),
             authFieldLabel('Remarks (optional)'),

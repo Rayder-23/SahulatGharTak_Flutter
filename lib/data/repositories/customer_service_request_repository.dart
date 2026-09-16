@@ -53,7 +53,7 @@ class CustomerServiceRequestRepository {
     required bool isUrgent,
     required String contactPerson,
     required String contactNo,
-    double? estimatedBudget,
+    int? serviceTitleUid,
     String? remarks,
   }) {
     return _apiService.create(
@@ -67,7 +67,7 @@ class CustomerServiceRequestRepository {
       isUrgent: isUrgent,
       contactPerson: contactPerson,
       contactNo: contactNo,
-      estimatedBudget: estimatedBudget,
+      serviceTitleUid: serviceTitleUid,
       remarks: remarks,
     );
   }
@@ -91,7 +91,6 @@ class CustomerServiceRequestRepository {
       contactPerson: request.contactPerson,
       contactNo: request.contactNo,
       status: 'Cancelled',
-      estimatedBudget: request.estimatedBudget,
       remarks: request.remarks,
       cancelReason: reason,
     );

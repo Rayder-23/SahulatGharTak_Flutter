@@ -58,7 +58,7 @@ class CustomerServiceRequestProvider extends ChangeNotifier {
     required bool isUrgent,
     required String contactPerson,
     required String contactNo,
-    double? estimatedBudget,
+    int? serviceTitleUid,
     String? remarks,
   }) async {
     _saving = true;
@@ -77,7 +77,7 @@ class CustomerServiceRequestProvider extends ChangeNotifier {
         isUrgent: isUrgent,
         contactPerson: contactPerson,
         contactNo: contactNo,
-        estimatedBudget: estimatedBudget,
+        serviceTitleUid: serviceTitleUid,
         remarks: remarks,
       );
       _requests = [created, ..._requests];

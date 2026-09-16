@@ -4,6 +4,7 @@ class ServiceTitle {
   final String categoryName;
   final String title;
   final String? description;
+  final double? basePrice;
   final DateTime createdOn;
 
   const ServiceTitle({
@@ -12,6 +13,7 @@ class ServiceTitle {
     required this.categoryName,
     required this.title,
     required this.description,
+    required this.basePrice,
     required this.createdOn,
   });
 
@@ -22,6 +24,7 @@ class ServiceTitle {
       categoryName: json['categoryName'] as String,
       title: json['title'] as String,
       description: json['description'] as String?,
+      basePrice: (json['basePrice'] as num?)?.toDouble(),
       createdOn: DateTime.parse(json['createdOn'] as String),
     );
   }
