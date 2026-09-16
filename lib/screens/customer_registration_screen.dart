@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../utils/constants.dart';
 import '../utils/customer_terms_and_conditions.dart';
+import '../utils/input_formatters.dart';
 import '../widgets/auth_card_scaffold.dart';
 import '../widgets/message_dialog.dart';
 import '../widgets/terms_and_conditions_section.dart';
@@ -54,7 +55,7 @@ class _CustomerRegistrationScreenState
     }
 
     final authProvider = context.read<AuthProvider>();
-    final mobileNo = _phoneController.text.trim();
+    final mobileNo = digitsOnlyMobile(_phoneController.text);
     final password = _passwordController.text;
     final success = await authProvider.registerCustomer(
       fullName: _fullNameController.text.trim(),
@@ -107,9 +108,9 @@ class _CustomerRegistrationScreenState
             TextFormField(
               controller: _phoneController,
               keyboardType: TextInputType.phone,
-              decoration: authFieldDecoration(hint: 'Enter your mobile number'),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+              inputFormatters: [MobileNumberInputFormatter()],
+              decoration: authFieldDecoration(hint: '03XX-XXXXXXX'),
+              validator: mobileNumberValidator,
             ),
             const SizedBox(height: 20),
             authFieldLabel('Gender'),

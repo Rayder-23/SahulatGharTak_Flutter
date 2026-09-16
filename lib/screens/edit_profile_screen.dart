@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../utils/input_formatters.dart';
 import '../widgets/auth_card_scaffold.dart';
 
 class CustomerEditProfileScreen extends StatefulWidget {
@@ -41,7 +42,7 @@ class _CustomerEditProfileScreenState extends State<CustomerEditProfileScreen> {
     final detail = authProvider.clientDetail;
     if (success && detail != null) {
       _nameController.text = detail.fullName;
-      _cnicController.text = detail.cnic;
+      _cnicController.text = formatCnicForDisplay(detail.cnic);
       _selectedGender = detail.gender.isNotEmpty ? detail.gender : null;
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(authProvider.error ?? 'Failed to load profile')));
@@ -96,8 +97,10 @@ class _CustomerEditProfileScreenState extends State<CustomerEditProfileScreen> {
                   authFieldLabel('CNIC'),
                   TextFormField(
                     controller: _cnicController,
-                    decoration: authFieldDecoration(hint: 'Enter your CNIC'),
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [CnicInputFormatter()],
+                    decoration: authFieldDecoration(hint: '12345-1234567-1'),
+                    validator: cnicValidator,
                   ),
                   const SizedBox(height: 20),
                   GenderSelector(

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
 import '../utils/constants.dart';
+import '../utils/input_formatters.dart';
 import '../widgets/auth_card_scaffold.dart';
 import '../widgets/message_dialog.dart';
 import 'customer_registration_screen.dart';
@@ -38,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final authProvider = context.read<AuthProvider>();
     final success = await authProvider.login(
-        _mobileNoController.text.trim(), _passwordController.text);
+        digitsOnlyMobile(_mobileNoController.text), _passwordController.text);
 
     if (!mounted) return;
 
@@ -56,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.of(context).pushNamed(
         OtpVerificationScreen.routeName,
         arguments: OtpVerificationArgs(
-          mobileNo: _mobileNoController.text.trim(),
+          mobileNo: digitsOnlyMobile(_mobileNoController.text),
           password: _passwordController.text,
           otpType: 'Registration',
         ),
@@ -88,9 +89,9 @@ class _LoginScreenState extends State<LoginScreen> {
             TextFormField(
               controller: _mobileNoController,
               keyboardType: TextInputType.phone,
-              decoration: authFieldDecoration(hint: 'Enter your mobile number'),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+              inputFormatters: [MobileNumberInputFormatter()],
+              decoration: authFieldDecoration(hint: '03XX-XXXXXXX'),
+              validator: mobileNumberValidator,
             ),
             const SizedBox(height: 20),
             authFieldLabel('Password'),

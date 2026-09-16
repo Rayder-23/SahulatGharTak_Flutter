@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../utils/input_formatters.dart';
 import '../widgets/auth_card_scaffold.dart';
 import '../widgets/message_dialog.dart';
 import 'reset_password_screen.dart';
@@ -27,7 +28,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final mobileNo = _mobileNoController.text.trim();
+    final mobileNo = digitsOnlyMobile(_mobileNoController.text);
     final authProvider = context.read<AuthProvider>();
     final success = await authProvider.sendOtp(mobileNo, otpType: 'PasswordReset');
 
@@ -65,8 +66,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             TextFormField(
               controller: _mobileNoController,
               keyboardType: TextInputType.phone,
-              decoration: authFieldDecoration(hint: 'Enter your mobile number'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+              inputFormatters: [MobileNumberInputFormatter()],
+              decoration: authFieldDecoration(hint: '03XX-XXXXXXX'),
+              validator: mobileNumberValidator,
             ),
             const SizedBox(height: 28),
             AuthPrimaryButton(label: 'Send Reset Code', isLoading: isLoading, onPressed: _submit),
