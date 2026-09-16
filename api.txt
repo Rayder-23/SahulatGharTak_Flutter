@@ -1,6 +1,6 @@
 ================================================================================
 SahulatGharTak API Reference
-Version: 3.10 | Last Updated: 2026-09-08
+Version: 3.13 | Last Updated: 2026-09-16
 Database: SahulatAppDB
 Local Base URL:    https://localhost:7265/api/
 Deployed Base URL:  https://sahulatghartak.com/api/
@@ -99,6 +99,7 @@ Request Body:
   "gender": "Male",
   "experienceYears": 2,
   "description": "Experienced provider",
+  "city": "Karachi",
   "categoryId": 1
 }
 
@@ -107,6 +108,8 @@ Notes:
 - verifies existing client using mobileNo + password
 - client must be OTP-verified (UsersLogin.IsVerified=true) before upgrade
 - CNIC must be unique across Providers (DB unique constraint)
+- city is optional — must be one of the values returned by GET /api/cities (case-insensitive)
+  when provided, else 400; if omitted, falls back to the client's existing City (may be null)
 
 Success (200):
 {
@@ -121,7 +124,8 @@ Success (200):
     "mobileNo": "03335191392",
     "categoryId": 1,
     "categoryName": "Plumber",
-    "clientId": 1
+    "clientId": 1,
+    "city": "Karachi"
   }
 }
 
@@ -130,6 +134,7 @@ Notes (register-provider):
 - clientId is the original Clients.UID — always present, since only an existing client account
   can be upgraded, and the Clients row is kept (not deleted) after upgrade. Use it to submit
   customer service requests (POST /api/customer-service-requests) even after becoming a provider.
+- city is Providers.City after the upgrade (see request notes above for validation/fallback)
 - Document upload is a separate API: POST /api/provider/upload-documents
 
 Fail (401):
@@ -957,6 +962,7 @@ Success (200):
     "gender": "Male",
     "experienceYears": 2,
     "description": "Experienced provider",
+    "city": "Karachi",
     "isVerified": false,
     "averageRating": 0.0,
     "totalReviews": 0,
@@ -993,13 +999,16 @@ Request Body:
   "gender": "Male",
   "experienceYears": 3,
   "description": "Updated provider profile",
+  "city": "Lahore",
   "categoryId": 1
 }
 
 Notes:
 - providerUid in URL and body must match
 - send categoryId OR categoryName (one is required)
-- editable: fullName, cnic, gender, experienceYears, description, category
+- editable: fullName, cnic, gender, experienceYears, description, city, category
+- city is optional — must be one of the values returned by GET /api/cities (case-insensitive)
+  when provided, else 400; omit/null leaves the existing Providers.City unchanged
 - read-only in response: isVerified, ratings, jobs, isAvailable, availableTiming, mobileNo
 
 Success (200):
@@ -1015,6 +1024,7 @@ Success (200):
     "gender": "Male",
     "experienceYears": 3,
     "description": "Updated provider profile",
+    "city": "Lahore",
     "isVerified": false,
     "averageRating": 0.0,
     "totalReviews": 0,
@@ -1517,13 +1527,13 @@ Request Body:
   "categoryUid": 4,
   "clientAddressUid": 1,
   "serviceTitle": "AC Repair",
+  "serviceTitleUid": 1,
   "serviceDescription": "AC not cooling properly",
   "preferredServiceDate": "2026-07-10",
   "preferredServiceTime": "10:00",
   "isUrgent": true,
   "contactPerson": "Shahid",
   "contactNo": "03335191392",
-  "estimatedBudget": 2500,
   "remarks": "Please call before arrival"
 }
 
@@ -1537,6 +1547,12 @@ Notes:
   them against the client's own account (clientName/mobile). If the app intends "contact me at my
   account number," it must populate these fields itself from the logged-in client's own profile
   before submitting; the backend will not fill them in automatically.
+- estimatedBudget is NO LONGER a client-supplied field — it does not exist in this request body.
+  It is populated server-side from the selected ServiceTitles.BasePrice (see the Service Titles
+  section) so the estimate can't be tampered with client-side. Send serviceTitleUid (optional —
+  the ServiceTitles.UID for the title picked from GET /api/service-titles?categoryUid={id}) to have
+  it populated; the title must be active and belong to categoryUid, else 400. Omit serviceTitleUid
+  to leave estimatedBudget null (e.g. the admin hasn't priced that title yet).
 
 Success (201):
 {
@@ -1571,6 +1587,13 @@ Fail (400):
   "data": null
 }
 
+Fail (400 — invalid service title):
+{
+  "success": false,
+  "message": "Service title does not belong to the selected category.",
+  "data": null
+}
+
 --------------------------------------------------------------------------------
 PUT Customer Service Request (Update)
 --------------------------------------------------------------------------------
@@ -1586,13 +1609,13 @@ Request Body:
   "categoryUid": 4,
   "clientAddressUid": 1,
   "serviceTitle": "AC Repair",
+  "serviceTitleUid": 1,
   "serviceDescription": "Updated description",
   "preferredServiceDate": "2026-07-11",
   "preferredServiceTime": "14:00",
   "isUrgent": false,
   "contactPerson": "Shahid",
   "contactNo": "03335191392",
-  "estimatedBudget": 3000,
   "status": "Initiated",
   "remarks": "Technician assigned",
   "cancelReason": null
@@ -1603,6 +1626,10 @@ Notes:
 - clientUid cannot be changed on update
 - serviceDescription is OPTIONAL (omit, null, or "" when not provided)
 - preferredServiceDate and preferredServiceTime are OPTIONAL (omit, null, or "" when not provided)
+- estimatedBudget is NO LONGER a client-supplied field — same as POST Create. Send serviceTitleUid
+  (optional) to re-derive estimatedBudget from the (possibly new) selected title's ServiceTitles.
+  BasePrice; the title must be active and belong to categoryUid, else 400. Omit serviceTitleUid to
+  leave the existing estimatedBudget unchanged.
 - status is WHITELISTED to "Initiated" or "Cancelled" only (legacy "Pending" is still accepted and
   normalized to "Initiated") — a client can edit request details while it's still Initiated, or
   cancel it. "Assigned"/"In Progress"/"Completed" are set by staff/the provider flow, never by
@@ -1621,7 +1648,6 @@ Example (customer cancelling):
   "serviceDescription": "AC not cooling properly",
   "contactPerson": "Shahid",
   "contactNo": "03335191392",
-  "estimatedBudget": 2500,
   "status": "Cancelled",
   "cancelReason": "Found another technician"
 }
@@ -2412,6 +2438,11 @@ SERVICE TITLES APIs
 ================================================================================
 Hierarchy: Services -> ServiceCategories -> ServiceTitles
 Flutter flow: GET /api/service-categories?serviceUid={id} then GET /api/service-titles?categoryUid={id}
+basePrice is an admin-set price estimate per title (Admin > Job Types, /Admin/ServiceTitles), nullable
+if the admin hasn't priced that title yet. Show it read-only as the "Estimated Budget" on the service
+request form (it replaces the old free-text estimatedBudget field customers used to type in) — send
+the selected title's id as serviceTitleUid on POST/PUT /api/customer-service-requests to have the
+server populate estimatedBudget from it. See CUSTOMER SERVICE REQUESTS APIs above.
 
 --------------------------------------------------------------------------------
 GET All Service Titles
@@ -2435,6 +2466,7 @@ Success (200):
     "categoryName": "Plumber",
     "title": "Leak Repair",
     "description": "Fixing pipe and faucet leaks",
+    "basePrice": 1500.00,
     "displayOrder": 1,
     "createdOn": "2026-08-06T00:00:00"
   }
@@ -2460,6 +2492,7 @@ Success (200):
   "categoryName": "Plumber",
   "title": "Leak Repair",
   "description": "Fixing pipe and faucet leaks",
+  "basePrice": 1500.00,
   "displayOrder": 1,
   "createdOn": "2026-08-06T00:00:00"
 }
@@ -2468,6 +2501,33 @@ Fail (404):
 {
   "message": "Service title not found."
 }
+
+================================================================================
+CITIES API
+================================================================================
+City options are admin-managed via the Configurations table (ConfigKey="Cities",
+comma-separated ConfigValue), the same mechanism the admin portal uses to build city
+dropdowns for Clients/Providers. Editable at /adminportal/configurations. Use this
+endpoint to populate any city picker (e.g. the register-provider City field) instead
+of hardcoding values in the app.
+
+--------------------------------------------------------------------------------
+GET All Cities
+--------------------------------------------------------------------------------
+Local:     https://localhost:7265/api/cities
+Deployed:  https://sahulatghartak.com/api/cities
+
+Request Body: none
+
+Success (200):
+[
+  "Karachi",
+  "Islamabad",
+  "Faisalabad",
+  "Lahore"
+]
+
+Fail: returns empty array [] if the "Cities" config key has no values
 
 ================================================================================
 MAPS / GPS APIs (Reverse Geocoding, Nearby Providers, Live Tracking)
