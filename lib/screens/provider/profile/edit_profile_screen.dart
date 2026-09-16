@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../providers/city_provider.dart';
 import '../../../providers/provider_dashboard_provider.dart';
+import '../../../utils/input_formatters.dart';
 import '../../../widgets/auth_card_scaffold.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
+import '../../../widgets/themed_dropdown.dart';
 
 class EditProfileScreen extends StatefulWidget {
   static const routeName = '/provider/profile/edit';
@@ -17,7 +20,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _cnicController;
-  late TextEditingController _experienceController;
+  int _experienceYears = 0;
+  String? _selectedCity;
   bool _saving = false;
 
   @override
@@ -25,15 +29,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     final profile = context.read<ProviderDashboardProvider>().providerDetail;
     _nameController = TextEditingController(text: profile?.fullName ?? '');
-    _cnicController = TextEditingController(text: profile?.cnic ?? '');
-    _experienceController = TextEditingController(text: (profile?.experienceYears ?? 0).toString());
+    _cnicController = TextEditingController(text: formatCnicForDisplay(profile?.cnic ?? ''));
+    _experienceYears = profile?.experienceYears ?? 0;
+    _selectedCity = profile?.city;
+    context.read<CityProvider>().loadCities();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _cnicController.dispose();
-    _experienceController.dispose();
     super.dispose();
   }
 
@@ -46,7 +51,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final updated = profile.copyWith(
       fullName: _nameController.text.trim(),
       cnic: _cnicController.text.trim(),
-      experienceYears: int.tryParse(_experienceController.text.trim()) ?? profile.experienceYears,
+      experienceYears: _experienceYears,
+      city: _selectedCity,
     );
 
     setState(() => _saving = true);
@@ -88,13 +94,65 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               const SizedBox(height: 20),
               authFieldLabel('CNIC'),
-              TextFormField(controller: _cnicController, decoration: authFieldDecoration(hint: 'Enter your CNIC')),
+              TextFormField(
+                controller: _cnicController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [CnicInputFormatter()],
+                decoration: authFieldDecoration(hint: '12345-1234567-1'),
+                validator: cnicValidator,
+              ),
               const SizedBox(height: 20),
               authFieldLabel('Experience (years)'),
-              TextFormField(
-                controller: _experienceController,
-                keyboardType: TextInputType.number,
-                decoration: authFieldDecoration(hint: 'Enter years of experience'),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F5F7),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFE0E0E5)),
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.remove_circle_outline),
+                      color: providerBrandBlue,
+                      onPressed: _experienceYears > 0
+                          ? () => setState(() => _experienceYears--)
+                          : null,
+                    ),
+                    Expanded(
+                      child: Text(
+                        '$_experienceYears ${_experienceYears == 1 ? 'year' : 'years'}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_outline),
+                      color: providerBrandBlue,
+                      onPressed: _experienceYears < 50
+                          ? () => setState(() => _experienceYears++)
+                          : null,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              authFieldLabel('City'),
+              Consumer<CityProvider>(
+                builder: (context, cityProvider, _) {
+                  if (cityProvider.isLoading) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  return ThemedDropdownField<String>(
+                    value: _selectedCity,
+                    hint: 'Select your city',
+                    items: cityProvider.cities.map((c) => ThemedDropdownItem(value: c, label: c)).toList(),
+                    onChanged: (v) => setState(() => _selectedCity = v),
+                  );
+                },
               ),
               const SizedBox(height: 28),
               AuthPrimaryButton(label: 'Save Changes', isLoading: _saving, onPressed: _save, color: providerBrandBlue),

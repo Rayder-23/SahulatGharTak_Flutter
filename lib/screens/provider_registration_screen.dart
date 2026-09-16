@@ -3,11 +3,14 @@ import 'package:provider/provider.dart';
 
 import '../models/category.dart';
 import '../providers/auth_provider.dart';
+import '../providers/city_provider.dart';
 import '../utils/constants.dart';
+import '../utils/input_formatters.dart';
 import '../utils/provider_terms_and_conditions.dart';
 import '../widgets/auth_card_scaffold.dart';
 import '../widgets/message_dialog.dart';
 import '../widgets/terms_and_conditions_section.dart';
+import '../widgets/themed_dropdown.dart';
 import 'category_picker_screen.dart';
 import 'login_screen.dart';
 import 'provider_dashboard_screen.dart';
@@ -29,12 +32,13 @@ class _ProviderRegistrationScreenState
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _cnicController = TextEditingController();
-  final _experienceController = TextEditingController();
   final _descriptionController = TextEditingController();
   String? _selectedGender;
   Category? _selectedCategory;
+  String? _selectedCity;
   bool _obscurePassword = true;
   bool _agreedToTerms = false;
+  int _experienceYears = 0;
 
   @override
   void initState() {
@@ -42,6 +46,7 @@ class _ProviderRegistrationScreenState
     final currentUser = context.read<AuthProvider>().currentUser;
     _fullNameController.text = currentUser?.username ?? '';
     _phoneController.text = currentUser?.mobileNo ?? '';
+    context.read<CityProvider>().loadCities();
   }
 
   @override
@@ -50,7 +55,6 @@ class _ProviderRegistrationScreenState
     _phoneController.dispose();
     _passwordController.dispose();
     _cnicController.dispose();
-    _experienceController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
@@ -89,10 +93,11 @@ class _ProviderRegistrationScreenState
       password: _passwordController.text,
       cnic: _cnicController.text.trim(),
       gender: _selectedGender!,
-      experienceYears: int.parse(_experienceController.text.trim()),
+      experienceYears: _experienceYears,
       description: _descriptionController.text.trim(),
       categoryId: _selectedCategory!.id,
       categoryName: _selectedCategory!.name,
+      city: _selectedCity,
     );
 
     if (!mounted) return;
@@ -165,9 +170,10 @@ class _ProviderRegistrationScreenState
             authFieldLabel('CNIC'),
             TextFormField(
               controller: _cnicController,
-              decoration: authFieldDecoration(hint: 'Enter your CNIC'),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+              keyboardType: TextInputType.number,
+              inputFormatters: [CnicInputFormatter()],
+              decoration: authFieldDecoration(hint: '12345-1234567-1'),
+              validator: cnicValidator,
             ),
             const SizedBox(height: 20),
             authFieldLabel('Gender'),
@@ -238,19 +244,60 @@ class _ProviderRegistrationScreenState
               },
             ),
             const SizedBox(height: 20),
-            authFieldLabel('Experience (years)'),
-            TextFormField(
-              controller: _experienceController,
-              keyboardType: TextInputType.number,
-              decoration:
-                  authFieldDecoration(hint: 'Enter years of experience'),
-              validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Required';
-                if (int.tryParse(v.trim()) == null) {
-                  return 'Enter a valid number';
+            authFieldLabel('City'),
+            Consumer<CityProvider>(
+              builder: (context, cityProvider, _) {
+                if (cityProvider.isLoading) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
                 }
-                return null;
+                return ThemedDropdownField<String>(
+                  value: _selectedCity,
+                  hint: 'Select your city',
+                  items: cityProvider.cities
+                      .map((c) => ThemedDropdownItem(value: c, label: c))
+                      .toList(),
+                  onChanged: (v) => setState(() => _selectedCity = v),
+                );
               },
+            ),
+            const SizedBox(height: 20),
+            authFieldLabel('Experience (years)'),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F5F7),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFE0E0E5)),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline),
+                    color: kPrimaryColor,
+                    onPressed: _experienceYears > 0
+                        ? () => setState(() => _experienceYears--)
+                        : null,
+                  ),
+                  Expanded(
+                    child: Text(
+                      '$_experienceYears ${_experienceYears == 1 ? 'year' : 'years'}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline),
+                    color: kPrimaryColor,
+                    onPressed: _experienceYears < 50
+                        ? () => setState(() => _experienceYears++)
+                        : null,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             authFieldLabel('Description'),

@@ -212,6 +212,10 @@ class _ProfileTabState extends State<ProfileTab> {
                 ListTile(leading: const Icon(Icons.wc_rounded, color: providerBrandBlue), title: const Text('Gender'), subtitle: Text(detail.gender)),
                 const Divider(height: 1),
                 ListTile(leading: const Icon(Icons.work_history_rounded, color: providerBrandBlue), title: const Text('Experience'), subtitle: Text('${detail.experienceYears} years')),
+                if (detail.city != null && detail.city!.isNotEmpty) ...[
+                  const Divider(height: 1),
+                  ListTile(leading: const Icon(Icons.location_city_rounded, color: providerBrandBlue), title: const Text('City'), subtitle: Text(detail.city!)),
+                ],
                 const Divider(height: 1),
                 ListTile(leading: const Icon(Icons.category_rounded, color: providerBrandBlue), title: const Text('Category'), subtitle: Text('${detail.categoryName} (ID: ${detail.categoryId})')),
                 if (detail.description.isNotEmpty) ...[

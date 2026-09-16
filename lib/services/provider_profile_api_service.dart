@@ -26,6 +26,7 @@ class ProviderProfileApiService {
             'gender': updated.gender,
             'experienceYears': updated.experienceYears,
             'description': updated.description,
+            if (updated.city != null) 'city': updated.city,
             'categoryId': updated.categoryId,
           }),
         )

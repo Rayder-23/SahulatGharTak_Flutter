@@ -166,6 +166,7 @@ class AuthProvider extends ChangeNotifier {
     required String description,
     required int categoryId,
     required String categoryName,
+    String? city,
   }) async {
     _isLoading = true;
     _error = null;
@@ -182,6 +183,7 @@ class AuthProvider extends ChangeNotifier {
         description: description,
         categoryId: categoryId,
         categoryName: categoryName,
+        city: city,
       );
       final loggedIn = await login(mobileNo, password);
       if (loggedIn && result.providerUid > 0) {

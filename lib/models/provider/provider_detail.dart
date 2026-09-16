@@ -7,6 +7,7 @@ class ProviderDetailModel {
   final String gender;
   final int experienceYears;
   final String description;
+  final String? city;
   final bool isVerified;
   final double averageRating;
   final int totalReviews;
@@ -26,6 +27,7 @@ class ProviderDetailModel {
     required this.gender,
     required this.experienceYears,
     required this.description,
+    this.city,
     required this.isVerified,
     required this.averageRating,
     required this.totalReviews,
@@ -47,6 +49,7 @@ class ProviderDetailModel {
       gender: json['gender'] as String? ?? '',
       experienceYears: json['experienceYears'] as int? ?? 0,
       description: json['description'] as String? ?? '',
+      city: json['city'] as String?,
       isVerified: json['isVerified'] as bool? ?? false,
       averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0,
       totalReviews: json['totalReviews'] as int? ?? 0,
@@ -65,6 +68,7 @@ class ProviderDetailModel {
     String? gender,
     int? experienceYears,
     String? description,
+    String? city,
   }) {
     return ProviderDetailModel(
       uid: uid,
@@ -75,6 +79,7 @@ class ProviderDetailModel {
       gender: gender ?? this.gender,
       experienceYears: experienceYears ?? this.experienceYears,
       description: description ?? this.description,
+      city: city ?? this.city,
       isVerified: isVerified,
       averageRating: averageRating,
       totalReviews: totalReviews,

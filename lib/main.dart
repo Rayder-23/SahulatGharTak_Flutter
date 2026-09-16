@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'data/repositories/category_repository.dart';
+import 'data/repositories/city_repository.dart';
 import 'data/repositories/client_address_repository.dart';
 import 'data/repositories/customer_service_request_repository.dart';
 import 'data/repositories/provider_bookings_repository.dart';
@@ -16,6 +17,7 @@ import 'data/repositories/service_catalog_repository.dart';
 import 'data/repositories/service_title_repository.dart';
 import 'providers/auth_provider.dart';
 import 'providers/category_provider.dart';
+import 'providers/city_provider.dart';
 import 'providers/service_title_provider.dart';
 import 'providers/service_catalog_provider.dart';
 import 'providers/client_address_provider.dart';
@@ -76,6 +78,7 @@ class SahulatApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider(repository: CategoryRepository())),
+        ChangeNotifierProvider(create: (_) => CityProvider(repository: CityRepository())),
         ChangeNotifierProvider(create: (_) => ServiceTitleProvider(repository: ServiceTitleRepository())),
         ChangeNotifierProvider(create: (_) => ServiceCatalogProvider(repository: ServiceCatalogRepository())),
         ChangeNotifierProvider(create: (_) => ProviderDashboardProvider(repository: ProviderDashboardRepository())),

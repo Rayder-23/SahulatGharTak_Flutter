@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 
 import '../models/client_address.dart';
 import '../providers/auth_provider.dart';
+import '../providers/city_provider.dart';
 import '../providers/client_address_provider.dart';
 import '../widgets/auth_card_scaffold.dart';
+import '../widgets/themed_dropdown.dart';
 
 class AddAddressScreen extends StatefulWidget {
   static const routeName = '/add-address';
@@ -20,7 +22,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   late final TextEditingController _titleController;
   late final TextEditingController _fullAddressController;
   late final TextEditingController _areaController;
-  late final TextEditingController _cityController;
+  String? _selectedCity;
 
   bool get _isEditing => widget.existing != null;
 
@@ -31,7 +33,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     _titleController = TextEditingController(text: existing?.addressTitle ?? '');
     _fullAddressController = TextEditingController(text: existing?.fullAddress ?? '');
     _areaController = TextEditingController(text: existing?.area ?? '');
-    _cityController = TextEditingController(text: existing?.city ?? '');
+    _selectedCity = existing?.city;
+    context.read<CityProvider>().loadCities();
   }
 
   @override
@@ -39,12 +42,15 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     _titleController.dispose();
     _fullAddressController.dispose();
     _areaController.dispose();
-    _cityController.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_selectedCity == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a city')));
+      return;
+    }
 
     final clientUid = context.read<AuthProvider>().clientUid;
     if (clientUid == null) return;
@@ -58,7 +64,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             addressTitle: _titleController.text.trim(),
             fullAddress: _fullAddressController.text.trim(),
             area: _areaController.text.trim(),
-            city: _cityController.text.trim(),
+            city: _selectedCity!,
           )
         : await addressProvider.updateAddress(
             addressUid: existing.uid,
@@ -66,7 +72,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             addressTitle: _titleController.text.trim(),
             fullAddress: _fullAddressController.text.trim(),
             area: _areaController.text.trim(),
-            city: _cityController.text.trim(),
+            city: _selectedCity!,
             latitude: existing.latitude,
             longitude: existing.longitude,
           );
@@ -119,10 +125,21 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             ),
             const SizedBox(height: 20),
             authFieldLabel('City'),
-            TextFormField(
-              controller: _cityController,
-              decoration: authFieldDecoration(hint: 'Enter city'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+            Consumer<CityProvider>(
+              builder: (context, cityProvider, _) {
+                if (cityProvider.isLoading) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                return ThemedDropdownField<String>(
+                  value: _selectedCity,
+                  hint: 'Select your city',
+                  items: cityProvider.cities.map((c) => ThemedDropdownItem(value: c, label: c)).toList(),
+                  onChanged: (v) => setState(() => _selectedCity = v),
+                );
+              },
             ),
             const SizedBox(height: 28),
             AuthPrimaryButton(label: _isEditing ? 'Save Changes' : 'Save Address', isLoading: saving, onPressed: _save),
