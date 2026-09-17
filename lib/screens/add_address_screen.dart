@@ -5,7 +5,9 @@ import '../models/client_address.dart';
 import '../providers/auth_provider.dart';
 import '../providers/city_provider.dart';
 import '../providers/client_address_provider.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/auth_card_scaffold.dart';
+import '../widgets/inline_field_error.dart';
 import '../widgets/themed_dropdown.dart';
 
 class AddAddressScreen extends StatefulWidget {
@@ -48,7 +50,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCity == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a city')));
+      showAppToast(context, 'Please select a city', type: AppToastType.error);
       return;
     }
 
@@ -80,11 +82,11 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     if (!mounted) return;
 
     if (success) {
+      showAppToast(context, _isEditing ? 'Address updated' : 'Address added', type: AppToastType.success);
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_isEditing ? 'Address updated' : 'Address added')));
     } else {
       final error = addressProvider.error ?? 'Failed to save address';
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      showAppToast(context, error, type: AppToastType.error);
     }
   }
 
@@ -132,6 +134,9 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     padding: EdgeInsets.symmetric(vertical: 12),
                     child: Center(child: CircularProgressIndicator()),
                   );
+                }
+                if (cityProvider.error != null && cityProvider.cities.isEmpty) {
+                  return InlineFieldError(message: cityProvider.error!, onRetry: cityProvider.loadCities);
                 }
                 return ThemedDropdownField<String>(
                   value: _selectedCity,

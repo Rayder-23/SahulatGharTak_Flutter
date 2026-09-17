@@ -7,7 +7,9 @@ import '../providers/city_provider.dart';
 import '../utils/constants.dart';
 import '../utils/input_formatters.dart';
 import '../utils/provider_terms_and_conditions.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/auth_card_scaffold.dart';
+import '../widgets/inline_field_error.dart';
 import '../widgets/message_dialog.dart';
 import '../widgets/terms_and_conditions_section.dart';
 import '../widgets/themed_dropdown.dart';
@@ -71,18 +73,15 @@ class _ProviderRegistrationScreenState
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCategory == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a category')));
+      showAppToast(context, 'Please select a category', type: AppToastType.error);
       return;
     }
     if (_selectedGender == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a gender')));
+      showAppToast(context, 'Please select a gender', type: AppToastType.error);
       return;
     }
     if (!_agreedToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Please agree to the Terms and Conditions')));
+      showAppToast(context, 'Please agree to the Terms and Conditions', type: AppToastType.error);
       return;
     }
 
@@ -252,6 +251,9 @@ class _ProviderRegistrationScreenState
                     padding: EdgeInsets.symmetric(vertical: 12),
                     child: Center(child: CircularProgressIndicator()),
                   );
+                }
+                if (cityProvider.error != null && cityProvider.cities.isEmpty) {
+                  return InlineFieldError(message: cityProvider.error!, onRetry: cityProvider.loadCities);
                 }
                 return ThemedDropdownField<String>(
                   value: _selectedCity,

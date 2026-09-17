@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
 import '../utils/input_formatters.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/auth_card_scaffold.dart';
+import '../widgets/message_dialog.dart';
 
 class CustomerEditProfileScreen extends StatefulWidget {
   static const routeName = '/edit-profile';
@@ -45,7 +47,14 @@ class _CustomerEditProfileScreenState extends State<CustomerEditProfileScreen> {
       _cnicController.text = formatCnicForDisplay(detail.cnic);
       _selectedGender = detail.gender.isNotEmpty ? detail.gender : null;
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(authProvider.error ?? 'Failed to load profile')));
+      setState(() => _loading = false);
+      await showMessageDialog(
+        context,
+        title: 'Could Not Load Profile',
+        message: authProvider.error ?? 'Failed to load profile',
+        type: MessageDialogType.error,
+      );
+      return;
     }
     setState(() => _loading = false);
   }
@@ -64,10 +73,10 @@ class _CustomerEditProfileScreenState extends State<CustomerEditProfileScreen> {
     setState(() => _saving = false);
 
     if (success) {
+      showAppToast(context, 'Profile updated', type: AppToastType.success);
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated')));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(authProvider.error ?? 'Failed to update profile')));
+      showAppToast(context, authProvider.error ?? 'Failed to update profile', type: AppToastType.error);
     }
   }
 

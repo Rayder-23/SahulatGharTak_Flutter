@@ -12,7 +12,10 @@ import '../providers/service_title_provider.dart';
 import '../utils/constants.dart';
 import '../utils/input_formatters.dart';
 import '../utils/platform_date_picker.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/auth_card_scaffold.dart';
+import '../widgets/inline_field_error.dart';
+import '../widgets/message_dialog.dart';
 import '../widgets/themed_dropdown.dart';
 import 'add_address_screen.dart';
 import 'service_requests_screen.dart';
@@ -156,7 +159,7 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedAddress == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select an address')));
+      showAppToast(context, 'Please select an address', type: AppToastType.error);
       return;
     }
     final clientUid = context.read<AuthProvider>().clientUid;
@@ -181,10 +184,14 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Service request submitted')));
       Navigator.of(context).pushReplacementNamed(ServiceRequestsScreen.routeName);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(requestProvider.error ?? 'Failed to submit request')));
+      await showMessageDialog(
+        context,
+        title: 'Submission Failed',
+        message: requestProvider.error ?? 'Failed to submit request',
+        type: MessageDialogType.error,
+      );
     }
   }
 
@@ -278,6 +285,11 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
                 child: Center(child: CircularProgressIndicator()),
+              )
+            else if (titleState.error != null && titleState.serviceTitles.isEmpty)
+              InlineFieldError(
+                message: titleState.error!,
+                onRetry: () => context.read<ServiceTitleProvider>().loadServiceTitles(_category!.id),
               )
             else
               ThemedDropdownField<String>(

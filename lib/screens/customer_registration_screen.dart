@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../utils/constants.dart';
 import '../utils/customer_terms_and_conditions.dart';
 import '../utils/input_formatters.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/auth_card_scaffold.dart';
 import '../widgets/message_dialog.dart';
 import '../widgets/terms_and_conditions_section.dart';
@@ -44,13 +45,11 @@ class _CustomerRegistrationScreenState
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedGender == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a gender')));
+      showAppToast(context, 'Please select a gender', type: AppToastType.error);
       return;
     }
     if (!_agreedToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Please agree to the Terms and Conditions')));
+      showAppToast(context, 'Please agree to the Terms and Conditions', type: AppToastType.error);
       return;
     }
 

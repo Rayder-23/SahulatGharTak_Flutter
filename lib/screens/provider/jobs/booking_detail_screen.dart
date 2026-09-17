@@ -9,6 +9,7 @@ import '../../../providers/provider_bookings_provider.dart';
 import '../../../utils/cancel_reasons.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/status_progress.dart';
+import '../../../widgets/app_toast.dart';
 import '../../../widgets/reason_dialog.dart';
 import '../../../widgets/status_progress_bar.dart';
 import '../../../widgets/themed_dropdown.dart';
@@ -57,7 +58,7 @@ Future<void> _callNumber(BuildContext context, String mobileNo) async {
   final uri = Uri(scheme: 'tel', path: mobileNo);
   final launched = await launchUrl(uri);
   if (!launched && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not start a call.')));
+    showAppToast(context, 'Could not start a call.', type: AppToastType.error);
   }
 }
 
@@ -109,14 +110,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     final success = await provider.updateStatus(booking, status, customerPaid: booking.customerPaid, reason: reason);
     if (!mounted) return;
 
-    final messenger = ScaffoldMessenger.of(context);
     final message = success ? 'Booking marked as $status' : (provider.error ?? 'Failed to update booking');
+    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
     if (success) {
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     } else {
       setState(() => _submitting = false);
     }
-    messenger.showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _startJob() async {
@@ -125,14 +125,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     final success = await provider.startJob(_currentBooking);
     if (!mounted) return;
 
-    final messenger = ScaffoldMessenger.of(context);
     final message = success ? 'Job started' : (provider.error ?? 'Failed to start job');
+    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
     if (success) {
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     } else {
       setState(() => _submitting = false);
     }
-    messenger.showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _respond(bool accept, {String? reason}) async {
@@ -141,14 +140,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     final success = await provider.respond(_currentBooking, accept, reason: reason);
     if (!mounted) return;
 
-    final messenger = ScaffoldMessenger.of(context);
     final message = success ? (accept ? 'Booking accepted' : 'Booking rejected') : (provider.error ?? 'Failed to respond to booking');
+    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
     if (success) {
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     } else {
       setState(() => _submitting = false);
     }
-    messenger.showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _confirmReject() async {
@@ -636,8 +634,8 @@ class _CompletionDialogState extends State<_CompletionDialog> {
     if (!mounted) return;
 
     if (success) {
+      showAppToast(context, 'Booking marked as completed', type: AppToastType.success);
       Navigator.of(context).pop(true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Booking marked as completed')));
     } else {
       setState(() {
         _submitting = false;

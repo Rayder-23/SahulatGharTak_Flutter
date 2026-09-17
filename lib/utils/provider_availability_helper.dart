@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
 import '../providers/provider_dashboard_provider.dart';
+import '../widgets/app_toast.dart';
 import 'platform_date_picker.dart';
 
 const _brandDark = Color(0xFF0A4FA8);
@@ -212,6 +213,6 @@ Future<void> toggleProviderOnlineStatus(BuildContext context, bool value) async 
   final success = await dashboard.setOnline(providerUid, value, availableFrom: availableFrom, availableTo: availableTo);
   if (!context.mounted) return;
   if (!success) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(dashboard.availabilityError ?? 'Failed to update status.')));
+    showAppToast(context, dashboard.availabilityError ?? 'Failed to update status.', type: AppToastType.error);
   }
 }

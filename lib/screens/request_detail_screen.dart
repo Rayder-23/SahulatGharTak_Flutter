@@ -10,6 +10,7 @@ import '../utils/breakpoints.dart';
 import '../utils/cancel_reasons.dart';
 import '../utils/constants.dart';
 import '../utils/status_progress.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/decorative_glow_circle.dart';
 import '../widgets/reason_dialog.dart';
@@ -90,8 +91,7 @@ Future<void> _callNumber(BuildContext context, String mobileNo) async {
   final uri = Uri(scheme: 'tel', path: mobileNo);
   final launched = await launchUrl(uri);
   if (!launched && context.mounted) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Could not start a call.')));
+    showAppToast(context, 'Could not start a call.', type: AppToastType.error);
   }
 }
 
@@ -181,11 +181,10 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
       setState(() => _request = updated);
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(success
-              ? 'Request cancelled'
-              : (requestProvider.error ?? 'Failed to cancel request'))),
+    showAppToast(
+      context,
+      success ? 'Request cancelled' : (requestProvider.error ?? 'Failed to cancel request'),
+      type: success ? AppToastType.success : AppToastType.error,
     );
   }
 
@@ -200,9 +199,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     if (!mounted) return;
 
     if (passcode == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passcode not available yet.')),
-      );
+      showAppToast(context, 'Passcode not available yet.', type: AppToastType.info);
       return;
     }
 
@@ -232,12 +229,10 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Request deleted')));
+      showAppToast(context, 'Request deleted', type: AppToastType.success);
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(requestProvider.error ?? 'Failed to delete request')));
+      showAppToast(context, requestProvider.error ?? 'Failed to delete request', type: AppToastType.error);
     }
   }
 

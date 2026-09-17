@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../providers/client_address_provider.dart';
 import '../utils/constants.dart';
 import '../utils/privacy_policy_launcher.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/curved_profile_header.dart';
@@ -73,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (!mounted) return;
 
     final message = success ? 'Address deleted' : (addressProvider.error ?? 'Failed to delete address');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
   }
 
   Future<void> _logout(BuildContext context) async {
@@ -289,9 +290,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: () => Navigator.of(context).pushNamed(CustomerEditProfileScreen.routeName),
-                icon: const Icon(Icons.edit_outlined, size: 18),
+                style: kProminentOutlinedButtonStyle(_brandBlue),
+                icon: const Icon(Icons.edit_rounded),
                 label: const Text('Edit Profile'),
-                style: OutlinedButton.styleFrom(foregroundColor: _brandBlue, side: BorderSide(color: _brandBlue.withValues(alpha: 0.4))),
               ),
               const SizedBox(height: 28),
               Row(

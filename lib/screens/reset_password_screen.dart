@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
 import '../utils/constants.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/auth_card_scaffold.dart';
 import '../widgets/message_dialog.dart';
 import '../widgets/otp_input_field.dart';
@@ -78,7 +79,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     if (success) {
       _startCooldown();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('OTP resent to ${args.mobileNo}')));
+      showAppToast(context, 'OTP resent to ${args.mobileNo}', type: AppToastType.success);
     } else {
       await showMessageDialog(
         context,
@@ -92,7 +93,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_otp.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enter the complete 6-digit code')));
+      showAppToast(context, 'Enter the complete 6-digit code', type: AppToastType.error);
       return;
     }
 

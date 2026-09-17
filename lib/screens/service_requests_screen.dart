@@ -10,6 +10,7 @@ import '../utils/breakpoints.dart';
 import '../utils/constants.dart';
 import '../utils/cancel_reasons.dart';
 import '../utils/status_progress.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/decorative_glow_circle.dart';
@@ -108,8 +109,7 @@ class _ServiceRequestsScreenState extends State<ServiceRequestsScreen> {
     final message = success
         ? 'Request deleted'
         : (requestProvider.error ?? 'Failed to delete request');
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
   }
 
   Future<void> _cancelRequest(CustomerServiceRequest request) async {
@@ -132,8 +132,7 @@ class _ServiceRequestsScreenState extends State<ServiceRequestsScreen> {
     final message = success
         ? 'Request cancelled'
         : (requestProvider.error ?? 'Failed to cancel request');
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
   }
 
   static const _brandDark = Color(0xFF0A4FA8);

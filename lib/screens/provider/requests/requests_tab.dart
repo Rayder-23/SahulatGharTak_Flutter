@@ -7,6 +7,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../providers/provider_bookings_provider.dart';
 import '../../../utils/cancel_reasons.dart';
 import '../../../utils/constants.dart';
+import '../../../widgets/app_toast.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
 import '../../../widgets/reason_dialog.dart';
 import '../../../widgets/provider/tab_state_placeholder.dart';
@@ -42,8 +43,10 @@ class _RequestsTabState extends State<RequestsTab> {
     final provider = context.read<ProviderBookingsProvider>();
     final success = await provider.respond(booking, true);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(success ? 'Booking accepted' : (provider.error ?? 'Failed to accept booking'))),
+    showAppToast(
+      context,
+      success ? 'Booking accepted' : (provider.error ?? 'Failed to accept booking'),
+      type: success ? AppToastType.success : AppToastType.error,
     );
   }
 
@@ -62,8 +65,10 @@ class _RequestsTabState extends State<RequestsTab> {
     final provider = context.read<ProviderBookingsProvider>();
     final success = await provider.respond(booking, false, reason: reason);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(success ? 'Booking rejected' : (provider.error ?? 'Failed to reject booking'))),
+    showAppToast(
+      context,
+      success ? 'Booking rejected' : (provider.error ?? 'Failed to reject booking'),
+      type: success ? AppToastType.success : AppToastType.error,
     );
   }
 

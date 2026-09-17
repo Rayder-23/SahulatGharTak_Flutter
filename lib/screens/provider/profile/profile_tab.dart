@@ -14,6 +14,7 @@ import '../../../widgets/curved_profile_header.dart';
 import '../../../widgets/delete_account_dialog.dart';
 import '../../../widgets/message_dialog.dart';
 import '../../../widgets/provider/provider_tab_header.dart' show providerBrandDark, providerBrandBlue, providerBrandAccent;
+import '../../../widgets/provider/tab_state_placeholder.dart';
 import '../../home_screen.dart';
 import '../../landing_screen.dart';
 
@@ -100,21 +101,25 @@ class _ProfileTabState extends State<ProfileTab> {
 
     if (dashboard.profileError != null && detail == null) {
       return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Failed to load profile: ${dashboard.profileError}'),
-              const SizedBox(height: 12),
-              ElevatedButton(onPressed: _loadProfile, child: const Text('Retry')),
-            ],
-          ),
+        body: TabStatePlaceholder(
+          icon: Icons.wifi_off_rounded,
+          color: Colors.red,
+          title: 'Couldn\'t load profile',
+          message: dashboard.profileError,
+          onRetry: _loadProfile,
         ),
       );
     }
 
     if (detail == null) {
-      return const Scaffold(body: Center(child: Text('No profile data found.')));
+      return Scaffold(
+        body: TabStatePlaceholder(
+          icon: Icons.person_off_outlined,
+          color: providerBrandBlue,
+          title: 'No profile data found',
+          onRetry: _loadProfile,
+        ),
+      );
     }
 
     return Scaffold(
@@ -261,8 +266,8 @@ class _ProfileTabState extends State<ProfileTab> {
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                style: kProminentFilledButtonStyle(providerBrandBlue),
+              child: OutlinedButton.icon(
+                style: kProminentOutlinedButtonStyle(providerBrandBlue),
                 icon: const Icon(Icons.edit_rounded),
                 label: const Text('Edit Profile'),
                 onPressed: () => Navigator.of(context).pushNamed(ProviderRoutes.editProfile),
@@ -281,10 +286,10 @@ class _ProfileTabState extends State<ProfileTab> {
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton.icon(
-                style: kProminentOutlinedButtonStyle(providerBrandBlue),
+              child: ElevatedButton.icon(
+                style: kProminentFilledButtonStyle(providerBrandBlue),
                 icon: const Icon(Icons.swap_horiz_rounded),
-                label: const Text('Customers Dashboard'),
+                label: const Text('Switch to Customer'),
                 // pushReplacementNamed: don't leave the provider dashboard
                 // on the stack to pop back into with stale data — switching
                 // back the other way uses the mirrored "Switch to Provider"

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
 import '../utils/constants.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/auth_card_scaffold.dart';
 import '../widgets/message_dialog.dart';
 import 'home_screen.dart';
@@ -109,11 +110,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       if (devOtp != null && devOtp.isNotEmpty) {
         _fillOtp(devOtp);
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(initial
-                ? 'OTP sent to ${args.mobileNo}'
-                : 'OTP resent to ${args.mobileNo}')),
+      showAppToast(
+        context,
+        initial ? 'OTP sent to ${args.mobileNo}' : 'OTP resent to ${args.mobileNo}',
+        type: AppToastType.success,
       );
     } else {
       await showMessageDialog(
@@ -128,8 +128,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   Future<void> _verify() async {
     final otp = _enteredOtp;
     if (otp.length != _otpLength) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Enter the complete 6-digit code')));
+      showAppToast(context, 'Enter the complete 6-digit code', type: AppToastType.error);
       return;
     }
 

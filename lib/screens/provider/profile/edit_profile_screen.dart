@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 import '../../../providers/city_provider.dart';
 import '../../../providers/provider_dashboard_provider.dart';
 import '../../../utils/input_formatters.dart';
+import '../../../widgets/app_toast.dart';
 import '../../../widgets/auth_card_scaffold.dart';
+import '../../../widgets/inline_field_error.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
 import '../../../widgets/themed_dropdown.dart';
 
@@ -61,10 +63,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _saving = false);
 
     if (success) {
+      showAppToast(context, 'Profile updated', type: AppToastType.success);
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated')));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(dashboard.profileError ?? 'Failed to update profile')));
+      showAppToast(context, dashboard.profileError ?? 'Failed to update profile', type: AppToastType.error);
     }
   }
 
@@ -145,6 +147,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       padding: EdgeInsets.symmetric(vertical: 12),
                       child: Center(child: CircularProgressIndicator()),
                     );
+                  }
+                  if (cityProvider.error != null && cityProvider.cities.isEmpty) {
+                    return InlineFieldError(message: cityProvider.error!, onRetry: cityProvider.loadCities);
                   }
                   return ThemedDropdownField<String>(
                     value: _selectedCity,
