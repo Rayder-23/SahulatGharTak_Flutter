@@ -59,36 +59,63 @@ class _OtpInputFieldState extends State<OtpInputField> {
     setState(() {});
   }
 
+  /// Backspace on an already-empty box never reaches [TextField.onChanged]
+  /// (there's nothing to delete, so the text value never actually changes) -
+  /// that's why, without this, a user who overshoots into the next empty box
+  /// has to manually tap back to the previous digit before backspace does
+  /// anything. Software keyboards still emit a real backspace [KeyDownEvent]
+  /// even when the field is empty, so catching it here (rather than relying
+  /// on a text change) is what makes continuous backspacing work.
+  void _onKeyEvent(int index, KeyEvent event) {
+    if (event is! KeyDownEvent || event.logicalKey != LogicalKeyboardKey.backspace) return;
+    if (_controllers[index].text.isEmpty && index > 0) {
+      _controllers[index - 1].clear();
+      _focusNodes[index - 1].requestFocus();
+      widget.onChanged(_controllers.map((c) => c.text).join());
+      setState(() {});
+    }
+  }
+
   Widget _box(int index) {
     return SizedBox(
       width: 46,
       height: 54,
-      child: TextField(
-        controller: _controllers[index],
+      child: KeyboardListener(
         focusNode: _focusNodes[index],
-        textAlign: TextAlign.center,
-        keyboardType: TextInputType.number,
-        maxLength: 1,
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        decoration: InputDecoration(
-          counterText: '',
-          filled: true,
-          fillColor: const Color(0xFFF5F5F7),
-          contentPadding: EdgeInsets.zero,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: kPrimaryColor, width: 1.5)),
+        onKeyEvent: (event) => _onKeyEvent(index, event),
+        child: TextField(
+          controller: _controllers[index],
+          focusNode: _focusNodes[index],
+          textAlign: TextAlign.center,
+          keyboardType: TextInputType.number,
+          maxLength: 1,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          decoration: InputDecoration(
+            counterText: '',
+            filled: true,
+            fillColor: const Color(0xFFF5F5F7),
+            contentPadding: EdgeInsets.zero,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: kPrimaryColor, width: 1.5)),
+          ),
+          onChanged: (value) {
+            // Deliberately does NOT move focus back when a filled box is
+            // cleared - that used to yank focus to the previous (still
+            // correct) box the instant a user backspaced a wrong digit,
+            // leaving them typing into the wrong box until they tapped the
+            // now-empty one manually. Backward navigation is handled
+            // exclusively by [_onKeyEvent] instead, only once a box is
+            // already empty, so clearing this box keeps focus right here,
+            // ready for the corrected digit.
+            if (value.isNotEmpty && index < widget.length - 1) {
+              _focusNodes[index + 1].requestFocus();
+            }
+            widget.onChanged(_controllers.map((c) => c.text).join());
+            setState(() {});
+          },
         ),
-        onChanged: (value) {
-          if (value.isNotEmpty && index < widget.length - 1) {
-            _focusNodes[index + 1].requestFocus();
-          } else if (value.isEmpty && index > 0) {
-            _focusNodes[index - 1].requestFocus();
-          }
-          widget.onChanged(_controllers.map((c) => c.text).join());
-          setState(() {});
-        },
       ),
     );
   }
