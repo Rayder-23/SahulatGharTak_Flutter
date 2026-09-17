@@ -18,6 +18,8 @@ import '../../../widgets/provider/tab_state_placeholder.dart';
 import '../../home_screen.dart';
 import '../../landing_screen.dart';
 
+const _verifiedGreen = Color(0xFF16A34A);
+
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key});
 
@@ -93,7 +95,8 @@ class _ProfileTabState extends State<ProfileTab> {
     final currentUser = context.watch<AuthProvider>().currentUser;
     final dashboard = context.watch<ProviderDashboardProvider>();
     final detail = dashboard.providerDetail;
-    final profilePhotoUrl = context.watch<ProviderDocumentProvider>().profilePhotoUrl;
+    final documents = context.watch<ProviderDocumentProvider>();
+    final profilePhotoUrl = documents.profilePhotoUrl;
 
     if (dashboard.profileLoading && detail == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -166,7 +169,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF14213D), letterSpacing: -0.2),
                   ),
                 ),
-                if (detail.isVerified) const Padding(padding: EdgeInsets.only(left: 6), child: Icon(Icons.verified_rounded, color: providerBrandBlue, size: 20)),
+                if (documents.isVerified) const Padding(padding: EdgeInsets.only(left: 6), child: Icon(Icons.verified_rounded, color: providerBrandBlue, size: 20)),
               ],
             ),
             const SizedBox(height: 4),
@@ -231,9 +234,15 @@ class _ProfileTabState extends State<ProfileTab> {
                 ListTile(leading: const Icon(Icons.task_alt_rounded, color: providerBrandBlue), title: const Text('Jobs Completed'), subtitle: Text('${detail.totalJobsCompleted}')),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.verified_user_rounded, color: providerBrandBlue),
+                  leading: Icon(Icons.verified_user_rounded, color: documents.isVerified ? _verifiedGreen : Colors.orange),
                   title: const Text('Verification Status'),
-                  subtitle: Text(detail.isVerified ? 'Verified' : 'Pending Verification'),
+                  subtitle: !documents.isVerified && documents.verificationRemarks != null && documents.verificationRemarks!.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(documents.verificationRemarks!, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                        )
+                      : null,
+                  trailing: _VerificationBadge(isVerified: documents.isVerified),
                 ),
                 const Divider(height: 1),
                 ListTile(leading: const Icon(Icons.event_rounded, color: providerBrandBlue), title: const Text('Member Since'), subtitle: Text(DateFormat('dd MMM yyyy').format(detail.createdOn))),
@@ -362,6 +371,33 @@ class _InfoCard extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(children: children),
+    );
+  }
+}
+
+/// Small pill badge for the Verification Status row - green with a check
+/// for a verified provider, amber/orange with an hourglass while pending.
+class _VerificationBadge extends StatelessWidget {
+  final bool isVerified;
+  const _VerificationBadge({required this.isVerified});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isVerified ? _verifiedGreen : Colors.orange;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(20)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(isVerified ? Icons.check_circle_rounded : Icons.hourglass_top_rounded, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            isVerified ? 'Verified' : 'Pending',
+            style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 11.5),
+          ),
+        ],
+      ),
     );
   }
 }

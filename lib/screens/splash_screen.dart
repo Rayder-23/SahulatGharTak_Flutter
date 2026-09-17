@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../utils/breakpoints.dart';
 import '../utils/motion.dart';
+import '../utils/provider_entry_gate.dart';
 import 'home_screen.dart';
 import 'landing_screen.dart';
-import 'provider_dashboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   static const routeName = '/';
@@ -36,8 +36,11 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!authProvider.isLoggedIn) {
       Navigator.of(context).pushReplacementNamed(LandingScreen.routeName);
     } else if (authProvider.role == 'Provider') {
-      Navigator.of(context)
-          .pushReplacementNamed(ProviderDashboardScreen.routeName);
+      // Check verification status before landing on the Provider Dashboard -
+      // an unverified provider gets routed to the pending-review page instead.
+      final target = await resolveProviderEntryRoute(context);
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed(target);
     } else {
       Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
     }

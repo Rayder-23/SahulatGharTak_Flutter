@@ -7,6 +7,7 @@ import '../widgets/auth_card_scaffold.dart';
 import '../widgets/message_dialog.dart';
 import '../widgets/provider/document_capture_sheet.dart';
 import '../widgets/provider/document_image_slot.dart';
+import 'provider/verification_pending_screen.dart';
 import 'provider_dashboard_screen.dart';
 
 class ProviderDocumentUploadArgs {
@@ -45,7 +46,13 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
         type: MessageDialogType.success,
       );
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(ProviderDashboardScreen.routeName, (route) => false);
+      // A brand-new registration's first submission is always pending admin
+      // review, so this normally lands on the pending-verification page
+      // rather than the dashboard - but `provider.isVerified` (fresh from
+      // this very upload response) is checked rather than assumed, in case
+      // an already-verified provider is replacing a document.
+      final target = provider.isVerified ? ProviderDashboardScreen.routeName : VerificationPendingScreen.routeName;
+      Navigator.of(context).pushNamedAndRemoveUntil(target, (route) => false);
     } else {
       await showMessageDialog(
         context,

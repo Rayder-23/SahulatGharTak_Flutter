@@ -4,4 +4,5 @@ class ProviderRoutes {
   static const verificationDocuments = '/provider/profile/verification-documents';
   static const editProfile = '/provider/profile/edit';
   static const notifications = '/provider/notifications';
+  static const pendingVerification = '/provider/verification-pending';
 }

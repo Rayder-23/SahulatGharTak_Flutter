@@ -4,13 +4,13 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../utils/constants.dart';
 import '../utils/input_formatters.dart';
+import '../utils/provider_entry_gate.dart';
 import '../widgets/auth_card_scaffold.dart';
 import '../widgets/message_dialog.dart';
 import 'customer_registration_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
 import 'otp_verification_screen.dart';
-import 'provider_dashboard_screen.dart';
 import 'provider_registration_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -49,9 +49,8 @@ class _LoginScreenState extends State<LoginScreen> {
       // Login — otherwise LandingScreen remains underneath and a back-press
       // from the dashboard drops the user onto what looks like a logged-out
       // screen, even though the session is still active.
-      final target = role == 'Provider'
-          ? ProviderDashboardScreen.routeName
-          : HomeScreen.routeName;
+      final target = role == 'Provider' ? await resolveProviderEntryRoute(context) : HomeScreen.routeName;
+      if (!mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil(target, (route) => false);
     } else if (authProvider.isUnverified) {
       Navigator.of(context).pushNamed(

@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../providers/client_address_provider.dart';
 import '../utils/constants.dart';
 import '../utils/privacy_policy_launcher.dart';
+import '../utils/provider_entry_gate.dart';
 import '../widgets/app_toast.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/confirm_dialog.dart';
@@ -17,7 +18,6 @@ import 'customer_registration_screen.dart';
 import 'edit_profile_screen.dart';
 import 'landing_screen.dart';
 import 'login_screen.dart';
-import 'provider_dashboard_screen.dart';
 import 'provider_registration_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -411,7 +411,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // underneath to pop back into (it wouldn't refresh itself
                   // on return). Switching back uses the mirrored button on
                   // the provider side, which rebuilds this screen fresh.
-                  onPressed: () => Navigator.of(context).pushReplacementNamed(ProviderDashboardScreen.routeName),
+                  onPressed: () async {
+                    final target = await resolveProviderEntryRoute(context);
+                    if (!context.mounted) return;
+                    Navigator.of(context).pushReplacementNamed(target);
+                  },
                   label: const Text('Switch to Provider'),
                 )
               else

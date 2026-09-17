@@ -37,6 +37,7 @@ import 'screens/login_screen.dart';
 import 'screens/forgot_password_screen.dart';
 import 'screens/reset_password_screen.dart';
 import 'screens/otp_verification_screen.dart';
+import 'screens/provider/verification_pending_screen.dart';
 import 'screens/provider_dashboard_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/profile_screen.dart';
@@ -106,6 +107,7 @@ class SahulatApp extends StatelessWidget {
           ResetPasswordScreen.routeName: (_) => const ResetPasswordScreen(),
           OtpVerificationScreen.routeName: (_) => const OtpVerificationScreen(),
           ProviderDashboardScreen.routeName: (_) => const ProviderDashboardScreen(),
+          VerificationPendingScreen.routeName: (_) => const VerificationPendingScreen(),
           HomeScreen.routeName: (_) => const MainNavigationShell(),
           ProfileScreen.routeName: (_) => const ProfileScreen(),
           AddAddressScreen.routeName: (_) => const AddAddressScreen(),
