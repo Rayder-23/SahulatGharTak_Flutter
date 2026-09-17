@@ -6,6 +6,7 @@ import '../../../models/provider/service_booking.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/provider_bookings_provider.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/currency_formatter.dart';
 import '../../../utils/status_progress.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
 import '../../../widgets/provider/status_chip.dart';
@@ -232,7 +233,7 @@ class _BookingCard extends StatelessWidget {
                                 if (booking.clientAddressTitle != null)
                                   _InfoRow(icon: Icons.location_on_rounded, text: booking.clientAddressTitle!),
                                 if (booking.clientAddressTitle != null) const SizedBox(height: 6),
-                                _InfoRow(icon: Icons.payments_rounded, text: 'Final Rs ${booking.finalAmount.toStringAsFixed(0)}'),
+                                _InfoRow(icon: Icons.payments_rounded, text: 'Final ${formatCurrency(booking.finalAmount)}'),
                               ],
                             ),
                           ),

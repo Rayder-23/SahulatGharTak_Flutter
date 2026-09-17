@@ -6,6 +6,7 @@ import '../../../providers/provider_bookings_provider.dart';
 import '../../../providers/provider_dashboard_provider.dart';
 import '../../../providers/provider_wallet_provider.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/currency_formatter.dart';
 import '../../../utils/provider_availability_helper.dart';
 import '../../../utils/provider_routes.dart';
 import '../../../widgets/provider/dashboard_stat_card.dart';
@@ -96,9 +97,7 @@ class _ProviderHomeTabState extends State<ProviderHomeTab> {
           color: Colors.amber),
       DashboardStatCard(
         label: 'Wallet Balance',
-        value: walletBalance == null
-            ? '—'
-            : 'Rs ${walletBalance.toStringAsFixed(0)}',
+        value: walletBalance == null ? '—' : formatCurrency(walletBalance),
         icon: Icons.account_balance_wallet,
         color: kSecondaryColor,
         onTap: () => widget.onNavigateToTab?.call(_kWalletTabIndex),

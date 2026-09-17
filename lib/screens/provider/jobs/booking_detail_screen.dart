@@ -8,6 +8,7 @@ import '../../../models/provider/service_booking.dart';
 import '../../../providers/provider_bookings_provider.dart';
 import '../../../utils/cancel_reasons.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/currency_formatter.dart';
 import '../../../utils/status_progress.dart';
 import '../../../widgets/app_toast.dart';
 import '../../../widgets/reason_dialog.dart';
@@ -282,10 +283,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       title: 'Payment',
                       icon: Icons.payments_rounded,
                       children: [
-                        _DetailRow(label: 'Final Amount', value: 'Rs ${booking.finalAmount.toStringAsFixed(0)}', icon: Icons.account_balance_wallet_rounded),
-                        _DetailRow(label: 'Customer Paid', value: 'Rs ${booking.customerPaid.toStringAsFixed(0)}', icon: Icons.receipt_rounded),
+                        _DetailRow(label: 'Final Amount', value: formatCurrency(booking.finalAmount), icon: Icons.account_balance_wallet_rounded),
+                        _DetailRow(label: 'Customer Paid', value: formatCurrency(booking.customerPaid), icon: Icons.receipt_rounded),
                         _DetailRow(label: 'Payment Mode', value: booking.paymentMode, icon: Icons.credit_card_rounded),
-                        _DetailRow(label: 'Your Earning', value: 'Rs ${booking.providerEarning.toStringAsFixed(0)}', icon: Icons.savings_rounded),
+                        _DetailRow(label: 'Your Earning', value: formatCurrency(booking.providerEarning), icon: Icons.savings_rounded),
                       ],
                     ),
                     const SizedBox(height: 14),

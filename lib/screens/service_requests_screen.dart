@@ -9,6 +9,7 @@ import '../providers/customer_service_request_provider.dart';
 import '../utils/breakpoints.dart';
 import '../utils/constants.dart';
 import '../utils/cancel_reasons.dart';
+import '../utils/currency_formatter.dart';
 import '../utils/status_progress.dart';
 import '../widgets/app_toast.dart';
 import '../widgets/bottom_nav.dart';
@@ -473,7 +474,7 @@ class _RequestCard extends StatelessWidget {
                                   _InfoRow(
                                       icon: Icons.payments_rounded,
                                       text:
-                                          'Est. budget Rs. ${request.estimatedBudget.toStringAsFixed(0)}'),
+                                          'Est. budget ${formatCurrency(request.estimatedBudget)}'),
                                 ],
                               ],
                             ),

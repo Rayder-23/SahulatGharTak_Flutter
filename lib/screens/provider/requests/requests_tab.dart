@@ -7,6 +7,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../providers/provider_bookings_provider.dart';
 import '../../../utils/cancel_reasons.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/currency_formatter.dart';
 import '../../../widgets/app_toast.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
 import '../../../widgets/reason_dialog.dart';
@@ -263,7 +264,7 @@ class _IncomingRequestCard extends StatelessWidget {
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
-                                  'Est. Rs ${booking.estimatedAmount.toStringAsFixed(0)}',
+                                  'Est. ${formatCurrency(booking.estimatedAmount)}',
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(color: Color(0xFF3A4658), fontSize: 13, fontWeight: FontWeight.w500),
                                 ),

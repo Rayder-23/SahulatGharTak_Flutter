@@ -6,6 +6,7 @@ import '../../../models/provider/provider_wallet.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/provider_wallet_provider.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/currency_formatter.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
 import '../../../widgets/provider/tab_state_placeholder.dart';
 
@@ -176,7 +177,7 @@ class _BalanceCard extends StatelessWidget {
                     Text(balanceLabel, style: TextStyle(color: Colors.grey[600], fontSize: 12.5, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 2),
                     Text(
-                      'Rs ${wallet.balance.abs().toStringAsFixed(0)}',
+                      formatCurrency(wallet.balance.abs()),
                       style: TextStyle(color: balanceColor, fontSize: 26, fontWeight: FontWeight.w800),
                     ),
                   ],
@@ -193,7 +194,7 @@ class _BalanceCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text('Pending Payout', style: TextStyle(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w600)),
               const Spacer(),
-              Text('Rs ${wallet.pendingPayoutTotal.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.w700, color: kPrimaryColor)),
+              Text(formatCurrency(wallet.pendingPayoutTotal), style: const TextStyle(fontWeight: FontWeight.w700, color: kPrimaryColor)),
             ],
           ),
         ],
@@ -247,7 +248,7 @@ class _TransactionTile extends StatelessWidget {
             ),
           ),
           Text(
-            '$sign Rs ${transaction.signedAmount.abs().toStringAsFixed(0)}',
+            '$sign ${formatCurrency(transaction.signedAmount.abs())}',
             style: TextStyle(color: amountColor, fontWeight: FontWeight.w800, fontSize: 14),
           ),
         ],

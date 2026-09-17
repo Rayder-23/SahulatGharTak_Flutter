@@ -10,6 +10,7 @@ import '../providers/client_address_provider.dart';
 import '../providers/customer_service_request_provider.dart';
 import '../providers/service_title_provider.dart';
 import '../utils/constants.dart';
+import '../utils/currency_formatter.dart';
 import '../utils/input_formatters.dart';
 import '../utils/platform_date_picker.dart';
 import '../widgets/app_toast.dart';
@@ -226,7 +227,7 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
                   Expanded(
                     child: Text(
                       _selectedBasePrice != null
-                          ? 'Rs ${_selectedBasePrice!.toStringAsFixed(0)}'
+                          ? formatCurrency(_selectedBasePrice!)
                           : _selectedServiceTitle == null
                               ? 'Select a service title below to see the estimate'
                               : 'No estimate set for this service yet',

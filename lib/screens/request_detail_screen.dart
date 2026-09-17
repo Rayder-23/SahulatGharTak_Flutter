@@ -9,6 +9,7 @@ import '../utils/api_error.dart';
 import '../utils/breakpoints.dart';
 import '../utils/cancel_reasons.dart';
 import '../utils/constants.dart';
+import '../utils/currency_formatter.dart';
 import '../utils/status_progress.dart';
 import '../widgets/app_toast.dart';
 import '../widgets/confirm_dialog.dart';
@@ -555,7 +556,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                       _DetailRow(
                                         label: 'Estimated Budget',
                                         value: request.estimatedBudget > 0
-                                            ? 'Rs. ${request.estimatedBudget.toStringAsFixed(0)}'
+                                            ? formatCurrency(request.estimatedBudget)
                                             : 'Not specified',
                                         icon: Icons
                                             .account_balance_wallet_rounded,
