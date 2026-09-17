@@ -45,10 +45,26 @@ class _ProviderRegistrationScreenState
   @override
   void initState() {
     super.initState();
-    final currentUser = context.read<AuthProvider>().currentUser;
+    final authProvider = context.read<AuthProvider>();
+    final currentUser = authProvider.currentUser;
     _fullNameController.text = currentUser?.username ?? '';
     _phoneController.text = currentUser?.mobileNo ?? '';
+    // Gender was already required when this account first registered as a
+    // customer - fetch it instead of asking again, seeding from any
+    // already-cached client detail (e.g. the user just visited Edit
+    // Profile) so there's no flash of an empty value while this resolves.
+    final cachedGender = authProvider.clientDetail?.gender;
+    if (cachedGender != null && cachedGender.isNotEmpty) _selectedGender = cachedGender;
+    _loadGender();
     context.read<CityProvider>().loadCities();
+  }
+
+  Future<void> _loadGender() async {
+    final authProvider = context.read<AuthProvider>();
+    await authProvider.fetchClientDetail();
+    if (!mounted) return;
+    final gender = authProvider.clientDetail?.gender;
+    if (gender != null && gender.isNotEmpty) setState(() => _selectedGender = gender);
   }
 
   @override
@@ -136,8 +152,7 @@ class _ProviderRegistrationScreenState
     final isLoading = context.watch<AuthProvider>().isLoading;
 
     return AuthCardScaffold(
-      title: 'Create Account',
-      subtitle: 'Register as a service provider',
+      title: 'Register as a Service Provider',
       avatarIcon: Icons.engineering,
       child: Form(
         key: _formKey,
@@ -152,18 +167,29 @@ class _ProviderRegistrationScreenState
                   (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 20),
-            authFieldLabel('Mobile Number'),
-            TextFormField(
-              controller: _phoneController,
-              readOnly: true,
-              enabled: false,
-              keyboardType: TextInputType.phone,
-              decoration: authFieldDecoration(hint: 'Enter your mobile number')
-                  .copyWith(
-                suffixIcon: const Icon(Icons.lock_outline,
-                    color: Colors.black38, size: 18),
-                fillColor: const Color(0xFFEDEDEF),
-              ),
+            // Mobile number and gender were already provided when this
+            // account first registered as a customer, so they're shown as
+            // compact, locked read-only chips side by side instead of two
+            // full-height fields repeating information already on file.
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _LockedInfoChip(
+                    icon: Icons.phone_rounded,
+                    label: 'MOBILE NUMBER',
+                    value: _phoneController.text.isEmpty ? '-' : _phoneController.text,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _LockedInfoChip(
+                    icon: Icons.wc_rounded,
+                    label: 'GENDER',
+                    value: _selectedGender ?? '-',
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             authFieldLabel('CNIC'),
@@ -171,15 +197,10 @@ class _ProviderRegistrationScreenState
               controller: _cnicController,
               keyboardType: TextInputType.number,
               inputFormatters: [CnicInputFormatter()],
-              decoration: authFieldDecoration(hint: '12345-1234567-1'),
+              decoration: authFieldDecoration(hint: 'XXXXX-XXXXXXX-X').copyWith(
+                hintStyle: TextStyle(color: Colors.grey.shade400, fontWeight: FontWeight.normal),
+              ),
               validator: cnicValidator,
-            ),
-            const SizedBox(height: 20),
-            authFieldLabel('Gender'),
-            GenderSelector(
-              initialValue: _selectedGender,
-              onChanged: (value) => setState(() => _selectedGender = value),
-              validator: (v) => v == null ? 'Required' : null,
             ),
             const SizedBox(height: 20),
             authFieldLabel('Confirm Your Account Password'),
@@ -342,6 +363,55 @@ class _ProviderRegistrationScreenState
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Compact, locked (non-editable) display of a value already on file for
+/// this account - used for Mobile Number/Gender so re-confirming information
+/// already provided during customer registration doesn't need a full-height
+/// field of its own.
+class _LockedInfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _LockedInfoChip({required this.icon, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEDEDEF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE0E0E5)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.black38),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(fontSize: 10, color: Colors.black45, fontWeight: FontWeight.w600, letterSpacing: 0.3),
+                ),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Color(0xFF1A2233)),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.lock_outline, size: 14, color: Colors.black38),
+        ],
       ),
     );
   }

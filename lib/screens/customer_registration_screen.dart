@@ -88,7 +88,6 @@ class _CustomerRegistrationScreenState
 
     return AuthCardScaffold(
       title: 'Create Account',
-      subtitle: 'Register as a customer',
       avatarIcon: Icons.person_add_alt_1,
       child: Form(
         key: _formKey,

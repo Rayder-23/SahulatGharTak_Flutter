@@ -9,7 +9,7 @@ import 'decorative_glow_circle.dart';
 /// rounded-top card, and a back button.
 class AuthCardScaffold extends StatelessWidget {
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final IconData avatarIcon;
   final Widget child;
   final Color accentColor;
@@ -17,7 +17,7 @@ class AuthCardScaffold extends StatelessWidget {
   const AuthCardScaffold({
     super.key,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.child,
     this.avatarIcon = Icons.person,
     this.accentColor = kPrimaryColor,
@@ -84,14 +84,16 @@ class AuthCardScaffold extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black87),
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            subtitle,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black.withValues(alpha: 0.5)),
-                          ),
+                          if (subtitle != null) ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              subtitle!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black.withValues(alpha: 0.5)),
+                            ),
+                          ],
                           const SizedBox(height: 32),
                           child,
                         ],
