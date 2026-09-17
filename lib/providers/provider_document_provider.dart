@@ -249,6 +249,17 @@ class ProviderDocumentProvider extends ChangeNotifier {
     }
   }
 
+  /// Clears stale local state before a fresh [loadDocuments] call. Does NOT
+  /// touch [_isVerified]/[_verificationRemarks] - this provider is a shared
+  /// singleton, and `ProviderDashboardScreen` reactively watches it to bounce
+  /// a provider out if verification is revoked while they're already inside
+  /// the dashboard. Forcing `_isVerified` to false here (even momentarily,
+  /// before the real value comes back from the server) was mistaken by that
+  /// watcher for an actual revocation, replacing the screen the provider had
+  /// just opened with the verification-pending block - the "loops back to
+  /// the same error" bug. `loadDocuments` overwrites both fields with the
+  /// authoritative server value immediately after this, so leaving them as
+  /// they are here is safe.
   void reset() {
     _profilePhoto = null;
     _cnicFront = null;
@@ -256,8 +267,6 @@ class ProviderDocumentProvider extends ChangeNotifier {
     _profilePhotoUrl = null;
     _cnicFrontUrl = null;
     _cnicBackUrl = null;
-    _isVerified = false;
-    _verificationRemarks = null;
     _isLoadingExisting = false;
     _loadError = null;
     _isUploading = false;

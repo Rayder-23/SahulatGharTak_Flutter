@@ -73,7 +73,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     // IsVerified server-side until re-reviewed), bounce them out instead of
     // leaving the tabs usable until they happen to leave and come back.
     final documents = context.watch<ProviderDocumentProvider>();
-    if (!documents.isVerified) {
+    // Ignore mid-fetch states (`isLoadingExisting`) - another screen sharing
+    // this singleton (e.g. "My Documents") may be reloading, and `isVerified`
+    // only reflects the authoritative server value once that finishes.
+    // Reacting mid-fetch previously bounced providers out of screens they'd
+    // just opened even though nothing was actually revoked.
+    if (!documents.isVerified && !documents.isLoadingExisting) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) Navigator.of(context).pushReplacementNamed(VerificationPendingScreen.routeName);
       });
