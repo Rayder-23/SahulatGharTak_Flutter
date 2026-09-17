@@ -1,6 +1,6 @@
 ================================================================================
 SahulatGharTak API Reference
-Version: 3.14 | Last Updated: 2026-09-17
+Version: 3.15 | Last Updated: 2026-09-17
 Database: SahulatAppDB
 Local Base URL:    https://localhost:7265/api/
 Deployed Base URL:  https://sahulatghartak.com/api/
@@ -600,7 +600,9 @@ Form Fields:
   that changed. Any field present replaces that stored image (same jpg/jpeg/png,
   5 MB validation, saved as profile.jpg/cnic_front.jpg/cnic_back.jpg). Any field
   omitted leaves the provider's existing stored image for that slot unchanged.
-  Re-uploading any file resets IsVerified to false until an admin re-verifies.
+  Re-uploading CNICFront and/or CNICBack resets IsVerified to false until an
+  admin re-verifies. Re-uploading ProfilePhoto alone does NOT reset IsVerified
+  (validated client-side by face detection at capture, not by manual review).
 
 Success (200):
 {

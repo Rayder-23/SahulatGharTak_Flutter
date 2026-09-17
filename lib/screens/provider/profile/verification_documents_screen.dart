@@ -147,6 +147,7 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                         networkUrl: provider.cnicFrontUrl,
                         placeholderIcon: Icons.credit_card,
                         label: 'Add CNIC front image',
+                        locked: provider.isVerified,
                         onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.cnicFront),
                         onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.cnicFront),
                       ),
@@ -158,9 +159,17 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                         networkUrl: provider.cnicBackUrl,
                         placeholderIcon: Icons.credit_card,
                         label: 'Add CNIC back image',
+                        locked: provider.isVerified,
                         onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.cnicBack),
                         onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.cnicBack),
                       ),
+                      if (provider.isVerified) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          'Your CNIC is locked after verification. Contact support if it needs to change.',
+                          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        ),
+                      ],
                       const SizedBox(height: 28),
                       if (provider.isUploading) ...[
                         ClipRRect(

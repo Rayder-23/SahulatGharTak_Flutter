@@ -14,6 +14,11 @@ class DocumentImageSlot extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onRemove;
 
+  /// When true, the slot cannot be tapped/replaced/removed and shows a lock
+  /// badge instead of "Tap to change" - used for CNIC images once a provider
+  /// is verified, since those are the documents an admin actually reviewed.
+  final bool locked;
+
   const DocumentImageSlot({
     super.key,
     required this.file,
@@ -22,6 +27,7 @@ class DocumentImageSlot extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.onRemove,
+    this.locked = false,
   });
 
   @override
@@ -30,7 +36,7 @@ class DocumentImageSlot extends StatelessWidget {
     final hasNetworkImage = !hasLocalFile && networkUrl != null;
 
     return InkWell(
-      onTap: onTap,
+      onTap: locked ? null : onTap,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         height: 140,
@@ -46,7 +52,7 @@ class DocumentImageSlot extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   Image.file(file!, fit: BoxFit.cover),
-                  if (onRemove != null)
+                  if (onRemove != null && !locked)
                     Positioned(
                       top: 6,
                       right: 6,
@@ -98,13 +104,23 @@ class DocumentImageSlot extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           color: Colors.black45,
-                          child: const Text(
-                            'Tap to change',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (locked) ...[
+                                const Icon(Icons.lock_rounded,
+                                    color: Colors.white, size: 12),
+                                const SizedBox(width: 4),
+                              ],
+                              Text(
+                                locked ? 'Verified — locked' : 'Tap to change',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ],
                           ),
                         ),
                       ),
