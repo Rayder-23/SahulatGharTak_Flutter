@@ -28,6 +28,14 @@ dependencies:
   animations: ^2.0.11
   url_launcher: ^6.3.0
   dropdown_button2: ^3.1.0
+  camera: ^0.12.1
+  google_mlkit_face_detection: ^0.13.1
+  google_mlkit_text_recognition: ^0.15.0
+  google_mlkit_barcode_scanning: ^0.14.2
+  google_mlkit_commons: ^0.11.1
+  image_cropper: ^8.1.0
+  permission_handler: ^11.3.1
+  image: ^4.2.0
 
 dev_dependencies:
   flutter_test:
