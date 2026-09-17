@@ -1,19 +1,13 @@
 import 'dart:io';
 
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-
 import '../../models/provider/provider_documents.dart';
 import '../../services/provider_document_api_service.dart';
 import '../../utils/constants.dart';
 
 /// Owns the provider-document data source: fetching/uploading via
-/// `ProviderDocumentApiService`, resolving a stored relative path to a full
-/// URL, and re-downloading an already-uploaded image to a local temp file
-/// when the upload endpoint needs all three slots resent but the caller only
-/// picked a replacement for one. `ProviderDocumentProvider` should keep only
-/// UI state (the `ImagePicker`, freshly-picked `File`s, loading/progress
-/// flags) and call through to this class.
+/// `ProviderDocumentApiService` and resolving a stored relative path to a
+/// full URL. `ProviderDocumentProvider` should keep only UI state (freshly
+/// picked `File`s, loading/progress flags) and call through to this class.
 class ProviderDocumentRepository {
   ProviderDocumentRepository({ProviderDocumentApiService? apiService}) : _apiService = apiService ?? ProviderDocumentApiService();
 
@@ -21,11 +15,14 @@ class ProviderDocumentRepository {
 
   Future<ProviderDocumentsModel?> fetchDocuments(int providerUid) => _apiService.fetchDocuments(providerUid);
 
+  /// Each file is optional - omitting one leaves that slot's already-stored
+  /// image untouched server-side (see api.txt). The provider's first-ever
+  /// submission still requires all three; the backend enforces that.
   Future<ProviderDocumentsModel> upload({
     required int providerUid,
-    required File profilePhoto,
-    required File cnicFront,
-    required File cnicBack,
+    File? profilePhoto,
+    File? cnicFront,
+    File? cnicBack,
     void Function(double progress)? onProgress,
   }) {
     return _apiService.uploadDocuments(
@@ -37,20 +34,18 @@ class ProviderDocumentRepository {
     );
   }
 
-  String? resolveUrl(String? relativePath) => relativePath == null ? null : '$kApiFileBaseUrl/$relativePath';
-
-  /// Downloads the image currently at [remoteUrl] to a local temp file, so it
-  /// can be resent alongside a newly picked replacement in another slot.
-  Future<File> downloadToTempFile(String remoteUrl) async {
-    final response = await http.get(Uri.parse(remoteUrl));
-    if (response.statusCode != 200) {
-      throw Exception('Could not load the existing image. Please pick it again.');
-    }
-
-    final dir = await getTemporaryDirectory();
-    final fileName = '${DateTime.now().microsecondsSinceEpoch}_${remoteUrl.split('/').last}';
-    final file = File('${dir.path}/$fileName');
-    await file.writeAsBytes(response.bodyBytes);
-    return file;
+  /// [version] busts Flutter's image cache (and any HTTP cache) after a
+  /// re-upload: the three document files always live at the same fixed
+  /// path (profile.jpg/cnic_front.jpg/cnic_back.jpg), so a plain URL is
+  /// byte-identical before and after an edit and `Image.network`/
+  /// `NetworkImage` - which cache by URL - would keep showing the old image
+  /// until the app restarts. Passing the document row's `updatedOn` (or
+  /// `createdOn` for a first-ever upload) as a query param gives each edit
+  /// a distinct URL so the new image is actually fetched.
+  String? resolveUrl(String? relativePath, {DateTime? version}) {
+    if (relativePath == null) return null;
+    final base = '$kApiFileBaseUrl/$relativePath';
+    if (version == null) return base;
+    return '$base?v=${version.millisecondsSinceEpoch}';
   }
 }

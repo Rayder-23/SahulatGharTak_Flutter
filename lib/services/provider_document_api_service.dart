@@ -32,21 +32,25 @@ class ProviderDocumentApiService {
 
   /// Uploads the provider's profile photo and CNIC images as multipart/form-data.
   ///
+  /// Each file is optional: on a provider's first submission the backend
+  /// requires all three, but on a later edit, omitting a slot leaves that
+  /// slot's already-stored image untouched server-side rather than being
+  /// re-sent - see the "Upload Provider Documents" section of api.txt.
+  ///
   /// [onProgress] is called with a value between 0.0 and 1.0 as the request body
   /// is streamed to the server (upload progress, not server processing time).
   Future<ProviderDocumentsModel> uploadDocuments({
     required int providerUid,
-    required File profilePhoto,
-    required File cnicFront,
-    required File cnicBack,
+    File? profilePhoto,
+    File? cnicFront,
+    File? cnicBack,
     void Function(double progress)? onProgress,
   }) async {
     final uri = Uri.parse('$kApiBaseUrl/provider/upload-documents');
-    final request = http.MultipartRequest('POST', uri)
-      ..fields['ProviderUID'] = providerUid.toString()
-      ..files.add(await _imagePart('ProfilePhoto', profilePhoto))
-      ..files.add(await _imagePart('CNICFront', cnicFront))
-      ..files.add(await _imagePart('CNICBack', cnicBack));
+    final request = http.MultipartRequest('POST', uri)..fields['ProviderUID'] = providerUid.toString();
+    if (profilePhoto != null) request.files.add(await _imagePart('ProfilePhoto', profilePhoto));
+    if (cnicFront != null) request.files.add(await _imagePart('CNICFront', cnicFront));
+    if (cnicBack != null) request.files.add(await _imagePart('CNICBack', cnicBack));
 
     final streamedResponse = await _sendWithProgress(request, onProgress);
     final response = await http.Response.fromStream(streamedResponse);

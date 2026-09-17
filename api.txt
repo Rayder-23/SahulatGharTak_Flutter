@@ -1,6 +1,6 @@
 ================================================================================
 SahulatGharTak API Reference
-Version: 3.13 | Last Updated: 2026-09-16
+Version: 3.14 | Last Updated: 2026-09-17
 Database: SahulatAppDB
 Local Base URL:    https://localhost:7265/api/
 Deployed Base URL:  https://sahulatghartak.com/api/
@@ -590,9 +590,17 @@ Content-Type: multipart/form-data
 
 Form Fields:
 - ProviderUID (int, required)
-- ProfilePhoto (file, required)
-- CNICFront (file, required)
-- CNICBack (file, required)
+- ProfilePhoto (file, optional*)
+- CNICFront (file, optional*)
+- CNICBack (file, optional*)
+
+* First-time submission (provider has no documents row yet, e.g. during initial
+  registration): all three files are required — omitting any returns 400.
+  Edit / replace (provider already has a documents row): send only the file(s)
+  that changed. Any field present replaces that stored image (same jpg/jpeg/png,
+  5 MB validation, saved as profile.jpg/cnic_front.jpg/cnic_back.jpg). Any field
+  omitted leaves the provider's existing stored image for that slot unchanged.
+  Re-uploading any file resets IsVerified to false until an admin re-verifies.
 
 Success (200):
 {
@@ -618,6 +626,22 @@ Fail (404):
   "message": "Provider not found.",
   "data": null
 }
+
+Fail (400) — first-time submission missing a required file:
+{
+  "success": false,
+  "message": "ProfilePhoto, CNICFront, and CNICBack are all required for a provider's first document submission.",
+  "data": null
+}
+
+Fail (400) — edit submission with a slot that has neither a new file nor an existing one to keep:
+{
+  "success": false,
+  "message": "No ProfilePhoto was provided and there is no existing profile photo to keep.",
+  "data": null
+}
+(Same shape for CNICFront -> "No CNICFront was provided and there is no existing CNIC front image to keep."
+ and CNICBack -> "No CNICBack was provided and there is no existing CNIC back image to keep.")
 
 Fail (415):
 {

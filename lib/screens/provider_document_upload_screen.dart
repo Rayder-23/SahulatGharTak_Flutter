@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/provider_document_provider.dart';
 import '../utils/constants.dart';
 import '../widgets/auth_card_scaffold.dart';
+import '../widgets/message_dialog.dart';
+import '../widgets/provider/document_capture_sheet.dart';
 import '../widgets/provider/document_image_slot.dart';
 import 'provider_dashboard_screen.dart';
 
@@ -30,45 +31,6 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
     _args ??= ModalRoute.of(context)!.settings.arguments as ProviderDocumentUploadArgs;
   }
 
-  Future<void> _pickImage(ProviderDocumentSlot slot) async {
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(top: 16, bottom: 8),
-              child: Text('Select Image Source', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_camera_outlined, color: kPrimaryColor),
-              title: const Text('Take Photo'),
-              onTap: () => Navigator.of(sheetContext).pop(ImageSource.camera),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined, color: kPrimaryColor),
-              title: const Text('Choose from Gallery'),
-              onTap: () => Navigator.of(sheetContext).pop(ImageSource.gallery),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-
-    if (source == null || !mounted) return;
-
-    final provider = context.read<ProviderDocumentProvider>();
-    await provider.pickImage(slot, source);
-
-    if (!mounted) return;
-    if (provider.error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(provider.error!)));
-    }
-  }
-
   Future<void> _upload() async {
     final provider = context.read<ProviderDocumentProvider>();
     final success = await provider.upload(_args!.providerUid);
@@ -76,10 +38,21 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Documents uploaded successfully.')));
+      await showMessageDialog(
+        context,
+        title: 'Documents Uploaded',
+        message: 'Your documents were uploaded successfully.',
+        type: MessageDialogType.success,
+      );
+      if (!mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil(ProviderDashboardScreen.routeName, (route) => false);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(provider.error ?? 'Failed to upload documents')));
+      await showMessageDialog(
+        context,
+        title: 'Upload Failed',
+        message: provider.error ?? 'Failed to upload documents',
+        type: MessageDialogType.error,
+      );
     }
   }
 
@@ -99,7 +72,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
             file: provider.profilePhoto,
             placeholderIcon: Icons.person_outline,
             label: 'Add profile photo',
-            onTap: () => _pickImage(ProviderDocumentSlot.profilePhoto),
+            onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.profilePhoto),
             onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.profilePhoto),
           ),
           const SizedBox(height: 20),
@@ -108,7 +81,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
             file: provider.cnicFront,
             placeholderIcon: Icons.credit_card,
             label: 'Add CNIC front image',
-            onTap: () => _pickImage(ProviderDocumentSlot.cnicFront),
+            onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.cnicFront),
             onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.cnicFront),
           ),
           const SizedBox(height: 20),
@@ -117,7 +90,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
             file: provider.cnicBack,
             placeholderIcon: Icons.credit_card,
             label: 'Add CNIC back image',
-            onTap: () => _pickImage(ProviderDocumentSlot.cnicBack),
+            onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.cnicBack),
             onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.cnicBack),
           ),
           const SizedBox(height: 28),
