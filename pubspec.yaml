@@ -3,9 +3,9 @@ description: A professional home services marketplace mobile application.
 # Author: Rayder-23
 # Team: Coditum Solutions
 publish_to: 'none'
-version: 1.0.2+5 # Android builds / Play Store App Bundle / General baseline
+version: 1.0.3+6 # Android builds / Play Store App Bundle / General baseline
 
-ios_version: 1.0.2+5 # iOS builds / Apple App Store IPA
+ios_version: 1.0.3+6 # iOS builds / Apple App Store IPA
 # Custom key read automatically by iOS workflow
 
 environment:
