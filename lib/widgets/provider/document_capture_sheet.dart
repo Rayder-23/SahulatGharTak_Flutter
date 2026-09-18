@@ -68,7 +68,12 @@ Future<void> showDocumentCaptureSheet(BuildContext context, {required ProviderDo
 }
 
 Future<File?> _pickFromGalleryAndCrop(BuildContext context, ProviderDocumentSlot slot) async {
-  final xFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  // requestFullMetadata: false keeps iOS on the permission-free
+  // PHPickerViewController path - the default (true) triggers an extra
+  // PHAsset metadata fetch that prompts for full photo-library access even
+  // though the picker itself never needs it. Safe here since the picked
+  // file goes straight into image_cropper next, which re-encodes it anyway.
+  final xFile = await ImagePicker().pickImage(source: ImageSource.gallery, requestFullMetadata: false);
   if (xFile == null || !context.mounted) return null;
 
   final isProfilePhoto = slot == ProviderDocumentSlot.profilePhoto;

@@ -2,14 +2,16 @@ import 'package:permission_handler/permission_handler.dart';
 
 enum CameraPermissionResult { granted, denied, permanentlyDenied }
 
-/// Thin wrapper around `permission_handler` for the permissions the live
-/// document-capture flow needs (camera for the live scanner, photos for the
-/// gallery+crop path). Kept separate from `ProviderDocumentProvider` so that
-/// provider stays unaware of *how* a permission was granted.
+/// Thin wrapper around `permission_handler` for the camera permission the
+/// live document-capture flow needs. The gallery+crop path deliberately
+/// requests no photos/storage permission - it goes through the system
+/// Android Photo Picker via `image_picker`, which needs none (Google Play
+/// policy requires apps with infrequent gallery access to use the picker
+/// instead of requesting broad media permissions). Kept separate from
+/// `ProviderDocumentProvider` so that provider stays unaware of *how* a
+/// permission was granted.
 class CameraPermissionService {
   Future<CameraPermissionResult> ensureCameraPermission() => _ensure(Permission.camera);
-
-  Future<CameraPermissionResult> ensurePhotosPermission() => _ensure(Permission.photos);
 
   Future<CameraPermissionResult> _ensure(Permission permission) async {
     var status = await permission.status;
