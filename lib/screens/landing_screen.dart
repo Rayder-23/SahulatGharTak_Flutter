@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/breakpoints.dart';
 import '../widgets/decorative_glow_circle.dart';
+import 'contact_us_screen.dart';
 import 'customer_registration_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -140,6 +141,20 @@ class LandingScreen extends StatelessWidget {
                               Colors.white.withValues(alpha: 0.85)),
                       child: const Text(
                         'Continue as Guest',
+                        style: TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.underline),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context)
+                          .pushNamed(ContactUsScreen.routeName),
+                      style: TextButton.styleFrom(
+                          foregroundColor:
+                              Colors.white.withValues(alpha: 0.85)),
+                      child: const Text(
+                        'Contact Us',
                         style: TextStyle(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w600,

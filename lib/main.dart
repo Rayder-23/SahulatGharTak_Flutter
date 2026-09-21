@@ -30,6 +30,7 @@ import 'screens/splash_screen.dart';
 import 'screens/add_address_screen.dart';
 import 'screens/edit_profile_screen.dart';
 import 'screens/landing_screen.dart';
+import 'screens/contact_us_screen.dart';
 import 'screens/customer_registration_screen.dart';
 import 'screens/provider_registration_screen.dart';
 import 'screens/provider_document_upload_screen.dart';
@@ -99,6 +100,7 @@ class SahulatApp extends StatelessWidget {
         routes: {
           SplashScreen.routeName: (_) => const SplashScreen(),
           LandingScreen.routeName: (_) => const LandingScreen(),
+          ContactUsScreen.routeName: (_) => const ContactUsScreen(),
           CustomerRegistrationScreen.routeName: (_) => const CustomerRegistrationScreen(),
           ProviderRegistrationScreen.routeName: (_) => const ProviderRegistrationScreen(),
           ProviderDocumentUploadScreen.routeName: (_) => const ProviderDocumentUploadScreen(),
