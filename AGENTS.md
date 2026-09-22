@@ -1,4 +1,8 @@
-# Sahulat Ghar Tak - Agent Customization Guide
+# AGENTS.md
+
+This file provides guidance to every coding agent when working with code in this repository. CLAUDE.md points here; every coding agent reads this file first.
+
+# Sahulat Ghar Tak overview
 
 **Project**: A Flutter home services marketplace mobile application, backed by a real ASP.NET Core REST API (`SahulatAppDB`). Customers browse service categories and submit service requests; Providers manage a dashboard of incoming requests, bookings, and their wallet/profile.
 
