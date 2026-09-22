@@ -1,3 +1,4 @@
+import '../../models/provider/material_item.dart';
 import '../../models/provider/service_booking.dart';
 import '../../services/rejected_bookings_store.dart';
 import '../../services/service_booking_api_service.dart';
@@ -53,6 +54,8 @@ class ProviderBookingsRepository {
     required String passcode,
     required double actualAmountPaid,
     String? paymentMode,
+    double? labourAmount,
+    List<MaterialItem>? materialItems,
   }) {
     return _apiService.verifyCompletion(
       bookingUid: booking.uid,
@@ -60,6 +63,8 @@ class ProviderBookingsRepository {
       passcode: passcode,
       actualAmountPaid: actualAmountPaid,
       paymentMode: paymentMode,
+      labourAmount: labourAmount,
+      materialItems: materialItems,
     );
   }
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../models/provider/material_item.dart';
 import '../models/provider/service_booking.dart';
 import '../utils/constants.dart';
 
@@ -103,6 +104,8 @@ class ServiceBookingApiService {
     required String passcode,
     required double actualAmountPaid,
     String? paymentMode,
+    double? labourAmount,
+    List<MaterialItem>? materialItems,
   }) async {
     final response = await http.post(
       Uri.parse('$kApiBaseUrl/service-bookings/$bookingUid/verify-completion'),
@@ -112,6 +115,8 @@ class ServiceBookingApiService {
         'passcode': passcode,
         'actualAmountPaid': actualAmountPaid,
         'paymentMode': paymentMode,
+        if (labourAmount != null) 'labourAmount': labourAmount,
+        if (materialItems != null) 'materialItems': materialItems.map((m) => m.toJson()).toList(),
       }),
     ).timeout(kApiTimeout);
 

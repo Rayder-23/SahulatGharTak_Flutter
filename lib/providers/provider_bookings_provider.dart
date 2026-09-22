@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/repositories/provider_bookings_repository.dart';
+import '../models/provider/material_item.dart';
 import '../models/provider/service_booking.dart';
 import '../utils/api_error.dart';
 
@@ -20,6 +21,9 @@ class ProviderBookingsProvider extends ChangeNotifier {
 
   String? _error;
   String? get error => _error;
+
+  bool _lostRace = false;
+  bool get lostRace => _lostRace;
 
   int? _providerUid;
   int _rejectedSeenCount = 0;
@@ -107,9 +111,12 @@ class ProviderBookingsProvider extends ChangeNotifier {
     return booking;
   }
 
+  static const _lostRaceMessage = 'This job has already been assigned to another provider.';
+
   Future<bool> respond(ServiceBooking booking, bool accept, {String? reason}) async {
     _updatingUid = booking.uid;
     _error = null;
+    _lostRace = false;
     notifyListeners();
 
     try {
@@ -118,6 +125,13 @@ class ProviderBookingsProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       _error = friendlyErrorMessage(e);
+      _lostRace = _error == _lostRaceMessage;
+      if (_lostRace && _providerUid != null) {
+        // A sibling offer on this job was auto-cancelled server-side when
+        // another provider won the race, so the stale in-memory list can
+        // still show a job that's no longer claimable — refresh from source.
+        await loadBookings(_providerUid!);
+      }
       return false;
     } finally {
       _updatingUid = null;
@@ -148,6 +162,8 @@ class ProviderBookingsProvider extends ChangeNotifier {
     required String passcode,
     required double actualAmountPaid,
     String? paymentMode,
+    double? labourAmount,
+    List<MaterialItem>? materialItems,
   }) async {
     _updatingUid = booking.uid;
     _error = null;
@@ -159,6 +175,8 @@ class ProviderBookingsProvider extends ChangeNotifier {
         passcode: passcode,
         actualAmountPaid: actualAmountPaid,
         paymentMode: paymentMode,
+        labourAmount: labourAmount,
+        materialItems: materialItems,
       );
       _bookings = _bookings.map((b) => b.uid == updated.uid ? updated : b).toList();
       return true;

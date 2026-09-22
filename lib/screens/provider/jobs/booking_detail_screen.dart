@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../models/provider/material_item.dart';
 import '../../../models/provider/service_booking.dart';
 import '../../../providers/provider_bookings_provider.dart';
 import '../../../utils/cancel_reasons.dart';
@@ -136,11 +137,17 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     final success = await provider.respond(_currentBooking, accept, reason: reason);
     if (!mounted) return;
 
-    final message = success ? (accept ? 'Booking accepted' : 'Booking rejected') : (provider.error ?? 'Failed to respond to booking');
-    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
     if (success) {
+      showAppToast(context, accept ? 'Booking accepted' : 'Booking rejected', type: AppToastType.success);
+      (widget.onClose ?? () => Navigator.of(context).maybePop())();
+    } else if (provider.lostRace) {
+      // The booking no longer belongs to this provider (another provider won
+      // the race and this one was auto-cancelled server-side) — leave the
+      // now-stale detail view instead of letting the provider act on it further.
+      showAppToast(context, 'Sorry, this job was just taken by another provider', type: AppToastType.error);
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     } else {
+      showAppToast(context, provider.error ?? 'Failed to respond to booking', type: AppToastType.error);
       setState(() => _submitting = false);
     }
   }
@@ -587,9 +594,25 @@ class _CompletionDialog extends StatefulWidget {
   State<_CompletionDialog> createState() => _CompletionDialogState();
 }
 
+class _MaterialItemRow {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController quantityController = TextEditingController(text: '1');
+  final TextEditingController unitPriceController = TextEditingController();
+
+  bool get isBlank => nameController.text.trim().isEmpty && unitPriceController.text.trim().isEmpty;
+
+  void dispose() {
+    nameController.dispose();
+    quantityController.dispose();
+    unitPriceController.dispose();
+  }
+}
+
 class _CompletionDialogState extends State<_CompletionDialog> {
   late final TextEditingController _passcodeController;
   late final TextEditingController _amountController;
+  late final TextEditingController _labourController;
+  final List<_MaterialItemRow> _materialRows = [];
   String? _paymentModeOverride;
   bool _submitting = false;
   String? _error;
@@ -599,13 +622,25 @@ class _CompletionDialogState extends State<_CompletionDialog> {
     super.initState();
     _passcodeController = TextEditingController();
     _amountController = TextEditingController(text: widget.booking.finalAmount.toStringAsFixed(0));
+    _labourController = TextEditingController();
   }
 
   @override
   void dispose() {
     _passcodeController.dispose();
     _amountController.dispose();
+    _labourController.dispose();
+    for (final row in _materialRows) {
+      row.dispose();
+    }
     super.dispose();
+  }
+
+  void _addMaterialRow() => setState(() => _materialRows.add(_MaterialItemRow()));
+
+  void _removeMaterialRow(_MaterialItemRow row) {
+    setState(() => _materialRows.remove(row));
+    row.dispose();
   }
 
   Future<void> _submit() async {
@@ -614,6 +649,29 @@ class _CompletionDialogState extends State<_CompletionDialog> {
     if (passcode.isEmpty || amount == null || amount <= 0) {
       setState(() => _error = 'Enter a valid passcode and an amount greater than 0 to close this job.');
       return;
+    }
+
+    final labourText = _labourController.text.trim();
+    double? labourAmount;
+    if (labourText.isNotEmpty) {
+      labourAmount = double.tryParse(labourText);
+      if (labourAmount == null || labourAmount < 0) {
+        setState(() => _error = 'Enter a valid labour charge, or leave it blank.');
+        return;
+      }
+    }
+
+    final materialItems = <MaterialItem>[];
+    for (final row in _materialRows) {
+      if (row.isBlank) continue;
+      final name = row.nameController.text.trim();
+      final quantity = int.tryParse(row.quantityController.text.trim());
+      final unitPrice = double.tryParse(row.unitPriceController.text.trim());
+      if (name.isEmpty || quantity == null || quantity <= 0 || unitPrice == null || unitPrice < 0) {
+        setState(() => _error = 'Enter a valid name, quantity, and price for every material item, or remove the row.');
+        return;
+      }
+      materialItems.add(MaterialItem(itemName: name, quantity: quantity, unitPrice: unitPrice));
     }
 
     setState(() {
@@ -626,6 +684,8 @@ class _CompletionDialogState extends State<_CompletionDialog> {
       passcode: passcode,
       actualAmountPaid: amount,
       paymentMode: _paymentModeOverride,
+      labourAmount: labourAmount,
+      materialItems: materialItems.isEmpty ? null : materialItems,
     );
     if (!mounted) return;
 
@@ -732,6 +792,32 @@ class _CompletionDialogState extends State<_CompletionDialog> {
                         ],
                         onChanged: (value) => setState(() => _paymentModeOverride = value),
                       ),
+                      const SizedBox(height: 14),
+                      const _FieldLabel(icon: Icons.engineering_rounded, text: 'Labour charge (Rs, optional)'),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: _labourController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$'))],
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                        decoration: _dialogFieldDecoration(hint: 'Leave blank to use the full amount'),
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          const Expanded(child: _FieldLabel(icon: Icons.receipt_long_rounded, text: 'Material items (optional)')),
+                          TextButton.icon(
+                            onPressed: _addMaterialRow,
+                            icon: const Icon(Icons.add_circle_outline_rounded, size: 16),
+                            label: const Text('Add item', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
+                            style: TextButton.styleFrom(foregroundColor: _brandBlue, padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                          ),
+                        ],
+                      ),
+                      for (final row in _materialRows) ...[
+                        const SizedBox(height: 8),
+                        _MaterialItemRowField(row: row, onRemove: () => _removeMaterialRow(row)),
+                      ],
                       if (_error != null) ...[
                         const SizedBox(height: 12),
                         Container(
@@ -782,6 +868,58 @@ class _CompletionDialogState extends State<_CompletionDialog> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _MaterialItemRowField extends StatelessWidget {
+  final _MaterialItemRow row;
+  final VoidCallback onRemove;
+
+  const _MaterialItemRowField({required this.row, required this.onRemove});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 3,
+          child: TextField(
+            controller: row.nameController,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            decoration: _dialogFieldDecoration(hint: 'Item name'),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          flex: 2,
+          child: TextField(
+            controller: row.quantityController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            decoration: _dialogFieldDecoration(hint: 'Qty'),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          flex: 2,
+          child: TextField(
+            controller: row.unitPriceController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$'))],
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            decoration: _dialogFieldDecoration(hint: 'Price'),
+          ),
+        ),
+        IconButton(
+          onPressed: onRemove,
+          icon: const Icon(Icons.remove_circle_outline_rounded, size: 20, color: Colors.red),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+        ),
+      ],
     );
   }
 }

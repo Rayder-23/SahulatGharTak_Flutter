@@ -40,8 +40,8 @@ class AuthApiService {
     required String gender,
     required int experienceYears,
     required String description,
-    required int categoryId,
-    required String categoryName,
+    required List<int> categoryIds,
+    required int primaryCategoryId,
     String? city,
   }) async {
     final json = await _post('register-provider', {
@@ -52,8 +52,8 @@ class AuthApiService {
       'gender': gender,
       'experienceYears': experienceYears,
       'description': description,
-      'categoryId': categoryId,
-      'categoryName': categoryName,
+      'categoryIds': categoryIds,
+      'primaryCategoryId': primaryCategoryId,
       if (city != null) 'city': city,
     });
     final data = json['data'] as Map<String, dynamic>?;

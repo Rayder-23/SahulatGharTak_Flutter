@@ -10,6 +10,7 @@ import 'data/repositories/city_repository.dart';
 import 'data/repositories/client_address_repository.dart';
 import 'data/repositories/customer_service_request_repository.dart';
 import 'data/repositories/provider_bookings_repository.dart';
+import 'data/repositories/provider_categories_repository.dart';
 import 'data/repositories/provider_dashboard_repository.dart';
 import 'data/repositories/provider_document_repository.dart';
 import 'data/repositories/provider_wallet_repository.dart';
@@ -23,6 +24,7 @@ import 'providers/service_catalog_provider.dart';
 import 'providers/client_address_provider.dart';
 import 'providers/customer_service_request_provider.dart';
 import 'providers/provider_bookings_provider.dart';
+import 'providers/provider_categories_provider.dart';
 import 'providers/provider_dashboard_provider.dart';
 import 'providers/provider_document_provider.dart';
 import 'providers/provider_wallet_provider.dart';
@@ -89,6 +91,7 @@ class SahulatApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CustomerServiceRequestProvider(repository: CustomerServiceRequestRepository())),
         ChangeNotifierProvider(create: (_) => ProviderDocumentProvider(repository: ProviderDocumentRepository())),
         ChangeNotifierProvider(create: (_) => ProviderWalletProvider(repository: ProviderWalletRepository())),
+        ChangeNotifierProvider(create: (_) => ProviderCategoriesProvider(repository: ProviderCategoriesRepository())),
       ],
       child: MaterialApp(
         title: 'Sahulat Ghar Tak',

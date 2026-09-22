@@ -46,7 +46,11 @@ class _RequestsTabState extends State<RequestsTab> {
     if (!context.mounted) return;
     showAppToast(
       context,
-      success ? 'Booking accepted' : (provider.error ?? 'Failed to accept booking'),
+      success
+          ? 'Booking accepted'
+          : provider.lostRace
+              ? 'Sorry, this job was just taken by another provider'
+              : (provider.error ?? 'Failed to accept booking'),
       type: success ? AppToastType.success : AppToastType.error,
     );
   }

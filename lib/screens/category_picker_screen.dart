@@ -14,7 +14,9 @@ const _brandDark = Color(0xFF0A4FA8);
 const _brandBlue = Color(0xFF016EE3);
 const _brandAccent = Color(0xFF4FC3F7);
 
-/// Full-screen category picker for the provider registration form.
+/// Full-screen multi-select category picker, used for provider registration
+/// (Feature 9 - multi-category support) and the "My Categories" management
+/// section on the provider profile.
 ///
 /// Fetches the complete category list itself (always unscoped, no
 /// `serviceUid` filter) instead of reading the shared [CategoryProvider] —
@@ -26,9 +28,10 @@ const _brandAccent = Color(0xFF4FC3F7);
 class CategoryPickerScreen extends StatefulWidget {
   static const routeName = '/register-provider/category-picker';
 
-  final int? selectedCategoryId;
+  /// Ids of categories already selected when this screen opens.
+  final Set<int> selectedCategoryIds;
 
-  const CategoryPickerScreen({super.key, this.selectedCategoryId});
+  const CategoryPickerScreen({super.key, this.selectedCategoryIds = const {}});
 
   @override
   State<CategoryPickerScreen> createState() => _CategoryPickerScreenState();
@@ -42,10 +45,12 @@ class _CategoryPickerScreenState extends State<CategoryPickerScreen> {
   bool _isLoading = true;
   String? _error;
   String _query = '';
+  late Set<int> _selectedIds;
 
   @override
   void initState() {
     super.initState();
+    _selectedIds = {...widget.selectedCategoryIds};
     _load();
   }
 
@@ -85,6 +90,21 @@ class _CategoryPickerScreenState extends State<CategoryPickerScreen> {
     return groups;
   }
 
+  void _toggle(Category category) {
+    setState(() {
+      if (_selectedIds.contains(category.id)) {
+        _selectedIds.remove(category.id);
+      } else {
+        _selectedIds.add(category.id);
+      }
+    });
+  }
+
+  void _done() {
+    final selected = _categories.where((c) => _selectedIds.contains(c.id)).toList();
+    Navigator.of(context).pop(selected);
+  }
+
   @override
   Widget build(BuildContext context) {
     final groups = _groupedFiltered;
@@ -121,13 +141,26 @@ class _CategoryPickerScreenState extends State<CategoryPickerScreen> {
                                 serviceName: serviceName,
                                 style: style,
                                 categories: groups[serviceName]!,
-                                selectedCategoryId: widget.selectedCategoryId,
-                                onSelected: (category) => Navigator.of(context).pop(category),
+                                selectedIds: _selectedIds,
+                                onToggle: _toggle,
                               );
                             },
                           ),
           ),
         ],
+      ),
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        child: ElevatedButton(
+          onPressed: _selectedIds.isEmpty ? null : _done,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _brandBlue,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(double.infinity, 48),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+          child: Text(_selectedIds.isEmpty ? 'Select at least one category' : 'Done (${_selectedIds.length} selected)'),
+        ),
       ),
     );
   }
@@ -235,15 +268,15 @@ class _CategoryGroupSection extends StatelessWidget {
   final String serviceName;
   final ServiceCatalogStyle style;
   final List<Category> categories;
-  final int? selectedCategoryId;
-  final ValueChanged<Category> onSelected;
+  final Set<int> selectedIds;
+  final ValueChanged<Category> onToggle;
 
   const _CategoryGroupSection({
     required this.serviceName,
     required this.style,
     required this.categories,
-    required this.selectedCategoryId,
-    required this.onSelected,
+    required this.selectedIds,
+    required this.onToggle,
   });
 
   @override
@@ -284,8 +317,8 @@ class _CategoryGroupSection extends StatelessWidget {
                   _CategoryTile(
                     category: categories[i],
                     color: style.color,
-                    selected: categories[i].id == selectedCategoryId,
-                    onTap: () => onSelected(categories[i]),
+                    selected: selectedIds.contains(categories[i].id),
+                    onTap: () => onToggle(categories[i]),
                   ),
                 ],
               ],

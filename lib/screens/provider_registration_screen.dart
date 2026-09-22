@@ -11,6 +11,7 @@ import '../widgets/app_toast.dart';
 import '../widgets/auth_card_scaffold.dart';
 import '../widgets/inline_field_error.dart';
 import '../widgets/message_dialog.dart';
+import '../widgets/primary_category_dialog.dart';
 import '../widgets/terms_and_conditions_section.dart';
 import '../widgets/themed_dropdown.dart';
 import 'category_picker_screen.dart';
@@ -36,7 +37,8 @@ class _ProviderRegistrationScreenState
   final _cnicController = TextEditingController();
   final _descriptionController = TextEditingController();
   String? _selectedGender;
-  Category? _selectedCategory;
+  Set<Category> _selectedCategories = {};
+  int? _primaryCategoryId;
   String? _selectedCity;
   bool _obscurePassword = true;
   bool _agreedToTerms = false;
@@ -77,19 +79,35 @@ class _ProviderRegistrationScreenState
     super.dispose();
   }
 
-  Future<void> _pickCategory() async {
-    final result = await Navigator.of(context).push<Category>(
+  Future<void> _pickCategories() async {
+    final result = await Navigator.of(context).push<List<Category>>(
       MaterialPageRoute(
-          builder: (_) =>
-              CategoryPickerScreen(selectedCategoryId: _selectedCategory?.id)),
+          builder: (_) => CategoryPickerScreen(
+              selectedCategoryIds: _selectedCategories.map((c) => c.id).toSet())),
     );
-    if (result != null) setState(() => _selectedCategory = result);
+    if (result == null || result.isEmpty || !mounted) return;
+
+    if (result.length == 1) {
+      setState(() {
+        _selectedCategories = result.toSet();
+        _primaryCategoryId = result.first.id;
+      });
+      return;
+    }
+
+    final currentPrimary = _primaryCategoryId;
+    final chosen = await showPrimaryCategoryDialog(context, categories: result, initialPrimaryId: currentPrimary);
+    if (!mounted) return;
+    setState(() {
+      _selectedCategories = result.toSet();
+      _primaryCategoryId = chosen ?? result.first.id;
+    });
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedCategory == null) {
-      showAppToast(context, 'Please select a category', type: AppToastType.error);
+    if (_selectedCategories.isEmpty || _primaryCategoryId == null) {
+      showAppToast(context, 'Please select at least one category', type: AppToastType.error);
       return;
     }
     if (_selectedGender == null) {
@@ -110,8 +128,8 @@ class _ProviderRegistrationScreenState
       gender: _selectedGender!,
       experienceYears: _experienceYears,
       description: _descriptionController.text.trim(),
-      categoryId: _selectedCategory!.id,
-      categoryName: _selectedCategory!.name,
+      categoryIds: _selectedCategories.map((c) => c.id).toList(),
+      primaryCategoryId: _primaryCategoryId!,
       city: _selectedCity,
     );
 
@@ -223,42 +241,61 @@ class _ProviderRegistrationScreenState
                   (v == null || v.length < 6) ? 'Minimum 6 characters' : null,
             ),
             const SizedBox(height: 20),
-            authFieldLabel('Category'),
-            FormField<Category>(
-              initialValue: _selectedCategory,
-              validator: (v) => v == null ? 'Required' : null,
+            authFieldLabel('Categories'),
+            FormField<Set<Category>>(
+              initialValue: _selectedCategories,
+              validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
               builder: (state) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     InkWell(
                       onTap: () async {
-                        await _pickCategory();
-                        state.didChange(_selectedCategory);
+                        await _pickCategories();
+                        state.didChange(_selectedCategories);
                       },
                       borderRadius: BorderRadius.circular(14),
                       child: InputDecorator(
                         decoration:
-                            authFieldDecoration(hint: 'Select your category')
+                            authFieldDecoration(hint: 'Select your categories')
                                 .copyWith(
                           errorText: state.errorText,
                           suffixIcon: const Icon(Icons.chevron_right_rounded,
                               color: Colors.black38),
                         ),
                         child: Text(
-                          _selectedCategory?.name ?? 'Select your category',
+                          _selectedCategories.isEmpty
+                              ? 'Select your categories'
+                              : _selectedCategories.map((c) => c.name).join(', '),
                           style: TextStyle(
                             fontSize: 15,
-                            color: _selectedCategory == null
+                            color: _selectedCategories.isEmpty
                                 ? Colors.grey.shade600
                                 : Colors.black87,
-                            fontWeight: _selectedCategory == null
+                            fontWeight: _selectedCategories.isEmpty
                                 ? FontWeight.normal
                                 : FontWeight.w600,
                           ),
                         ),
                       ),
                     ),
+                    if (_selectedCategories.length > 1) ...[
+                      const SizedBox(height: 10),
+                      Text('Set primary category', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+                      const SizedBox(height: 6),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _selectedCategories.map((category) {
+                          final isPrimary = category.id == _primaryCategoryId;
+                          return ChoiceChip(
+                            label: Text(category.name),
+                            selected: isPrimary,
+                            onSelected: (_) => setState(() => _primaryCategoryId = category.id),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ],
                 );
               },

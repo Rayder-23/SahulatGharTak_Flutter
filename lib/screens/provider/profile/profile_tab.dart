@@ -2,19 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../models/category.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/provider_categories_provider.dart';
 import '../../../providers/provider_dashboard_provider.dart';
 import '../../../providers/provider_document_provider.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/provider_availability_helper.dart';
 import '../../../utils/privacy_policy_launcher.dart';
 import '../../../utils/provider_routes.dart';
+import '../../../widgets/app_toast.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/curved_profile_header.dart';
 import '../../../widgets/delete_account_dialog.dart';
 import '../../../widgets/message_dialog.dart';
 import '../../../widgets/provider/provider_tab_header.dart' show providerBrandDark, providerBrandBlue, providerBrandAccent;
+import '../../../widgets/primary_category_dialog.dart';
 import '../../../widgets/provider/tab_state_placeholder.dart';
+import '../../category_picker_screen.dart';
 import '../../home_screen.dart';
 import '../../landing_screen.dart';
 
@@ -44,6 +49,70 @@ class _ProfileTabState extends State<ProfileTab> {
       dashboard.loadProviderDetail(providerUid);
       dashboard.loadAvailabilityStatus(providerUid);
       context.read<ProviderDocumentProvider>().loadDocuments(providerUid);
+      context.read<ProviderCategoriesProvider>().load(providerUid);
+    }
+  }
+
+  Future<void> _editCategories(BuildContext context) async {
+    final providerUid = context.read<AuthProvider>().currentUser?.providerUid;
+    if (providerUid == null) return;
+
+    final categoriesProvider = context.read<ProviderCategoriesProvider>();
+    final currentIds = categoriesProvider.categories.map((c) => c.categoryUid).toSet();
+
+    final result = await Navigator.of(context).push<List<Category>>(
+      MaterialPageRoute(builder: (_) => CategoryPickerScreen(selectedCategoryIds: currentIds)),
+    );
+    if (result == null || result.isEmpty || !context.mounted) return;
+
+    final primaryMatches = categoriesProvider.categories.where((c) => c.isPrimary);
+    final currentPrimary = primaryMatches.isEmpty ? null : primaryMatches.first.categoryUid;
+
+    int primaryCategoryId;
+    if (result.length == 1) {
+      primaryCategoryId = result.first.id;
+    } else {
+      final chosen = await showPrimaryCategoryDialog(context, categories: result, initialPrimaryId: currentPrimary);
+      if (chosen == null || !context.mounted) return;
+      primaryCategoryId = chosen;
+    }
+
+    await _saveCategories(context, providerUid, categoryIds: result.map((c) => c.id).toList(), primaryCategoryId: primaryCategoryId);
+  }
+
+  /// Lets the provider change which of their *already-selected* categories is
+  /// primary at any time, without going through the full add/remove picker —
+  /// a standalone entry point to [showPrimaryCategoryDialog] alongside
+  /// [_editCategories]'s full "Edit" flow.
+  Future<void> _editPrimaryCategory(BuildContext context) async {
+    final providerUid = context.read<AuthProvider>().currentUser?.providerUid;
+    if (providerUid == null) return;
+
+    final categoriesProvider = context.read<ProviderCategoriesProvider>();
+    final categories = categoriesProvider.categories;
+    if (categories.length < 2) return;
+
+    final asCategories = categories
+        .map((c) => Category(id: c.categoryUid, serviceId: 0, serviceName: '', name: c.categoryName, description: null, createdOn: DateTime.now()))
+        .toList();
+    final primaryMatches = categories.where((c) => c.isPrimary);
+    final currentPrimary = primaryMatches.isEmpty ? null : primaryMatches.first.categoryUid;
+
+    final chosen = await showPrimaryCategoryDialog(context, categories: asCategories, initialPrimaryId: currentPrimary);
+    if (chosen == null || chosen == currentPrimary || !context.mounted) return;
+
+    await _saveCategories(context, providerUid, categoryIds: categories.map((c) => c.categoryUid).toList(), primaryCategoryId: chosen);
+  }
+
+  Future<void> _saveCategories(BuildContext context, int providerUid, {required List<int> categoryIds, required int primaryCategoryId}) async {
+    final categoriesProvider = context.read<ProviderCategoriesProvider>();
+    final success = await categoriesProvider.save(providerUid, categoryIds: categoryIds, primaryCategoryId: primaryCategoryId);
+    if (!context.mounted) return;
+
+    if (success) {
+      showAppToast(context, 'Categories updated', type: AppToastType.success);
+    } else {
+      showAppToast(context, categoriesProvider.error ?? 'Failed to update categories', type: AppToastType.error);
     }
   }
 
@@ -247,6 +316,65 @@ class _ProfileTabState extends State<ProfileTab> {
                 const Divider(height: 1),
                 ListTile(leading: const Icon(Icons.event_rounded, color: providerBrandBlue), title: const Text('Member Since'), subtitle: Text(DateFormat('dd MMM yyyy').format(detail.createdOn))),
               ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                const Expanded(child: _SectionHeader('My Categories')),
+                Consumer<ProviderCategoriesProvider>(
+                  builder: (context, categoriesProvider, _) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (categoriesProvider.categories.length > 1) ...[
+                          TextButton.icon(
+                            onPressed: categoriesProvider.isSaving ? null : () => _editPrimaryCategory(context),
+                            icon: const Icon(Icons.star_rounded, size: 16),
+                            label: const Text('Edit Primary', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
+                            style: TextButton.styleFrom(foregroundColor: providerBrandBlue, padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                          ),
+                          const SizedBox(width: 14),
+                        ],
+                        TextButton.icon(
+                          onPressed: categoriesProvider.isSaving ? null : () => _editCategories(context),
+                          icon: const Icon(Icons.edit_rounded, size: 16),
+                          label: const Text('Edit', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
+                          style: TextButton.styleFrom(foregroundColor: providerBrandBlue, padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Consumer<ProviderCategoriesProvider>(
+              builder: (context, categoriesProvider, _) {
+                if (categoriesProvider.isLoading && categoriesProvider.categories.isEmpty) {
+                  return const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Center(child: CircularProgressIndicator()));
+                }
+                if (categoriesProvider.categories.isEmpty) {
+                  return _InfoCard(
+                    children: [
+                      ListTile(leading: const Icon(Icons.category_rounded, color: providerBrandBlue), title: const Text('Category'), subtitle: Text('${detail.categoryName} (ID: ${detail.categoryId})')),
+                    ],
+                  );
+                }
+                return _InfoCard(
+                  children: [
+                    for (var i = 0; i < categoriesProvider.categories.length; i++) ...[
+                      if (i != 0) const Divider(height: 1),
+                      ListTile(
+                        leading: const Icon(Icons.category_rounded, color: providerBrandBlue),
+                        title: Text(categoriesProvider.categories[i].categoryName),
+                        trailing: categoriesProvider.categories[i].isPrimary
+                            ? const Chip(label: Text('Primary', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)), visualDensity: VisualDensity.compact)
+                            : null,
+                      ),
+                    ],
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 16),
             const _SectionHeader('Availability'),

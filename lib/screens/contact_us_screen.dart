@@ -12,9 +12,9 @@ class ContactUsScreen extends StatelessWidget {
   static const phone1Digits = '03135355770';
   static const phone1WhatsApp = '923135355770';
 
-  static const phone2Display = '0325-5763450';
-  static const phone2Digits = '03255763450';
-  static const phone2WhatsApp = '923255763450';
+  static const phone2Display = '0315-5355770';
+  static const phone2Digits = '03155355770';
+  static const phone2WhatsApp = '923155355770';
 
   static const email = 'sahulatghartak@gmail.com';
 
@@ -106,58 +106,62 @@ class _PhoneContactTile extends StatelessWidget {
       color: kPrimaryColor.withValues(alpha: 0.06),
       borderRadius: BorderRadius.circular(14),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Expanded(
-              child: InkWell(
-                onTap: onCall,
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: kPrimaryColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: kPrimaryColor.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.phone_outlined,
-                            color: kPrimaryColor),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              label,
-                              style: const TextStyle(
-                                color: Colors.black54,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              displayNumber,
-                              style: const TextStyle(
-                                color: Colors.black87,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+              ),
+              child: const Icon(Icons.contact_phone_rounded,
+                  color: kPrimaryColor),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.black54,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    displayNumber,
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Tooltip(
+              message: 'Call',
+              child: Material(
+                color: kPrimaryColor,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onCall,
+                  child: const SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: Icon(Icons.call_rounded, color: Colors.white, size: 20),
                   ),
                 ),
               ),
             ),
+            const SizedBox(width: 10),
             Tooltip(
               message: 'WhatsApp',
               child: Material(
@@ -225,12 +229,17 @@ class _EmailContactTile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      email,
-                      style: const TextStyle(
-                        color: Colors.black87,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        email,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],

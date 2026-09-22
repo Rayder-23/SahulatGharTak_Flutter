@@ -164,8 +164,8 @@ class AuthProvider extends ChangeNotifier {
     required String gender,
     required int experienceYears,
     required String description,
-    required int categoryId,
-    required String categoryName,
+    required List<int> categoryIds,
+    required int primaryCategoryId,
     String? city,
   }) async {
     _isLoading = true;
@@ -181,8 +181,8 @@ class AuthProvider extends ChangeNotifier {
         gender: gender,
         experienceYears: experienceYears,
         description: description,
-        categoryId: categoryId,
-        categoryName: categoryName,
+        categoryIds: categoryIds,
+        primaryCategoryId: primaryCategoryId,
         city: city,
       );
       final loggedIn = await login(mobileNo, password);
