@@ -6,8 +6,10 @@ import '../../../models/provider/service_booking.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/provider_bookings_provider.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/contact_actions.dart';
 import '../../../utils/currency_formatter.dart';
 import '../../../utils/status_progress.dart';
+import '../../../widgets/app_toast.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
 import '../../../widgets/provider/status_chip.dart';
 import '../../../widgets/provider/tab_state_placeholder.dart';
@@ -136,6 +138,9 @@ class _BookingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = statusColor(booking.status);
+    final bookingsProvider = context.watch<ProviderBookingsProvider>();
+    final isStarting = bookingsProvider.updatingUid == booking.uid;
+    final canStartJob = booking.status == 'Accepted';
 
     return OpenContainer(
       closedElevation: 0,
@@ -247,7 +252,71 @@ class _BookingCard extends StatelessWidget {
                             compact: true,
                           ),
                           const SizedBox(height: 10),
-                          StatusChip(label: booking.status, color: color),
+                          Row(
+                            children: [
+                              StatusChip(label: booking.status, color: color),
+                              if (booking.clientMobileNo != null) ...[
+                                const Spacer(),
+                                TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                                    visualDensity: VisualDensity.compact,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  onPressed: () => callNumber(context, booking.clientMobileNo!),
+                                  icon: const Icon(Icons.call_rounded, size: 16, color: kAccentColor),
+                                  label: const Text('Call', style: TextStyle(color: kAccentColor, fontWeight: FontWeight.w700)),
+                                ),
+                                TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                                    visualDensity: VisualDensity.compact,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  onPressed: () => openWhatsApp(context, booking.clientMobileNo!),
+                                  icon: const Icon(Icons.chat, size: 16, color: Color(0xFF25D366)),
+                                  label: const Text('WhatsApp', style: TextStyle(color: Color(0xFF25D366), fontWeight: FontWeight.w700)),
+                                ),
+                              ],
+                            ],
+                          ),
+                          if (canStartJob) ...[
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: kAccentColor,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                                ),
+                                onPressed: isStarting
+                                    ? null
+                                    : () async {
+                                        final success = await bookingsProvider.startJob(booking);
+                                        if (!context.mounted) return;
+                                        showAppToast(
+                                          context,
+                                          success
+                                              ? 'Job started'
+                                              : (bookingsProvider.error ?? 'Failed to start job'),
+                                          type: success ? AppToastType.success : AppToastType.error,
+                                        );
+                                      },
+                                icon: isStarting
+                                    ? const SizedBox(
+                                        height: 16,
+                                        width: 16,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                      )
+                                    : const Icon(Icons.play_arrow_rounded, size: 18),
+                                label: Text(isStarting ? 'Starting…' : 'Start Job'),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

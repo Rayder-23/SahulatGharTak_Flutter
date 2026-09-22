@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../models/provider/service_booking.dart';
 import '../../../providers/provider_bookings_provider.dart';
 import '../../../utils/cancel_reasons.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/contact_actions.dart';
 import '../../../utils/currency_formatter.dart';
 import '../../../utils/status_progress.dart';
 import '../../../widgets/app_toast.dart';
@@ -55,13 +55,8 @@ IconData statusIcon(String status) {
   }
 }
 
-Future<void> _callNumber(BuildContext context, String mobileNo) async {
-  final uri = Uri(scheme: 'tel', path: mobileNo);
-  final launched = await launchUrl(uri);
-  if (!launched && context.mounted) {
-    showAppToast(context, 'Could not start a call.', type: AppToastType.error);
-  }
-}
+Future<void> _callNumber(BuildContext context, String mobileNo) =>
+    callNumber(context, mobileNo);
 
 /// Full-screen booking detail, opened via container-transform from the
 /// bookings list — mirrors [RequestDetailScreen]'s gradient header + sectioned
