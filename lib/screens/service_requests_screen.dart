@@ -1,6 +1,5 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/customer_service_request.dart';
@@ -10,6 +9,7 @@ import '../utils/breakpoints.dart';
 import '../utils/constants.dart';
 import '../utils/cancel_reasons.dart';
 import '../utils/currency_formatter.dart';
+import '../utils/date_time_formatter.dart';
 import '../utils/status_progress.dart';
 import '../widgets/app_toast.dart';
 import '../widgets/bottom_nav.dart';
@@ -499,7 +499,7 @@ class _RequestCard extends StatelessWidget {
                                   size: 13, color: Colors.grey[400]),
                               const SizedBox(width: 4),
                               Text(
-                                'Requested ${DateFormat('dd MMM yyyy').format(request.createdOn)}',
+                                'Requested ${formatLocalDateTime(request.createdOn, 'dd MMM yyyy')}',
                                 style: TextStyle(
                                     color: Colors.grey[400],
                                     fontSize: 11.5,
@@ -628,7 +628,7 @@ class _RequestCard extends StatelessWidget {
                                   color: Color(0xFF1A2233)),
                             ),
                             Text(
-                              '${request.status} · ${DateFormat('dd MMM yyyy').format(request.createdOn)}',
+                              '${request.status} · ${formatLocalDateTime(request.createdOn, 'dd MMM yyyy')}',
                               style: TextStyle(
                                   color: Colors.grey[500],
                                   fontSize: 11.5,

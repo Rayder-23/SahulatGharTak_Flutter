@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -10,6 +9,7 @@ import '../utils/breakpoints.dart';
 import '../utils/cancel_reasons.dart';
 import '../utils/constants.dart';
 import '../utils/currency_formatter.dart';
+import '../utils/date_time_formatter.dart';
 import '../utils/status_progress.dart';
 import '../widgets/app_toast.dart';
 import '../widgets/confirm_dialog.dart';
@@ -588,9 +588,9 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                           compact: true),
                                       _DetailRow(
                                         label: 'Requested On',
-                                        value:
-                                            DateFormat('dd MMM yyyy, hh:mm a')
-                                                .format(request.createdOn),
+                                        value: formatLocalDateTime(
+                                            request.createdOn,
+                                            'dd MMM yyyy, hh:mm a'),
                                         icon: Icons.schedule_rounded,
                                         compact: true,
                                       ),

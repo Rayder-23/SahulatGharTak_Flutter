@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/provider/material_item.dart';
@@ -10,6 +9,7 @@ import '../../../utils/cancel_reasons.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/contact_actions.dart';
 import '../../../utils/currency_formatter.dart';
+import '../../../utils/date_time_formatter.dart';
 import '../../../utils/status_progress.dart';
 import '../../../widgets/app_toast.dart';
 import '../../../widgets/reason_dialog.dart';
@@ -300,19 +300,19 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                         _DetailRow(label: 'Booking ID', value: '#${booking.uid}', icon: Icons.tag_rounded, compact: true),
                         _DetailRow(
                             label: 'Created On',
-                            value: DateFormat('dd MMM yyyy, hh:mm a').format(booking.createdOn),
+                            value: formatLocalDateTime(booking.createdOn, 'dd MMM yyyy, hh:mm a'),
                             icon: Icons.schedule_rounded,
                             compact: true),
                         if (booking.acceptedOn != null)
                           _DetailRow(
                               label: 'Accepted On',
-                              value: DateFormat('dd MMM yyyy, hh:mm a').format(booking.acceptedOn!),
+                              value: formatLocalDateTime(booking.acceptedOn!, 'dd MMM yyyy, hh:mm a'),
                               icon: Icons.thumb_up_rounded,
                               compact: true),
                         if (booking.completedOn != null)
                           _DetailRow(
                               label: 'Completed On',
-                              value: DateFormat('dd MMM yyyy, hh:mm a').format(booking.completedOn!),
+                              value: formatLocalDateTime(booking.completedOn!, 'dd MMM yyyy, hh:mm a'),
                               icon: Icons.check_circle_rounded,
                               compact: true),
                       ],

@@ -1,12 +1,19 @@
 ================================================================================
 SahulatGharTak API Reference
-Version: 3.16 | Last Updated: 2026-09-21
+Version: 3.17 | Last Updated: 2026-09-23
 Database: SahulatAppDB
 Local Base URL:    https://localhost:7265/api/
 Deployed Base URL:  https://sahulatghartak.com/api/
 DB Server: 34.131.41.192,1433
 Format: REST over HTTPS, JSON request/response bodies
 Auth: None currently — no Authorization header/token required; identity is passed via userId/mobileNo/profileId fields in request bodies
+
+DateTime fields: all DateTime values in API responses are UTC, serialized as ISO-8601 with an
+explicit "Z" suffix (e.g. "2026-09-22T11:29:43.137Z") — added 2026-09-23 via a global
+UtcDateTimeJsonConverter (previously the "Z" was missing, since EF Core returns SQL Server
+datetime columns as Kind=Unspecified). The app is responsible for converting to local/Pakistan
+display time; do not assume these are already Pakistan time. Operations are Pakistan-based (PKT,
+UTC+5, no DST) — recommended client handling: parse as UTC, then convert to local/PKT for display.
 
 Purpose: Authoritative source of truth for this project's backend API contract.
 Read this file before implementing, modifying, or debugging any API integration

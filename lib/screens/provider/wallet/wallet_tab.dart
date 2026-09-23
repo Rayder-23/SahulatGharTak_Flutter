@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/provider/provider_wallet.dart';
@@ -7,6 +6,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../providers/provider_wallet_provider.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/currency_formatter.dart';
+import '../../../utils/date_time_formatter.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
 import '../../../widgets/provider/tab_state_placeholder.dart';
 
@@ -237,7 +237,7 @@ class _TransactionTile extends StatelessWidget {
                 Text(_humanizeReason(transaction.reason), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                 const SizedBox(height: 2),
                 Text(
-                  DateFormat('MMM d, yyyy • h:mm a').format(transaction.createdOn),
+                  formatLocalDateTime(transaction.createdOn, 'MMM d, yyyy • h:mm a'),
                   style: TextStyle(color: Colors.grey[500], fontSize: 11.5),
                 ),
                 if (transaction.bookingUid != null) ...[

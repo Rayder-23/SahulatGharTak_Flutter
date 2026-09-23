@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/provider/service_booking.dart';
@@ -8,6 +7,7 @@ import '../../../providers/provider_bookings_provider.dart';
 import '../../../utils/cancel_reasons.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/currency_formatter.dart';
+import '../../../utils/date_time_formatter.dart';
 import '../../../widgets/app_toast.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
 import '../../../widgets/reason_dialog.dart';
@@ -284,7 +284,7 @@ class _IncomingRequestCard extends StatelessWidget {
                         Icon(Icons.schedule_rounded, size: 13, color: Colors.grey[400]),
                         const SizedBox(width: 4),
                         Text(
-                          'Requested ${DateFormat('dd MMM yyyy, hh:mm a').format(booking.createdOn)}',
+                          'Requested ${formatLocalDateTime(booking.createdOn, 'dd MMM yyyy, hh:mm a')}',
                           style: TextStyle(color: Colors.grey[400], fontSize: 11.5, fontWeight: FontWeight.w500),
                         ),
                       ],

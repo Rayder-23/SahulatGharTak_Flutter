@@ -63,9 +63,9 @@ class _ProviderHomeTabState extends State<ProviderHomeTab> {
     final completedToday = bookingsProvider.bookings
         .where((b) =>
             b.completedOn != null &&
-            b.completedOn!.year == now.year &&
-            b.completedOn!.month == now.month &&
-            b.completedOn!.day == now.day)
+            b.completedOn!.toLocal().year == now.year &&
+            b.completedOn!.toLocal().month == now.month &&
+            b.completedOn!.toLocal().day == now.day)
         .length;
     final averageRating = dashboard.providerDetail?.averageRating ?? 0;
     final walletBalance = walletProvider.wallet?.balance;

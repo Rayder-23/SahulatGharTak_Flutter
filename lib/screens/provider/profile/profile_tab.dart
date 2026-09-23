@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/category.dart';
@@ -8,6 +7,7 @@ import '../../../providers/provider_categories_provider.dart';
 import '../../../providers/provider_dashboard_provider.dart';
 import '../../../providers/provider_document_provider.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/date_time_formatter.dart';
 import '../../../utils/provider_availability_helper.dart';
 import '../../../utils/privacy_policy_launcher.dart';
 import '../../../utils/provider_routes.dart';
@@ -314,7 +314,7 @@ class _ProfileTabState extends State<ProfileTab> {
                   trailing: _VerificationBadge(isVerified: documents.isVerified),
                 ),
                 const Divider(height: 1),
-                ListTile(leading: const Icon(Icons.event_rounded, color: providerBrandBlue), title: const Text('Member Since'), subtitle: Text(DateFormat('dd MMM yyyy').format(detail.createdOn))),
+                ListTile(leading: const Icon(Icons.event_rounded, color: providerBrandBlue), title: const Text('Member Since'), subtitle: Text(formatLocalDateTime(detail.createdOn, 'dd MMM yyyy'))),
               ],
             ),
             const SizedBox(height: 16),
