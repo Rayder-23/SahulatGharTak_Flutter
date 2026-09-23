@@ -54,3 +54,8 @@ app.*.map.json
 android/key.properties
 *.jks
 *.keystore
+
+# Local-only secrets (API keys, etc.)
+.env
+.env.*
+!.env.example

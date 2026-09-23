@@ -17,8 +17,8 @@ class ClientAddressRepository {
     required String fullAddress,
     required String area,
     required String city,
-    double latitude = 0,
-    double longitude = 0,
+    double? latitude,
+    double? longitude,
   }) {
     return _apiService.create(
       clientUid: clientUid,
@@ -38,8 +38,8 @@ class ClientAddressRepository {
     required String fullAddress,
     required String area,
     required String city,
-    double latitude = 0,
-    double longitude = 0,
+    double? latitude,
+    double? longitude,
   }) {
     return _apiService.update(
       addressUid: addressUid,

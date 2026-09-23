@@ -5,8 +5,9 @@ class ClientAddress {
   final String fullAddress;
   final String area;
   final String city;
-  final double latitude;
-  final double longitude;
+  final double? latitude;
+  final double? longitude;
+  final bool hasLocation;
 
   const ClientAddress({
     required this.uid,
@@ -15,8 +16,9 @@ class ClientAddress {
     required this.fullAddress,
     required this.area,
     required this.city,
-    required this.latitude,
-    required this.longitude,
+    this.latitude,
+    this.longitude,
+    this.hasLocation = false,
   });
 
   factory ClientAddress.fromJson(Map<String, dynamic> json) {
@@ -27,8 +29,9 @@ class ClientAddress {
       fullAddress: json['fullAddress'] as String? ?? '',
       area: json['area'] as String? ?? '',
       city: json['city'] as String? ?? '',
-      latitude: (json['latitude'] as num?)?.toDouble() ?? 0,
-      longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      hasLocation: json['hasLocation'] as bool? ?? false,
     );
   }
 }

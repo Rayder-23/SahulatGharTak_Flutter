@@ -34,6 +34,8 @@
 	<string>Sahulat Ghar Tak needs access to your photo library to select your profile photo and CNIC images during provider registration.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Sahulat Ghar Tak's camera requires microphone access to initialize, though audio is never recorded.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Sahulat Ghar Tak uses your location to center the map and help you drop an accurate pin for your address.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -45,8 +45,8 @@ class ClientAddressProvider extends ChangeNotifier {
     required String fullAddress,
     required String area,
     required String city,
-    double latitude = 0,
-    double longitude = 0,
+    double? latitude,
+    double? longitude,
   }) async {
     _saving = true;
     _error = null;
@@ -80,8 +80,8 @@ class ClientAddressProvider extends ChangeNotifier {
     required String fullAddress,
     required String area,
     required String city,
-    double latitude = 0,
-    double longitude = 0,
+    double? latitude,
+    double? longitude,
   }) async {
     _saving = true;
     _error = null;

@@ -381,7 +381,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             decoration: BoxDecoration(color: _brandBlue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(11)),
                             child: Icon(Icons.location_on_rounded, color: _brandBlue, size: 20),
                           ),
-                          title: Text(address.addressTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+                          title: Row(
+                            children: [
+                              Flexible(child: Text(address.addressTitle, style: const TextStyle(fontWeight: FontWeight.w700))),
+                              const SizedBox(width: 6),
+                              if (address.hasLocation)
+                                const Icon(Icons.location_on_rounded, size: 15, color: _brandBlue)
+                              else
+                                GestureDetector(
+                                  onTap: () => _editAddress(address),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: const Text('Set location', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: Colors.orange)),
+                                  ),
+                                ),
+                            ],
+                          ),
                           subtitle: Text('${address.fullAddress}, ${address.area}, ${address.city}'),
                           trailing: addressState.deletingUid == address.uid
                               ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))

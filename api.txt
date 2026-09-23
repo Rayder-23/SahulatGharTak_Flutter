@@ -1,6 +1,6 @@
 ================================================================================
 SahulatGharTak API Reference
-Version: 3.17 | Last Updated: 2026-09-23
+Version: 3.18 | Last Updated: 2026-09-23
 Database: SahulatAppDB
 Local Base URL:    https://localhost:7265/api/
 Deployed Base URL:  https://sahulatghartak.com/api/
@@ -1304,7 +1304,8 @@ Success (200):
       "area": "DHA Phase 2",
       "city": "Karachi",
       "latitude": 24.8607000,
-      "longitude": 67.0011000
+      "longitude": 67.0011000,
+      "hasLocation": true
     }
   ]
 }
@@ -1334,7 +1335,8 @@ Success (200):
     "area": "DHA Phase 2",
     "city": "Karachi",
     "latitude": 24.8607000,
-    "longitude": 67.0011000
+    "longitude": 67.0011000,
+    "hasLocation": true
   }
 }
 
@@ -1362,6 +1364,15 @@ Request Body:
   "longitude": 67.0011
 }
 
+Notes:
+- latitude/longitude are both optional (nullable), but if provided, BOTH must be present together
+  — sending only one triggers a validation Fail (400) below. Omitting both is fine (address has no
+  GPS pin yet); the response's hasLocation will be false.
+- (0, 0) is treated as "no pin set", same as omitting both fields — hasLocation is computed as
+  (latitude != null && longitude != null && !(latitude == 0 && longitude == 0)). This exists
+  because every currently-published app build sends (0, 0) as its default today; that behavior
+  keeps working unchanged, this note is just documenting what hasLocation reports for it.
+
 Success (201):
 {
   "success": true,
@@ -1374,14 +1385,22 @@ Success (201):
     "area": "DHA Phase 2",
     "city": "Karachi",
     "latitude": 24.8607000,
-    "longitude": 67.0011000
+    "longitude": 67.0011000,
+    "hasLocation": true
   }
 }
 
-Fail (400):
+Fail (400 - client not found):
 {
   "success": false,
   "message": "Client not found.",
+  "data": null
+}
+
+Fail (400 - only one of latitude/longitude sent):
+{
+  "success": false,
+  "message": "Latitude and Longitude must both be provided or both omitted.",
   "data": null
 }
 
@@ -1408,6 +1427,7 @@ Request Body:
 
 Notes:
 - addressUid in URL and body must match
+- Same latitude/longitude rules as POST Create above: both-or-neither, (0,0) treated as no pin set.
 
 Success (200):
 {
@@ -1421,7 +1441,8 @@ Success (200):
     "area": "Clifton",
     "city": "Karachi",
     "latitude": 24.8138000,
-    "longitude": 67.0299000
+    "longitude": 67.0299000,
+    "hasLocation": true
   }
 }
 
@@ -1429,6 +1450,13 @@ Fail (404):
 {
   "success": false,
   "message": "Client address not found.",
+  "data": null
+}
+
+Fail (400 - only one of latitude/longitude sent):
+{
+  "success": false,
+  "message": "Latitude and Longitude must both be provided or both omitted.",
   "data": null
 }
 

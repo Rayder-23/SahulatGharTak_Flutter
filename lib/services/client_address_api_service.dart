@@ -20,8 +20,8 @@ class ClientAddressApiService {
     required String fullAddress,
     required String area,
     required String city,
-    double latitude = 0,
-    double longitude = 0,
+    double? latitude,
+    double? longitude,
   }) async {
     final response = await http.post(
       Uri.parse('$kApiBaseUrl/client-addresses'),
@@ -32,8 +32,8 @@ class ClientAddressApiService {
         'fullAddress': fullAddress,
         'area': area,
         'city': city,
-        'latitude': latitude,
-        'longitude': longitude,
+        if (latitude != null) 'latitude': latitude,
+        if (longitude != null) 'longitude': longitude,
       }),
     ).timeout(kApiTimeout);
 
@@ -48,8 +48,8 @@ class ClientAddressApiService {
     required String fullAddress,
     required String area,
     required String city,
-    double latitude = 0,
-    double longitude = 0,
+    double? latitude,
+    double? longitude,
   }) async {
     final response = await http.put(
       Uri.parse('$kApiBaseUrl/client-addresses/$addressUid'),
@@ -61,8 +61,8 @@ class ClientAddressApiService {
         'fullAddress': fullAddress,
         'area': area,
         'city': city,
-        'latitude': latitude,
-        'longitude': longitude,
+        if (latitude != null) 'latitude': latitude,
+        if (longitude != null) 'longitude': longitude,
       }),
     ).timeout(kApiTimeout);
 
