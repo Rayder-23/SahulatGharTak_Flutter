@@ -68,6 +68,8 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
         return 'Align your CNIC (front) within the frame';
       case ProviderDocumentSlot.cnicBack:
         return 'Align your CNIC (back) within the frame';
+      case ProviderDocumentSlot.policeVerification:
+        return 'Align the document within the frame';
     }
   }
 

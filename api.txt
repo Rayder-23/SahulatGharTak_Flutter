@@ -1,6 +1,6 @@
 ================================================================================
 SahulatGharTak API Reference
-Version: 3.19 | Last Updated: 2026-09-24
+Version: 3.20 | Last Updated: 2026-09-24
 Database: SahulatAppDB
 Local Base URL:    https://localhost:7265/api/
 Deployed Base URL:  https://sahulatghartak.com/api/
@@ -613,7 +613,8 @@ PROVIDER DOCUMENT APIs
 ================================================================================
 Files are stored under wwwroot/uploads/providers/{ProviderUID}/
 Database stores relative paths only (e.g. uploads/providers/25/profile.jpg)
-Allowed: jpg, jpeg, png | Max 5 MB per image | Fixed names: profile.jpg, cnic_front.jpg, cnic_back.jpg
+Allowed: jpg, jpeg, png | Max 5 MB per image
+Fixed names: profile.jpg, cnic_front.jpg, cnic_back.jpg, police_verification.jpg [v3.20]
 
 --------------------------------------------------------------------------------
 POST Upload Provider Documents
@@ -628,16 +629,23 @@ Form Fields:
 - ProfilePhoto (file, optional*)
 - CNICFront (file, optional*)
 - CNICBack (file, optional*)
+- PoliceVerification (file, optional) [v3.20] — always optional, on both first submission and
+  edit. Old app builds never send this field and are unaffected; new app builds may also omit it
+  (e.g. a provider hasn't obtained the certificate yet). No isFirstSubmission requirement applies
+  to this field, unlike the three above.
 
 * First-time submission (provider has no documents row yet, e.g. during initial
-  registration): all three files are required — omitting any returns 400.
+  registration): ProfilePhoto, CNICFront, and CNICBack are required — omitting any of those
+  three returns 400. PoliceVerification is never required (see above).
   Edit / replace (provider already has a documents row): send only the file(s)
   that changed. Any field present replaces that stored image (same jpg/jpeg/png,
-  5 MB validation, saved as profile.jpg/cnic_front.jpg/cnic_back.jpg). Any field
-  omitted leaves the provider's existing stored image for that slot unchanged.
+  5 MB validation, saved as profile.jpg/cnic_front.jpg/cnic_back.jpg/police_verification.jpg).
+  Any field omitted leaves the provider's existing stored image for that slot unchanged.
   Re-uploading CNICFront and/or CNICBack resets IsVerified to false until an
   admin re-verifies. Re-uploading ProfilePhoto alone does NOT reset IsVerified
   (validated client-side by face detection at capture, not by manual review).
+  Re-uploading PoliceVerification does NOT reset IsVerified either (unrelated to CNIC/provider
+  identity verification).
 
 Success (200):
 {
@@ -648,6 +656,7 @@ Success (200):
     "profilePhotoPath": "uploads/providers/25/profile.jpg",
     "cnicFrontImagePath": "uploads/providers/25/cnic_front.jpg",
     "cnicBackImagePath": "uploads/providers/25/cnic_back.jpg",
+    "policeVerificationPath": null,
     "isVerified": false,
     "verifiedOn": null,
     "verifiedBy": null,
@@ -712,6 +721,7 @@ Success (200):
     "profilePhotoPath": "uploads/providers/25/profile.jpg",
     "cnicFrontImagePath": "uploads/providers/25/cnic_front.jpg",
     "cnicBackImagePath": "uploads/providers/25/cnic_back.jpg",
+    "policeVerificationPath": null,
     "isVerified": false,
     "verifiedOn": null,
     "verifiedBy": null,
@@ -776,6 +786,7 @@ Success (200):
     "profilePhotoPath": "uploads/providers/25/profile.jpg",
     "cnicFrontImagePath": "uploads/providers/25/cnic_front.jpg",
     "cnicBackImagePath": "uploads/providers/25/cnic_back.jpg",
+    "policeVerificationPath": null,
     "isVerified": true,
     "verifiedOn": "2026-07-23T12:00:00",
     "verifiedBy": 1,

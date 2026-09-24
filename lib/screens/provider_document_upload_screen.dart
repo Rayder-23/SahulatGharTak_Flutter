@@ -100,6 +100,15 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
             onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.cnicBack),
             onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.cnicBack),
           ),
+          const SizedBox(height: 20),
+          authFieldLabel('Police Verification (optional)'),
+          DocumentImageSlot(
+            file: provider.policeVerification,
+            placeholderIcon: Icons.local_police_outlined,
+            label: 'Add police verification certificate',
+            onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.policeVerification),
+            onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.policeVerification),
+          ),
           const SizedBox(height: 28),
           if (provider.isUploading) ...[
             ClipRRect(

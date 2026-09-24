@@ -23,6 +23,7 @@ class ProviderDocumentRepository {
     File? profilePhoto,
     File? cnicFront,
     File? cnicBack,
+    File? policeVerification,
     void Function(double progress)? onProgress,
   }) {
     return _apiService.uploadDocuments(
@@ -30,6 +31,7 @@ class ProviderDocumentRepository {
       profilePhoto: profilePhoto,
       cnicFront: cnicFront,
       cnicBack: cnicBack,
+      policeVerification: policeVerification,
       onProgress: onProgress,
     );
   }

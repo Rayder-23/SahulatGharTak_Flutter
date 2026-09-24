@@ -170,6 +170,25 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                           style: TextStyle(color: Colors.grey[600], fontSize: 12),
                         ),
                       ],
+                      const SizedBox(height: 20),
+                      const Text('Police Verification (optional)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                      const SizedBox(height: 8),
+                      DocumentImageSlot(
+                        file: provider.policeVerification,
+                        networkUrl: provider.policeVerificationUrl,
+                        placeholderIcon: Icons.local_police_outlined,
+                        label: 'Add police verification certificate',
+                        locked: provider.isVerified,
+                        onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.policeVerification),
+                        onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.policeVerification),
+                      ),
+                      if (provider.isVerified) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          'Your Police Verification document is locked after verification. Contact support if it needs to change.',
+                          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        ),
+                      ],
                       const SizedBox(height: 28),
                       if (provider.isUploading) ...[
                         ClipRRect(

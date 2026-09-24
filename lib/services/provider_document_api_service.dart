@@ -44,6 +44,7 @@ class ProviderDocumentApiService {
     File? profilePhoto,
     File? cnicFront,
     File? cnicBack,
+    File? policeVerification,
     void Function(double progress)? onProgress,
   }) async {
     final uri = Uri.parse('$kApiBaseUrl/provider/upload-documents');
@@ -51,6 +52,7 @@ class ProviderDocumentApiService {
     if (profilePhoto != null) request.files.add(await _imagePart('ProfilePhoto', profilePhoto));
     if (cnicFront != null) request.files.add(await _imagePart('CNICFront', cnicFront));
     if (cnicBack != null) request.files.add(await _imagePart('CNICBack', cnicBack));
+    if (policeVerification != null) request.files.add(await _imagePart('PoliceVerification', policeVerification));
 
     final streamedResponse = await _sendWithProgress(request, onProgress);
     final response = await http.Response.fromStream(streamedResponse);

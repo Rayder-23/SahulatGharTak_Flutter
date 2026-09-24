@@ -9,7 +9,7 @@ import '../data/repositories/provider_document_repository.dart';
 import '../models/provider/provider_documents.dart';
 import '../utils/api_error.dart';
 
-enum ProviderDocumentSlot { profilePhoto, cnicFront, cnicBack }
+enum ProviderDocumentSlot { profilePhoto, cnicFront, cnicBack, policeVerification }
 
 class ProviderDocumentProvider extends ChangeNotifier {
   ProviderDocumentProvider({required ProviderDocumentRepository repository}) : _repository = repository;
@@ -31,12 +31,14 @@ class ProviderDocumentProvider extends ChangeNotifier {
   File? _profilePhoto;
   File? _cnicFront;
   File? _cnicBack;
+  File? _policeVerification;
 
   // Already-uploaded documents, resolved to full URLs (used by the "view and
   // change existing documents" screen; empty for the post-registration flow).
   String? _profilePhotoUrl;
   String? _cnicFrontUrl;
   String? _cnicBackUrl;
+  String? _policeVerificationUrl;
   bool _isVerified = false;
   String? _verificationRemarks;
 
@@ -51,9 +53,11 @@ class ProviderDocumentProvider extends ChangeNotifier {
   File? get profilePhoto => _profilePhoto;
   File? get cnicFront => _cnicFront;
   File? get cnicBack => _cnicBack;
+  File? get policeVerification => _policeVerification;
   String? get profilePhotoUrl => _profilePhotoUrl;
   String? get cnicFrontUrl => _cnicFrontUrl;
   String? get cnicBackUrl => _cnicBackUrl;
+  String? get policeVerificationUrl => _policeVerificationUrl;
   bool get isVerified => _isVerified;
   String? get verificationRemarks => _verificationRemarks;
   bool get isLoadingExisting => _isLoadingExisting;
@@ -72,7 +76,7 @@ class ProviderDocumentProvider extends ChangeNotifier {
   /// saved - used by the "view/edit documents" screen to disable Save Changes
   /// when nothing was actually changed, since a no-op save would still be a
   /// wasted round trip.
-  bool get hasChanges => _profilePhoto != null || _cnicFront != null || _cnicBack != null;
+  bool get hasChanges => _profilePhoto != null || _cnicFront != null || _cnicBack != null || _policeVerification != null;
 
   /// Loads the provider's currently uploaded documents (for the "view and
   /// change" screen reached from the profile page). Safe to call when the
@@ -88,6 +92,7 @@ class ProviderDocumentProvider extends ChangeNotifier {
       _profilePhotoUrl = _repository.resolveUrl(docs?.profilePhotoPath, version: version);
       _cnicFrontUrl = _repository.resolveUrl(docs?.cnicFrontImagePath, version: version);
       _cnicBackUrl = _repository.resolveUrl(docs?.cnicBackImagePath, version: version);
+      _policeVerificationUrl = _repository.resolveUrl(docs?.policeVerificationPath, version: version);
       _isVerified = docs?.isVerified ?? false;
       _verificationRemarks = docs?.verificationRemarks;
     } catch (e) {
@@ -104,7 +109,7 @@ class ProviderDocumentProvider extends ChangeNotifier {
   /// ceiling and records the result.
   Future<void> setPickedImage(ProviderDocumentSlot slot, File file) async {
     try {
-      final isCnic = slot != ProviderDocumentSlot.profilePhoto;
+      final isCnic = slot == ProviderDocumentSlot.cnicFront || slot == ProviderDocumentSlot.cnicBack || slot == ProviderDocumentSlot.policeVerification;
       final resolved = await _enforceSizeLimit(
         file,
         maxDimension: isCnic ? _cnicMaxDimension : _profilePhotoMaxDimension,
@@ -120,6 +125,9 @@ class ProviderDocumentProvider extends ChangeNotifier {
           break;
         case ProviderDocumentSlot.cnicBack:
           _cnicBack = resolved;
+          break;
+        case ProviderDocumentSlot.policeVerification:
+          _policeVerification = resolved;
           break;
       }
       _error = null;
@@ -184,6 +192,9 @@ class ProviderDocumentProvider extends ChangeNotifier {
       case ProviderDocumentSlot.cnicBack:
         _cnicBack = null;
         break;
+      case ProviderDocumentSlot.policeVerification:
+        _policeVerification = null;
+        break;
     }
     notifyListeners();
   }
@@ -220,6 +231,7 @@ class ProviderDocumentProvider extends ChangeNotifier {
         profilePhoto: _profilePhoto,
         cnicFront: _cnicFront,
         cnicBack: _cnicBack,
+        policeVerification: _policeVerification,
         onProgress: (progress) {
           _uploadProgress = progress;
           notifyListeners();
@@ -233,10 +245,12 @@ class ProviderDocumentProvider extends ChangeNotifier {
       _profilePhoto = null;
       _cnicFront = null;
       _cnicBack = null;
+      _policeVerification = null;
       final version = _uploadedDocuments?.updatedOn ?? _uploadedDocuments?.createdOn;
       _profilePhotoUrl = _repository.resolveUrl(_uploadedDocuments?.profilePhotoPath, version: version);
       _cnicFrontUrl = _repository.resolveUrl(_uploadedDocuments?.cnicFrontImagePath, version: version);
       _cnicBackUrl = _repository.resolveUrl(_uploadedDocuments?.cnicBackImagePath, version: version);
+      _policeVerificationUrl = _repository.resolveUrl(_uploadedDocuments?.policeVerificationPath, version: version);
       _isVerified = _uploadedDocuments?.isVerified ?? false;
       _verificationRemarks = _uploadedDocuments?.verificationRemarks;
       return true;
@@ -264,9 +278,11 @@ class ProviderDocumentProvider extends ChangeNotifier {
     _profilePhoto = null;
     _cnicFront = null;
     _cnicBack = null;
+    _policeVerification = null;
     _profilePhotoUrl = null;
     _cnicFrontUrl = null;
     _cnicBackUrl = null;
+    _policeVerificationUrl = null;
     _isLoadingExisting = false;
     _loadError = null;
     _isUploading = false;

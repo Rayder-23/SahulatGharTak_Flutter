@@ -3,6 +3,7 @@ class ProviderDocumentsModel {
   final String? profilePhotoPath;
   final String? cnicFrontImagePath;
   final String? cnicBackImagePath;
+  final String? policeVerificationPath;
   final bool isVerified;
   final DateTime? verifiedOn;
   final int? verifiedBy;
@@ -15,6 +16,7 @@ class ProviderDocumentsModel {
     this.profilePhotoPath,
     this.cnicFrontImagePath,
     this.cnicBackImagePath,
+    this.policeVerificationPath,
     required this.isVerified,
     this.verifiedOn,
     this.verifiedBy,
@@ -29,6 +31,7 @@ class ProviderDocumentsModel {
       profilePhotoPath: json['profilePhotoPath'] as String?,
       cnicFrontImagePath: json['cnicFrontImagePath'] as String?,
       cnicBackImagePath: json['cnicBackImagePath'] as String?,
+      policeVerificationPath: json['policeVerificationPath'] as String?,
       isVerified: json['isVerified'] as bool? ?? false,
       verifiedOn: json['verifiedOn'] != null ? DateTime.parse(json['verifiedOn'] as String) : null,
       verifiedBy: json['verifiedBy'] as int?,

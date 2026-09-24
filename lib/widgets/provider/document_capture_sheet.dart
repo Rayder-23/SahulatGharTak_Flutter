@@ -48,7 +48,13 @@ Future<void> showDocumentCaptureSheet(BuildContext context, {required ProviderDo
   if (source == null || !context.mounted) return;
 
   File? picked;
-  if (source == ImageSource.camera) {
+  if (slot == ProviderDocumentSlot.policeVerification) {
+    // No live-detection guide and no face/CNIC validation for this document -
+    // it's an optional certificate image, not an identity check.
+    picked = source == ImageSource.camera
+        ? await _captureWithPlainCamera(context)
+        : await _pickFromGalleryAndCrop(context, slot);
+  } else if (source == ImageSource.camera) {
     picked = await Navigator.of(context).push<File?>(
       MaterialPageRoute(builder: (_) => LiveCameraCaptureScreen(slot: slot)),
     );
@@ -67,6 +73,23 @@ Future<void> showDocumentCaptureSheet(BuildContext context, {required ProviderDo
   }
 }
 
+/// Plain camera capture with no live framing guide/detection and no crop
+/// aspect lock - used for documents (e.g. Police Verification) that don't
+/// need identity validation.
+Future<File?> _captureWithPlainCamera(BuildContext context) async {
+  final xFile = await ImagePicker().pickImage(source: ImageSource.camera);
+  if (xFile == null || !context.mounted) return null;
+
+  final cropped = await ImageCropper().cropImage(
+    sourcePath: xFile.path,
+    uiSettings: [
+      AndroidUiSettings(toolbarTitle: 'Crop Image', toolbarColor: providerBrandBlue, toolbarWidgetColor: Colors.white),
+      IOSUiSettings(title: 'Crop Image'),
+    ],
+  );
+  return cropped == null ? null : File(cropped.path);
+}
+
 Future<File?> _pickFromGalleryAndCrop(BuildContext context, ProviderDocumentSlot slot) async {
   // requestFullMetadata: false keeps iOS on the permission-free
   // PHPickerViewController path - the default (true) triggers an extra
@@ -77,27 +100,35 @@ Future<File?> _pickFromGalleryAndCrop(BuildContext context, ProviderDocumentSlot
   if (xFile == null || !context.mounted) return null;
 
   final isProfilePhoto = slot == ProviderDocumentSlot.profilePhoto;
+  final isPoliceVerification = slot == ProviderDocumentSlot.policeVerification;
   final title = switch (slot) {
     ProviderDocumentSlot.profilePhoto => 'Crop Profile Photo',
     ProviderDocumentSlot.cnicFront => 'Crop CNIC Front',
     ProviderDocumentSlot.cnicBack => 'Crop CNIC Back',
+    ProviderDocumentSlot.policeVerification => 'Crop Image',
   };
 
   final cropped = await ImageCropper().cropImage(
     sourcePath: xFile.path,
-    aspectRatio: isProfilePhoto ? const CropAspectRatio(ratioX: 1, ratioY: 1) : const CropAspectRatio(ratioX: 85.6, ratioY: 54),
+    aspectRatio: isPoliceVerification
+        ? null
+        : isProfilePhoto
+            ? const CropAspectRatio(ratioX: 1, ratioY: 1)
+            : const CropAspectRatio(ratioX: 85.6, ratioY: 54),
     uiSettings: [
       AndroidUiSettings(
         toolbarTitle: title,
         toolbarColor: providerBrandBlue,
         toolbarWidgetColor: Colors.white,
-        lockAspectRatio: true,
+        lockAspectRatio: !isPoliceVerification,
       ),
-      IOSUiSettings(title: title, aspectRatioLockEnabled: true),
+      IOSUiSettings(title: title, aspectRatioLockEnabled: !isPoliceVerification),
     ],
   );
   if (cropped == null) return null;
   final croppedFile = File(cropped.path);
+
+  if (isPoliceVerification) return croppedFile;
 
   if (!context.mounted) return null;
   final isValid = await _validateStaticImage(context, slot, croppedFile);
@@ -107,6 +138,7 @@ Future<File?> _pickFromGalleryAndCrop(BuildContext context, ProviderDocumentSlot
       ProviderDocumentSlot.profilePhoto => 'No face was detected in that photo. Please choose a clearer one.',
       ProviderDocumentSlot.cnicFront => 'That doesn\'t look like a CNIC front. Please choose a clearer photo of the front.',
       ProviderDocumentSlot.cnicBack => 'That doesn\'t look like a CNIC back. Please choose a clearer photo of the back.',
+      ProviderDocumentSlot.policeVerification => 'Please choose a clearer photo.',
     };
     await showMessageDialog(context, title: 'Photo Not Accepted', message: message, type: MessageDialogType.error);
     return null;
