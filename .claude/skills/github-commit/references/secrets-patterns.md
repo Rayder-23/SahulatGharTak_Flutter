@@ -47,8 +47,16 @@ sk-ant-       # Anthropic
 AKIA          # AWS access key
 ASIA          # AWS temporary key
 xox[baprs]-   # Slack
-rk_live_      # Stripe secret key
+sk_live_      # Stripe secret key — highest severity
+sk_test_      # Stripe test secret key
+rk_live_      # Stripe restricted key
 pk_live_      # Stripe publishable key (low risk but flag anyway)
+AIza          # Google API key
+ya29.         # Google OAuth access token
+glpat-        # GitLab PAT
+npm_          # npm access token
+dop_v1_       # DigitalOcean PAT
+hf_           # Hugging Face token
 SG.           # SendGrid
 key-          # Mailgun
 Bearer        # Hardcoded Bearer token in source code or config
