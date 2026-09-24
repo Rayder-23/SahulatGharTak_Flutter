@@ -99,7 +99,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         ),
       ),
     );
-    if (result != null) setState(() => _pin = result);
+    if (result != null) {
+      setState(() => _pin = result);
+      _mapController?.animateCamera(CameraUpdate.newLatLng(result));
+    }
   }
 
   Future<void> _savePin() async {

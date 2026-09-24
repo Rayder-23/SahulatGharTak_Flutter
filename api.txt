@@ -1,6 +1,6 @@
 ================================================================================
 SahulatGharTak API Reference
-Version: 3.18 | Last Updated: 2026-09-23
+Version: 3.19 | Last Updated: 2026-09-24
 Database: SahulatAppDB
 Local Base URL:    https://localhost:7265/api/
 Deployed Base URL:  https://sahulatghartak.com/api/
@@ -2846,6 +2846,70 @@ Fail (400):
   "message": "Unable to resolve address for the given coordinates.",
   "data": null
 }
+
+Note (v3.19): responses are now forced to English (Nominatim's accept-language=en is set
+server-side) — previously could return script in the coordinate's local language (e.g. Urdu).
+
+--------------------------------------------------------------------------------
+GET Search Geocode (forward) [v3.19]
+--------------------------------------------------------------------------------
+Local:     https://localhost:7265/api/geocoding/search?q={text}&limit={limit}
+Deployed:  https://sahulatghartak.com/api/geocoding/search?q={text}&limit={limit}
+
+Forward-geocodes a free-text query (e.g. "Gulberg Lahore") into candidate coordinate + address
+results, via the same OpenStreetMap Nominatim instance used by Reverse Geocode above. Soft-biased
+to Pakistan (Nominatim countrycodes=pk) but not hard-filtered. English-only results (accept-language=en).
+
+Query params:
+- q (required) — free-text search query, URL-encoded
+- limit (int, optional, default 5, max 10) — number of candidate results to return
+
+Example:
+GET https://localhost:7265/api/geocoding/search?q=Gulberg%20Lahore
+
+Request Body: none
+
+Success (200):
+{
+  "success": true,
+  "message": "Search results retrieved successfully.",
+  "data": [
+    {
+      "displayName": "Gulberg, Lahore Cant, Lahore District, Punjab, 54660, Pakistan",
+      "road": null,
+      "area": "Gulberg",
+      "city": "Lahore Cant",
+      "state": "Punjab",
+      "postalCode": "54660",
+      "latitude": 31.5119955,
+      "longitude": 74.3430178
+    }
+  ]
+}
+
+Fail (200 - no results found):
+{
+  "success": true,
+  "message": "Search results retrieved successfully.",
+  "data": []
+}
+
+Fail (400 - missing/empty q):
+{
+  "success": false,
+  "message": "Search query is required.",
+  "data": null
+}
+
+Fail (400 - Nominatim unreachable/errors):
+{
+  "success": false,
+  "message": "Unable to search for the given query.",
+  "data": null
+}
+
+This is a new route — no currently-published app build calls it, so no app-version coordination
+was needed to add it.
 
 --------------------------------------------------------------------------------
 GET Nearby Providers

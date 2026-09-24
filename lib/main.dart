@@ -45,7 +45,6 @@ import 'screens/provider_dashboard_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/profile_screen.dart';
 import 'widgets/main_navigation_shell.dart';
-import 'screens/service_providers_screen.dart';
 import 'screens/service_request_form_screen.dart';
 import 'screens/service_requests_screen.dart';
 import 'screens/subcategories_screen.dart';
@@ -117,7 +116,6 @@ class SahulatApp extends StatelessWidget {
           ProfileScreen.routeName: (_) => const ProfileScreen(),
           AddAddressScreen.routeName: (_) => const AddAddressScreen(),
           CustomerEditProfileScreen.routeName: (_) => const CustomerEditProfileScreen(),
-          ServiceProvidersScreen.routeName: (_) => const ServiceProvidersScreen(),
           SubCategoriesScreen.routeName: (_) => const SubCategoriesScreen(),
           ServiceRequestFormScreen.routeName: (_) => const ServiceRequestFormScreen(),
           ServiceRequestsScreen.routeName: (_) => const ServiceRequestsScreen(),

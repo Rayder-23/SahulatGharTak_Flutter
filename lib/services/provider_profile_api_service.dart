@@ -36,14 +36,6 @@ class ProviderProfileApiService {
     return ProviderDetailModel.fromJson(json['data'] as Map<String, dynamic>);
   }
 
-  Future<List<ProviderProfileModel>> fetchByCategory(int categoryId) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/provider-profiles?categoryId=$categoryId')).timeout(kApiTimeout);
-
-    final json = _decode(response, 'Failed to load service providers');
-    final List<dynamic> data = json['data'] as List<dynamic>? ?? [];
-    return data.map((item) => ProviderProfileModel.fromJson(item as Map<String, dynamic>)).toList();
-  }
-
   Future<ProviderProfileModel> fetchById(int userId) async {
     final response = await http.get(Uri.parse('$kApiBaseUrl/provider-profiles/$userId')).timeout(kApiTimeout);
 
