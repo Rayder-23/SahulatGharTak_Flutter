@@ -274,7 +274,8 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
                 value: _selectedAddress,
                 hint: 'Select an address',
                 items: addressState.addresses
-                    .map((a) => ThemedDropdownItem(value: a, label: '${a.addressTitle} - ${a.area}, ${a.city}'))
+                    .map((a) => ThemedDropdownItem(
+                        value: a, label: '${a.addressTitle} — ${a.fullAddress}, ${a.area}, ${a.city}'))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedAddress = v),
                 validator: (v) => v == null ? 'Required' : null,

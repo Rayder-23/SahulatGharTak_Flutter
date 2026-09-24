@@ -8,6 +8,7 @@ import '../providers/customer_service_request_provider.dart';
 import '../utils/breakpoints.dart';
 import '../utils/constants.dart';
 import '../utils/cancel_reasons.dart';
+import '../utils/contact_actions.dart';
 import '../utils/currency_formatter.dart';
 import '../utils/date_time_formatter.dart';
 import '../utils/status_progress.dart';
@@ -298,6 +299,8 @@ class _RequestCard extends StatelessWidget {
   final VoidCallback onCancel;
   final VoidCallback onDelete;
 
+  static const _brandBlue = _ServiceRequestsScreenState._brandBlue;
+
   const _RequestCard({
     required this.request,
     required this.statusColor,
@@ -507,6 +510,50 @@ class _RequestCard extends StatelessWidget {
                               ),
                             ],
                           ),
+                          if (request.providerMobileNo != null || request.passcode != null) ...[
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                if (request.passcode != null)
+                                  TextButton.icon(
+                                    style: TextButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                        visualDensity: VisualDensity.compact,
+                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                    onPressed: () => showRequestPasscodeDialog(context, request),
+                                    icon: const Icon(Icons.password_rounded, size: 16, color: _brandBlue),
+                                    label: const Text('Passcode', style: TextStyle(color: _brandBlue, fontWeight: FontWeight.w700)),
+                                  )
+                                else
+                                  const SizedBox.shrink(),
+                                if (request.providerMobileNo != null)
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextButton.icon(
+                                        style: TextButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                                            visualDensity: VisualDensity.compact,
+                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                        onPressed: () => callNumber(context, request.providerMobileNo!),
+                                        icon: const Icon(Icons.call_rounded, size: 16, color: kAccentColor),
+                                        label: const Text('Call', style: TextStyle(color: kAccentColor, fontWeight: FontWeight.w700)),
+                                      ),
+                                      TextButton.icon(
+                                        style: TextButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                                            visualDensity: VisualDensity.compact,
+                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                        onPressed: () => openWhatsApp(context, request.providerMobileNo!),
+                                        icon: const Icon(Icons.chat, size: 16, color: Color(0xFF25D366)),
+                                        label: const Text('WhatsApp', style: TextStyle(color: Color(0xFF25D366), fontWeight: FontWeight.w700)),
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                          ],
                           if (canCancel || canDelete) ...[
                             const Divider(height: 22),
                             Row(

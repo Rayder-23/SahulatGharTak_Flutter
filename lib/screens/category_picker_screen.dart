@@ -297,9 +297,13 @@ class _CategoryGroupSection extends StatelessWidget {
                   child: Icon(style.icon, size: 17, color: style.color),
                 ),
                 const SizedBox(width: 10),
-                Text(
-                  serviceName,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF14213D)),
+                Expanded(
+                  child: Text(
+                    serviceName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF14213D)),
+                  ),
                 ),
               ],
             ),

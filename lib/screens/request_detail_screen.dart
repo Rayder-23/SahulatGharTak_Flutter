@@ -8,6 +8,7 @@ import '../utils/api_error.dart';
 import '../utils/breakpoints.dart';
 import '../utils/cancel_reasons.dart';
 import '../utils/constants.dart';
+import '../utils/contact_actions.dart' show openWhatsApp;
 import '../utils/currency_formatter.dart';
 import '../utils/date_time_formatter.dart';
 import '../utils/status_progress.dart';
@@ -94,6 +95,27 @@ Future<void> _callNumber(BuildContext context, String mobileNo) async {
   if (!launched && context.mounted) {
     showAppToast(context, 'Could not start a call.', type: AppToastType.error);
   }
+}
+
+/// Shows the completion passcode for [request] — falls back to the on-device
+/// store when the API's own `passcode` field isn't populated (e.g. a cached
+/// list snapshot fetched before the booking was accepted). Shared between
+/// [RequestDetailScreen] and the requests-list card so the passcode action
+/// behaves identically from either place.
+Future<void> showRequestPasscodeDialog(BuildContext context, CustomerServiceRequest request) async {
+  var passcode = request.passcode;
+  passcode ??= await context.read<CustomerServiceRequestProvider>().getStoredPasscode(request.uid);
+  if (!context.mounted) return;
+
+  if (passcode == null) {
+    showAppToast(context, 'Passcode not available yet.', type: AppToastType.info);
+    return;
+  }
+
+  showDialog(
+    context: context,
+    builder: (_) => _PasscodeDialog(passcode: passcode!),
+  );
 }
 
 /// Read-only detail view for a single service request. Accepts either the
@@ -192,22 +214,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
   Future<void> _showPasscode() async {
     final request = _request;
     if (request == null) return;
-
-    var passcode = request.passcode;
-    passcode ??= await context
-        .read<CustomerServiceRequestProvider>()
-        .getStoredPasscode(request.uid);
-    if (!mounted) return;
-
-    if (passcode == null) {
-      showAppToast(context, 'Passcode not available yet.', type: AppToastType.info);
-      return;
-    }
-
-    showDialog(
-      context: context,
-      builder: (_) => _PasscodeDialog(passcode: passcode!),
-    );
+    await showRequestPasscodeDialog(context, request);
   }
 
   Future<void> _deleteRequest() async {
@@ -448,39 +455,85 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                           _DetailRow(
                                             label: 'Mobile No',
                                             icon: Icons.phone_rounded,
-                                            valueWidget: Row(
+                                            valueWidget: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    request.providerMobileNo!,
-                                                    style: const TextStyle(
-                                                        color:
-                                                            Color(0xFF1A2233),
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w600),
-                                                  ),
+                                                Text(
+                                                  request.providerMobileNo!,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                      color:
+                                                          Color(0xFF1A2233),
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600),
                                                 ),
-                                                TextButton.icon(
-                                                  style: TextButton.styleFrom(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 8),
-                                                      visualDensity:
-                                                          VisualDensity
-                                                              .compact),
-                                                  onPressed: () => _callNumber(
-                                                      context,
-                                                      request
-                                                          .providerMobileNo!),
-                                                  icon: Icon(Icons.call_rounded,
-                                                      size: 16,
-                                                      color: _brandBlue),
-                                                  label: Text('Call',
-                                                      style: TextStyle(
-                                                          color: _brandBlue,
-                                                          fontWeight:
-                                                              FontWeight.w700)),
+                                                const SizedBox(height: 4),
+                                                Wrap(
+                                                  spacing: 4,
+                                                  children: [
+                                                    TextButton.icon(
+                                                      style: TextButton
+                                                          .styleFrom(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      8),
+                                                          visualDensity:
+                                                              VisualDensity
+                                                                  .compact),
+                                                      onPressed: () =>
+                                                          _callNumber(
+                                                              context,
+                                                              request
+                                                                  .providerMobileNo!),
+                                                      icon: Icon(
+                                                          Icons.call_rounded,
+                                                          size: 16,
+                                                          color: _brandBlue),
+                                                      label: Text('Call',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  _brandBlue,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700)),
+                                                    ),
+                                                    TextButton.icon(
+                                                      style: TextButton
+                                                          .styleFrom(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      8),
+                                                          visualDensity:
+                                                              VisualDensity
+                                                                  .compact),
+                                                      onPressed: () =>
+                                                          openWhatsApp(
+                                                              context,
+                                                              request
+                                                                  .providerMobileNo!),
+                                                      icon: const Icon(
+                                                          Icons.chat,
+                                                          size: 16,
+                                                          color: Color(
+                                                              0xFF25D366)),
+                                                      label: const Text(
+                                                          'WhatsApp',
+                                                          style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF25D366),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700)),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),

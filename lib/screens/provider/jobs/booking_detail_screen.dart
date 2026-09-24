@@ -59,6 +59,21 @@ IconData statusIcon(String status) {
 Future<void> _callNumber(BuildContext context, String mobileNo) =>
     callNumber(context, mobileNo);
 
+/// Opens the job-completion dialog (passcode + amount + optional labour/
+/// material items) for [booking]. Shared between [BookingDetailScreen] and
+/// the bookings list card so "Mark as Complete" behaves identically from
+/// either place. Returns true if the booking was successfully completed.
+Future<bool?> showBookingCompletionDialog(
+  BuildContext context, {
+  required ServiceBooking booking,
+  required ProviderBookingsProvider provider,
+}) {
+  return showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => _CompletionDialog(booking: booking, provider: provider),
+  );
+}
+
 /// Full-screen booking detail, opened via container-transform from the
 /// bookings list — mirrors [RequestDetailScreen]'s gradient header + sectioned
 /// card layout, with the provider-side accept/reject/complete actions pinned
@@ -182,10 +197,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
   Future<void> _openCompletionDialog() async {
     final provider = context.read<ProviderBookingsProvider>();
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => _CompletionDialog(booking: _currentBooking, provider: provider),
-    );
+    final result = await showBookingCompletionDialog(context, booking: _currentBooking, provider: provider);
     if (result == true && mounted) {
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     }
@@ -240,19 +252,32 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                           _DetailRow(
                             label: 'Contact Number',
                             icon: Icons.phone_rounded,
-                            valueWidget: Row(
+                            valueWidget: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: Text(
-                                    booking.clientMobileNo!,
-                                    style: const TextStyle(color: Color(0xFF1A2233), fontSize: 14, fontWeight: FontWeight.w600),
-                                  ),
+                                Text(
+                                  booking.clientMobileNo!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Color(0xFF1A2233), fontSize: 14, fontWeight: FontWeight.w600),
                                 ),
-                                TextButton.icon(
-                                  style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), visualDensity: VisualDensity.compact),
-                                  onPressed: () => _callNumber(context, booking.clientMobileNo!),
-                                  icon: const Icon(Icons.call_rounded, size: 16, color: kAccentColor),
-                                  label: const Text('Call', style: TextStyle(color: kAccentColor, fontWeight: FontWeight.w700)),
+                                const SizedBox(height: 4),
+                                Wrap(
+                                  spacing: 4,
+                                  children: [
+                                    TextButton.icon(
+                                      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), visualDensity: VisualDensity.compact),
+                                      onPressed: () => _callNumber(context, booking.clientMobileNo!),
+                                      icon: const Icon(Icons.call_rounded, size: 16, color: kAccentColor),
+                                      label: const Text('Call', style: TextStyle(color: kAccentColor, fontWeight: FontWeight.w700)),
+                                    ),
+                                    TextButton.icon(
+                                      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), visualDensity: VisualDensity.compact),
+                                      onPressed: () => openWhatsApp(context, booking.clientMobileNo!),
+                                      icon: const Icon(Icons.chat, size: 16, color: Color(0xFF25D366)),
+                                      label: const Text('WhatsApp', style: TextStyle(color: Color(0xFF25D366), fontWeight: FontWeight.w700)),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

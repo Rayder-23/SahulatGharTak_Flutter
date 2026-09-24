@@ -141,6 +141,7 @@ class _BookingCard extends StatelessWidget {
     final bookingsProvider = context.watch<ProviderBookingsProvider>();
     final isStarting = bookingsProvider.updatingUid == booking.uid;
     final canStartJob = booking.status == 'Accepted';
+    final canComplete = booking.status == 'In Progress';
 
     return OpenContainer(
       closedElevation: 0,
@@ -314,6 +315,25 @@ class _BookingCard extends StatelessWidget {
                                       )
                                     : const Icon(Icons.play_arrow_rounded, size: 18),
                                 label: Text(isStarting ? 'Starting…' : 'Start Job'),
+                              ),
+                            ),
+                          ],
+                          if (canComplete) ...[
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                                ),
+                                onPressed: () => showBookingCompletionDialog(context, booking: booking, provider: bookingsProvider),
+                                icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+                                label: const Text('Mark as Complete'),
                               ),
                             ),
                           ],
