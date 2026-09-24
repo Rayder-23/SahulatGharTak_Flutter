@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/time_format_provider.dart';
 import '../utils/constants.dart';
 import '../utils/provider_entry_gate.dart';
 import '../widgets/app_toast.dart';
@@ -156,6 +157,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       setState(() => _verifying = false);
 
       if (loggedIn) {
+        final userId = authProvider.currentUser?.userId;
+        if (userId != null) await context.read<TimeFormatProvider>().load(userId);
+        if (!mounted) return;
+
         await showMessageDialog(
           context,
           title: 'Account Verified',

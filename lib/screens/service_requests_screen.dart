@@ -443,8 +443,7 @@ class _RequestCard extends StatelessWidget {
                                 const SizedBox(height: 6),
                                 _InfoRow(
                                   icon: Icons.event_rounded,
-                                  text:
-                                      '${request.preferredServiceDate} · ${request.preferredServiceTime}',
+                                  text: formatScheduledDateTime(request.preferredServiceDate, request.preferredServiceTime) ?? 'Not specified',
                                   trailing: request.isUrgent
                                       ? Container(
                                           margin:
@@ -502,7 +501,7 @@ class _RequestCard extends StatelessWidget {
                                   size: 13, color: Colors.grey[400]),
                               const SizedBox(width: 4),
                               Text(
-                                'Requested ${formatLocalDateTime(request.createdOn, 'dd MMM yyyy')}',
+                                'Requested ${formatLocalDateTime(request.createdOn, kCompactDatePattern)}',
                                 style: TextStyle(
                                     color: Colors.grey[400],
                                     fontSize: 11.5,
@@ -675,7 +674,7 @@ class _RequestCard extends StatelessWidget {
                                   color: Color(0xFF1A2233)),
                             ),
                             Text(
-                              '${request.status} · ${formatLocalDateTime(request.createdOn, 'dd MMM yyyy')}',
+                              '${request.status} · ${formatLocalDateTime(request.createdOn, kCompactDatePattern)}',
                               style: TextStyle(
                                   color: Colors.grey[500],
                                   fontSize: 11.5,

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/client_address.dart';
 import '../providers/auth_provider.dart';
 import '../providers/client_address_provider.dart';
+import '../providers/time_format_provider.dart';
 import '../utils/constants.dart';
 import '../utils/privacy_policy_launcher.dart';
 import '../utils/provider_entry_gate.dart';
@@ -90,6 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     await context.read<AuthProvider>().logout();
     if (!context.mounted) return;
+    context.read<TimeFormatProvider>().reset();
     Navigator.of(context).pushNamedAndRemoveUntil(LandingScreen.routeName, (route) => false);
   }
 
@@ -420,6 +422,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
+              const SizedBox(height: 28),
+              const Text('Preferences', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF14213D), letterSpacing: -0.2)),
+              const SizedBox(height: 8),
+              Consumer<TimeFormatProvider>(
+                builder: (context, timeFormat, _) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+                    ),
+                    child: SwitchListTile(
+                      secondary: const Icon(Icons.schedule_rounded, color: _brandBlue),
+                      title: const Text('24-hour time'),
+                      subtitle: Text(timeFormat.use24Hour ? 'e.g. 14:30' : 'e.g. 2:30 PM'),
+                      value: timeFormat.use24Hour,
+                      activeThumbColor: _brandBlue,
+                      onChanged: (v) => timeFormat.setUse24Hour(v),
+                    ),
+                  );
+                },
+              ),
               const SizedBox(height: 32),
               if (user.role == 'Provider')
                 ElevatedButton.icon(

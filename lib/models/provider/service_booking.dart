@@ -2,6 +2,8 @@ class ServiceBooking {
   final int uid;
   final int requestUid;
   final String requestTitle;
+  final String? preferredServiceDate;
+  final String? preferredServiceTime;
   final int clientUid;
   final String clientName;
   final int providerUid;
@@ -39,6 +41,8 @@ class ServiceBooking {
     required this.uid,
     required this.requestUid,
     required this.requestTitle,
+    this.preferredServiceDate,
+    this.preferredServiceTime,
     required this.clientUid,
     required this.clientName,
     required this.providerUid,
@@ -84,6 +88,8 @@ class ServiceBooking {
       'uid': uid,
       'requestUid': requestUid,
       'requestTitle': requestTitle,
+      'preferredServiceDate': preferredServiceDate,
+      'preferredServiceTime': preferredServiceTime,
       'clientUid': clientUid,
       'clientName': clientName,
       'providerUid': providerUid,
@@ -124,6 +130,8 @@ class ServiceBooking {
       uid: json['uid'] as int,
       requestUid: json['requestUid'] as int,
       requestTitle: json['requestTitle'] as String? ?? '',
+      preferredServiceDate: json['preferredServiceDate'] as String?,
+      preferredServiceTime: json['preferredServiceTime'] as String?,
       clientUid: json['clientUid'] as int,
       clientName: json['clientName'] as String? ?? '',
       providerUid: json['providerUid'] as int,

@@ -8,6 +8,7 @@ import '../../../providers/provider_bookings_provider.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/contact_actions.dart';
 import '../../../utils/currency_formatter.dart';
+import '../../../utils/date_time_formatter.dart';
 import '../../../utils/status_progress.dart';
 import '../../../widgets/app_toast.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
@@ -236,9 +237,17 @@ class _BookingCard extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (booking.clientAddressTitle != null)
-                                  _InfoRow(icon: Icons.location_on_rounded, text: booking.clientAddressTitle!),
-                                if (booking.clientAddressTitle != null) const SizedBox(height: 6),
+                                if (_fullAddress(booking) != null) ...[
+                                  _InfoRow(icon: Icons.location_on_rounded, text: _fullAddress(booking)!, maxLines: 3),
+                                  const SizedBox(height: 6),
+                                ],
+                                if (formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime) != null) ...[
+                                  _InfoRow(
+                                    icon: Icons.event_rounded,
+                                    text: formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime)!,
+                                  ),
+                                  const SizedBox(height: 6),
+                                ],
                                 _InfoRow(icon: Icons.payments_rounded, text: 'Final ${formatCurrency(booking.finalAmount)}'),
                               ],
                             ),
@@ -354,11 +363,24 @@ class _BookingCard extends StatelessWidget {
   }
 }
 
+/// Joins the client's full address (not just the address title, e.g. "Home")
+/// so the provider has enough detail to judge distance/travel time. Returns
+/// null when the booking has no address fields populated yet (e.g. status
+/// hasn't reached Accepted - see api.txt's contact-fields note).
+String? _fullAddress(ServiceBooking booking) {
+  final parts = [booking.clientFullAddress, booking.clientArea, booking.clientCity]
+      .whereType<String>()
+      .where((s) => s.trim().isNotEmpty)
+      .toList();
+  return parts.isEmpty ? null : parts.join(', ');
+}
+
 class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String text;
+  final int maxLines;
 
-  const _InfoRow({required this.icon, required this.text});
+  const _InfoRow({required this.icon, required this.text, this.maxLines = 1});
 
   @override
   Widget build(BuildContext context) {
@@ -370,7 +392,8 @@ class _InfoRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(color: Color(0xFF3A4658), fontSize: 13, fontWeight: FontWeight.w500),
+            style: const TextStyle(color: Color(0xFF3A4658), fontSize: 13, fontWeight: FontWeight.w500, height: 1.3),
+            maxLines: maxLines,
             overflow: TextOverflow.ellipsis,
           ),
         ),

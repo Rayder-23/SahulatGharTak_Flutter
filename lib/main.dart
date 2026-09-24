@@ -28,6 +28,7 @@ import 'providers/provider_categories_provider.dart';
 import 'providers/provider_dashboard_provider.dart';
 import 'providers/provider_document_provider.dart';
 import 'providers/provider_wallet_provider.dart';
+import 'providers/time_format_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/add_address_screen.dart';
 import 'screens/edit_profile_screen.dart';
@@ -91,6 +92,7 @@ class SahulatApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProviderDocumentProvider(repository: ProviderDocumentRepository())),
         ChangeNotifierProvider(create: (_) => ProviderWalletProvider(repository: ProviderWalletRepository())),
         ChangeNotifierProvider(create: (_) => ProviderCategoriesProvider(repository: ProviderCategoriesRepository())),
+        ChangeNotifierProvider(create: (_) => TimeFormatProvider()),
       ],
       child: MaterialApp(
         title: 'Sahulat Ghar Tak',

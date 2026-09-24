@@ -1,6 +1,6 @@
 ================================================================================
 SahulatGharTak API Reference
-Version: 3.20 | Last Updated: 2026-09-24
+Version: 3.21 | Last Updated: 2026-09-24
 Database: SahulatAppDB
 Local Base URL:    https://localhost:7265/api/
 Deployed Base URL:  https://sahulatghartak.com/api/
@@ -1936,6 +1936,13 @@ Notes:
 - rejectReason is set when a provider rejects a Pending booking (see POST .../respond below);
   cancelReason is set when an Accepted/In Progress booking is cancelled (see PUT .../{bookingUid}
   below). Both are null otherwise.
+- preferredServiceDate/preferredServiceTime (added v3.21) are sourced from the linked
+  CustomerServiceRequests row (via requestUid) — not stored on ServiceBookings itself. They let
+  the provider app show the customer's scheduled date/time on Requests/Bookings tab cards. Both
+  are nullable (the original request may have left them blank). preferredServiceDate is date-only
+  ("yyyy-MM-dd"), preferredServiceTime is a free-text "HH:mm"-style string — neither is a UTC
+  instant, both are passed through as stored with no timezone conversion. Same sourcing applies
+  to every endpoint below that returns a booking object.
 
 Success (200):
 {
@@ -1946,6 +1953,8 @@ Success (200):
       "uid": 1,
       "requestUid": 5,
       "requestTitle": "AC Repair",
+      "preferredServiceDate": "2026-07-22",
+      "preferredServiceTime": "14:30",
       "clientUid": 1,
       "clientName": "Shahid",
       "providerUid": 4,
@@ -2011,6 +2020,8 @@ Success (200):
     "uid": 1,
     "requestUid": 5,
     "requestTitle": "AC Repair",
+    "preferredServiceDate": "2026-07-22",
+    "preferredServiceTime": "14:30",
     "clientUid": 1,
     "clientName": "Shahid",
     "providerUid": 4,
@@ -2093,6 +2104,8 @@ Success (201):
     "uid": 1,
     "requestUid": 5,
     "requestTitle": "AC Repair",
+    "preferredServiceDate": "2026-07-22",
+    "preferredServiceTime": "14:30",
     "clientUid": 1,
     "clientName": "Shahid",
     "providerUid": 4,
@@ -2198,6 +2211,8 @@ Success (200):
     "uid": 1,
     "requestUid": 5,
     "requestTitle": "AC Repair",
+    "preferredServiceDate": "2026-07-22",
+    "preferredServiceTime": "14:30",
     "clientUid": 1,
     "clientName": "Shahid",
     "providerUid": 4,
@@ -2342,6 +2357,8 @@ Success (200 - accepted):
     "uid": 1,
     "requestUid": 5,
     "requestTitle": "AC Repair",
+    "preferredServiceDate": "2026-07-22",
+    "preferredServiceTime": "14:30",
     "clientUid": 1,
     "clientName": "Shahid",
     "providerUid": 4,
@@ -2371,6 +2388,8 @@ Success (200 - rejected):
     "uid": 1,
     "requestUid": 5,
     "requestTitle": "AC Repair",
+    "preferredServiceDate": "2026-07-22",
+    "preferredServiceTime": "14:30",
     "providerUid": 4,
     "providerName": "Ali Electrician",
     "status": "Rejected",

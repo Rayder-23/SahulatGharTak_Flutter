@@ -287,6 +287,12 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                           icon: Icons.location_on_rounded,
                           value: [booking.clientFullAddress, booking.clientArea, booking.clientCity].whereType<String>().join(', '),
                         ),
+                        if (formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime) != null)
+                          _DetailRow(
+                            label: 'Scheduled',
+                            icon: Icons.event_rounded,
+                            value: formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime)!,
+                          ),
                       ],
                     ),
                     const SizedBox(height: 14),
@@ -325,19 +331,19 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                         _DetailRow(label: 'Booking ID', value: '#${booking.uid}', icon: Icons.tag_rounded, compact: true),
                         _DetailRow(
                             label: 'Created On',
-                            value: formatLocalDateTime(booking.createdOn, 'dd MMM yyyy, hh:mm a'),
+                            value: formatLocalDateTime(booking.createdOn, kDatePattern, includeTime: true),
                             icon: Icons.schedule_rounded,
                             compact: true),
                         if (booking.acceptedOn != null)
                           _DetailRow(
                               label: 'Accepted On',
-                              value: formatLocalDateTime(booking.acceptedOn!, 'dd MMM yyyy, hh:mm a'),
+                              value: formatLocalDateTime(booking.acceptedOn!, kDatePattern, includeTime: true),
                               icon: Icons.thumb_up_rounded,
                               compact: true),
                         if (booking.completedOn != null)
                           _DetailRow(
                               label: 'Completed On',
-                              value: formatLocalDateTime(booking.completedOn!, 'dd MMM yyyy, hh:mm a'),
+                              value: formatLocalDateTime(booking.completedOn!, kDatePattern, includeTime: true),
                               icon: Icons.check_circle_rounded,
                               compact: true),
                       ],

@@ -6,6 +6,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../providers/provider_categories_provider.dart';
 import '../../../providers/provider_dashboard_provider.dart';
 import '../../../providers/provider_document_provider.dart';
+import '../../../providers/time_format_provider.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/date_time_formatter.dart';
 import '../../../utils/provider_availability_helper.dart';
@@ -129,6 +130,7 @@ class _ProfileTabState extends State<ProfileTab> {
 
     await context.read<AuthProvider>().logout();
     if (!context.mounted) return;
+    context.read<TimeFormatProvider>().reset();
     Navigator.of(context).pushNamedAndRemoveUntil(LandingScreen.routeName, (route) => false);
   }
 
@@ -314,7 +316,7 @@ class _ProfileTabState extends State<ProfileTab> {
                   trailing: _VerificationBadge(isVerified: documents.isVerified),
                 ),
                 const Divider(height: 1),
-                ListTile(leading: const Icon(Icons.event_rounded, color: providerBrandBlue), title: const Text('Member Since'), subtitle: Text(formatLocalDateTime(detail.createdOn, 'dd MMM yyyy'))),
+                ListTile(leading: const Icon(Icons.event_rounded, color: providerBrandBlue), title: const Text('Member Since'), subtitle: Text(formatLocalDateTime(detail.createdOn, kDatePattern))),
               ],
             ),
             const SizedBox(height: 16),
@@ -372,6 +374,24 @@ class _ProfileTabState extends State<ProfileTab> {
                             : null,
                       ),
                     ],
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            const _SectionHeader('Preferences'),
+            Consumer<TimeFormatProvider>(
+              builder: (context, timeFormat, _) {
+                return _InfoCard(
+                  children: [
+                    SwitchListTile(
+                      secondary: const Icon(Icons.schedule_rounded, color: providerBrandBlue),
+                      title: const Text('24-hour time'),
+                      subtitle: Text(timeFormat.use24Hour ? 'e.g. 14:30' : 'e.g. 2:30 PM'),
+                      value: timeFormat.use24Hour,
+                      activeThumbColor: providerBrandBlue,
+                      onChanged: (v) => timeFormat.setUse24Hour(v),
+                    ),
                   ],
                 );
               },

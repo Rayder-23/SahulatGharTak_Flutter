@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/time_format_provider.dart';
 import '../utils/constants.dart';
 import '../utils/input_formatters.dart';
 import '../utils/provider_entry_gate.dart';
@@ -44,6 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
+      final userId = authProvider.currentUser?.userId;
+      if (userId != null) await context.read<TimeFormatProvider>().load(userId);
+      if (!mounted) return;
+
       final role = authProvider.role;
       // Clear the whole stack (Landing + Login) instead of just replacing
       // Login — otherwise LandingScreen remains underneath and a back-press

@@ -362,20 +362,14 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                     children: [
                                       _DetailRow(
                                         label: 'Preferred Date',
-                                        value:
-                                            request.preferredServiceDate.isEmpty
-                                                ? 'Not specified'
-                                                : request.preferredServiceDate,
+                                        value: formatScheduledDateTime(request.preferredServiceDate, null) ?? 'Not specified',
                                         icon: Icons.calendar_today_rounded,
                                         muted: request
                                             .preferredServiceDate.isEmpty,
                                       ),
                                       _DetailRow(
                                         label: 'Preferred Time',
-                                        value:
-                                            request.preferredServiceTime.isEmpty
-                                                ? 'Not specified'
-                                                : request.preferredServiceTime,
+                                        value: formatScheduledDateTime(null, request.preferredServiceTime) ?? 'Not specified',
                                         icon: Icons.access_time_rounded,
                                         muted: request
                                             .preferredServiceTime.isEmpty,
@@ -643,7 +637,8 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                         label: 'Requested On',
                                         value: formatLocalDateTime(
                                             request.createdOn,
-                                            'dd MMM yyyy, hh:mm a'),
+                                            kDatePattern,
+                                            includeTime: true),
                                         icon: Icons.schedule_rounded,
                                         compact: true,
                                       ),

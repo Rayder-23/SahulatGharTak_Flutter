@@ -237,7 +237,7 @@ class _TransactionTile extends StatelessWidget {
                 Text(_humanizeReason(transaction.reason), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                 const SizedBox(height: 2),
                 Text(
-                  formatLocalDateTime(transaction.createdOn, 'MMM d, yyyy • h:mm a'),
+                  formatLocalDateTime(transaction.createdOn, kCompactDatePattern, includeTime: true, timeSeparator: ' • '),
                   style: TextStyle(color: Colors.grey[500], fontSize: 11.5),
                 ),
                 if (transaction.bookingUid != null) ...[

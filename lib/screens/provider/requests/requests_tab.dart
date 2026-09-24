@@ -247,20 +247,39 @@ class _IncomingRequestCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Icon(Icons.location_on_rounded, size: 16, color: kPrimaryColor),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
-                                  [booking.clientAddressTitle, booking.clientFullAddress, booking.clientArea, booking.clientCity]
+                                  [booking.clientFullAddress, booking.clientArea, booking.clientCity]
                                       .whereType<String>()
+                                      .where((s) => s.trim().isNotEmpty)
                                       .join(', '),
+                                  maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0xFF3A4658), fontSize: 13, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(color: Color(0xFF3A4658), fontSize: 13, fontWeight: FontWeight.w500, height: 1.3),
                                 ),
                               ),
                             ],
                           ),
+                          if (formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime) != null) ...[
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const Icon(Icons.event_rounded, size: 16, color: kPrimaryColor),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime)!,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Color(0xFF3A4658), fontSize: 13, fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                           const SizedBox(height: 6),
                           Row(
                             children: [
@@ -284,7 +303,7 @@ class _IncomingRequestCard extends StatelessWidget {
                         Icon(Icons.schedule_rounded, size: 13, color: Colors.grey[400]),
                         const SizedBox(width: 4),
                         Text(
-                          'Requested ${formatLocalDateTime(booking.createdOn, 'dd MMM yyyy, hh:mm a')}',
+                          'Requested ${formatLocalDateTime(booking.createdOn, kCompactDatePattern, includeTime: true)}',
                           style: TextStyle(color: Colors.grey[400], fontSize: 11.5, fontWeight: FontWeight.w500),
                         ),
                       ],

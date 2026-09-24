@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/time_format_provider.dart';
 import '../utils/breakpoints.dart';
 import '../utils/motion.dart';
 import '../utils/provider_entry_gate.dart';
@@ -31,6 +32,10 @@ class _SplashScreenState extends State<SplashScreen> {
       Future.delayed(const Duration(seconds: 2)),
     ]);
 
+    if (!mounted) return;
+
+    final userId = authProvider.currentUser?.userId;
+    if (userId != null) await context.read<TimeFormatProvider>().load(userId);
     if (!mounted) return;
 
     if (!authProvider.isLoggedIn) {
