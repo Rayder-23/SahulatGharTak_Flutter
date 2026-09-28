@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../utils/constants.dart';
+import '../../../utils/contact_actions.dart';
 import '../../../widgets/compact_app_header.dart';
 
 /// Read-only map showing the client's dropped pin for a booking's address —
@@ -54,6 +55,22 @@ class ClientLocationMapScreen extends StatelessWidget {
                 ),
               ),
             ),
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 20,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () => openDirections(context, location),
+              icon: const Icon(Icons.directions_rounded),
+              label: const Text('Directions'),
+            ),
+          ),
         ],
       ),
     );
