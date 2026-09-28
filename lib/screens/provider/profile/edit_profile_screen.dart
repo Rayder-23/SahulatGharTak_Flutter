@@ -24,6 +24,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _cnicController;
   int _experienceYears = 0;
   String? _selectedCity;
+  String? _selectedGender;
   bool _saving = false;
 
   @override
@@ -34,6 +35,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _cnicController = TextEditingController(text: formatCnicForDisplay(profile?.cnic ?? ''));
     _experienceYears = profile?.experienceYears ?? 0;
     _selectedCity = profile?.city;
+    _selectedGender = profile?.gender.isNotEmpty == true ? profile?.gender : null;
     context.read<CityProvider>().loadCities();
   }
 
@@ -55,6 +57,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       cnic: _cnicController.text.trim(),
       experienceYears: _experienceYears,
       city: _selectedCity,
+      gender: _selectedGender,
     );
 
     setState(() => _saving = true);
@@ -93,6 +96,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 controller: _nameController,
                 decoration: authFieldDecoration(hint: 'Enter your full name'),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+              ),
+              const SizedBox(height: 20),
+              GenderSelector(
+                initialValue: _selectedGender,
+                onChanged: (value) => setState(() => _selectedGender = value),
+                validator: (v) => v == null ? 'Please select a gender' : null,
               ),
               const SizedBox(height: 20),
               authFieldLabel('CNIC'),
