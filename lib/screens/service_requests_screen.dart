@@ -320,12 +320,6 @@ class _RequestCard extends StatelessWidget {
     return normalized == 'completed' || normalized == 'cancelled';
   }
 
-  /// The granular, computed progress label (`'Requested'`/`'Assigned'`/
-  /// `'In Progress'`/`'Completed'`/`'Cancelled'`) — shown instead of the raw
-  /// (coarse) [CustomerServiceRequest.status] wherever the UI needs to
-  /// signal where the job actually stands. See docs/status-workflow.md.
-  String get _displayStatus => request.progressStatus ?? 'Cancelled';
-
   @override
   Widget build(BuildContext context) {
     return OpenContainer(
@@ -365,56 +359,21 @@ class _RequestCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      request.serviceTitle,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 16.5,
-                                          color: Color(0xFF1A2233),
-                                          height: 1.2),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      request.categoryName,
-                                      style: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 12.5,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                    color: statusColor.withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(_statusIcon(_displayStatus),
-                                        size: 13, color: statusColor),
-                                    const SizedBox(width: 4),
-                                    Text(_displayStatus,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            color: statusColor,
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 11.5)),
-                                  ],
-                                ),
-                              ),
-                            ],
+                          Text(
+                            request.serviceTitle,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 16.5,
+                                color: Color(0xFF1A2233),
+                                height: 1.2),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            request.categoryName,
+                            style: TextStyle(
+                                color: Colors.grey[500],
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w600),
                           ),
                           if (request.bouncedBack) ...[
                             const SizedBox(height: 10),

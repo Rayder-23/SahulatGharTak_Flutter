@@ -12,7 +12,6 @@ import '../../../utils/date_time_formatter.dart';
 import '../../../utils/status_progress.dart';
 import '../../../widgets/app_toast.dart';
 import '../../../widgets/provider/provider_tab_header.dart';
-import '../../../widgets/provider/status_chip.dart';
 import '../../../widgets/provider/tab_state_placeholder.dart';
 import '../../../widgets/status_filter_tabs.dart';
 import '../../../widgets/status_progress_bar.dart';
@@ -172,51 +171,23 @@ class _BookingCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            booking.requestTitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16.5, color: Color(0xFF1A2233), height: 1.2),
+                          ),
+                          const SizedBox(height: 2),
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Icon(Icons.person_outline_rounded, size: 13, color: Colors.grey[500]),
+                              const SizedBox(width: 3),
                               Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      booking.requestTitle,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16.5, color: Color(0xFF1A2233), height: 1.2),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.person_outline_rounded, size: 13, color: Colors.grey[500]),
-                                        const SizedBox(width: 3),
-                                        Expanded(
-                                          child: Text(
-                                            booking.clientName,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(color: Colors.grey[500], fontSize: 12.5, fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(20)),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(statusIcon(booking.status), size: 13, color: color),
-                                    const SizedBox(width: 4),
-                                    Text(booking.status,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 11.5)),
-                                  ],
+                                child: Text(
+                                  booking.clientName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(color: Colors.grey[500], fontSize: 12.5, fontWeight: FontWeight.w600),
                                 ),
                               ),
                             ],
@@ -261,12 +232,10 @@ class _BookingCard extends StatelessWidget {
                             terminalColor: Colors.red,
                             compact: true,
                           ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              StatusChip(label: booking.status, color: color),
-                              if (booking.clientMobileNo != null) ...[
-                                const Spacer(),
+                          if (booking.clientMobileNo != null) ...[
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
                                 TextButton.icon(
                                   style: TextButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -288,8 +257,8 @@ class _BookingCard extends StatelessWidget {
                                   label: const Text('WhatsApp', style: TextStyle(color: Color(0xFF25D366), fontWeight: FontWeight.w700)),
                                 ),
                               ],
-                            ],
-                          ),
+                            ),
+                          ],
                           if (canStartJob) ...[
                             const SizedBox(height: 10),
                             SizedBox(
