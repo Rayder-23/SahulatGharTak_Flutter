@@ -11,6 +11,7 @@ import 'package:sahulat_ghar_tak/models/customer_service_request.dart';
 import 'package:sahulat_ghar_tak/services/customer_service_request_api_service.dart';
 import 'package:sahulat_ghar_tak/services/deleted_requests_store.dart';
 import 'package:sahulat_ghar_tak/services/request_passcode_store.dart';
+import 'package:sahulat_ghar_tak/services/request_progress_history_store.dart';
 
 CustomerServiceRequest _request(int uid, {String? passcode}) {
   return CustomerServiceRequest(
@@ -32,6 +33,29 @@ CustomerServiceRequest _request(int uid, {String? passcode}) {
     status: 'Initiated',
     createdOn: DateTime(2026, 9, 3),
     passcode: passcode,
+  );
+}
+
+CustomerServiceRequest _requestWithProgress(int uid, String? progressStatus) {
+  return CustomerServiceRequest(
+    uid: uid,
+    clientUid: 1,
+    clientName: 'Client',
+    categoryUid: 1,
+    categoryName: 'Category',
+    clientAddressUid: 1,
+    addressTitle: 'Home',
+    serviceTitle: 'Service',
+    serviceDescription: 'Description',
+    preferredServiceDate: '2026-09-03',
+    preferredServiceTime: '10:00',
+    isUrgent: false,
+    contactPerson: 'Person',
+    contactNo: '0300',
+    estimatedBudget: 0,
+    status: 'Initiated',
+    progressStatus: progressStatus,
+    createdOn: DateTime(2026, 9, 3),
   );
 }
 
@@ -70,11 +94,26 @@ class _FakePasscodeStore extends RequestPasscodeStore {
   }
 }
 
+class _FakeProgressHistoryStore extends RequestProgressHistoryStore {
+  _FakeProgressHistoryStore([Map<int, String?>? initial]) : _history = initial ?? {};
+  final Map<int, String?> _history;
+
+  @override
+  Future<Map<int, String?>> load(int clientUid) async => Map<int, String?>.from(_history);
+
+  @override
+  Future<void> save(int clientUid, Map<int, String?> history) async {
+    _history
+      ..clear()
+      ..addAll(history);
+  }
+}
+
 void main() {
   test('fetchByClient filters out requests hidden on-device', () async {
     final api = _FakeApiService([_request(1), _request(2), _request(3)]);
     final deletedStore = _FakeDeletedStore({2});
-    final repo = CustomerServiceRequestRepository(apiService: api, deletedStore: deletedStore, passcodeStore: _FakePasscodeStore());
+    final repo = CustomerServiceRequestRepository(apiService: api, deletedStore: deletedStore, passcodeStore: _FakePasscodeStore(), progressHistoryStore: _FakeProgressHistoryStore());
 
     final visible = await repo.fetchByClient(1);
 
@@ -84,7 +123,7 @@ void main() {
   test('fetchByClient persists the passcode of every visible request', () async {
     final api = _FakeApiService([_request(1, passcode: 'AAA'), _request(2, passcode: 'BBB')]);
     final passcodeStore = _FakePasscodeStore();
-    final repo = CustomerServiceRequestRepository(apiService: api, deletedStore: _FakeDeletedStore({}), passcodeStore: passcodeStore);
+    final repo = CustomerServiceRequestRepository(apiService: api, deletedStore: _FakeDeletedStore({}), passcodeStore: passcodeStore, progressHistoryStore: _FakeProgressHistoryStore());
 
     await repo.fetchByClient(1);
 
@@ -94,7 +133,7 @@ void main() {
   test('fetchByClient does not persist a passcode for a hidden request', () async {
     final api = _FakeApiService([_request(1, passcode: 'AAA'), _request(2, passcode: 'BBB')]);
     final passcodeStore = _FakePasscodeStore();
-    final repo = CustomerServiceRequestRepository(apiService: api, deletedStore: _FakeDeletedStore({2}), passcodeStore: passcodeStore);
+    final repo = CustomerServiceRequestRepository(apiService: api, deletedStore: _FakeDeletedStore({2}), passcodeStore: passcodeStore, progressHistoryStore: _FakeProgressHistoryStore());
 
     await repo.fetchByClient(1);
 
@@ -104,7 +143,7 @@ void main() {
   test('fetchById persists the fetched request\'s passcode', () async {
     final api = _FakeApiService([_request(7, passcode: 'ZZZ')]);
     final passcodeStore = _FakePasscodeStore();
-    final repo = CustomerServiceRequestRepository(apiService: api, deletedStore: _FakeDeletedStore({}), passcodeStore: passcodeStore);
+    final repo = CustomerServiceRequestRepository(apiService: api, deletedStore: _FakeDeletedStore({}), passcodeStore: passcodeStore, progressHistoryStore: _FakeProgressHistoryStore());
 
     await repo.fetchById(7);
 
@@ -117,10 +156,63 @@ void main() {
       apiService: _FakeApiService([]),
       deletedStore: deletedStore,
       passcodeStore: _FakePasscodeStore(),
+      progressHistoryStore: _FakeProgressHistoryStore(),
     );
 
     await repo.hide(1, 42);
 
     expect(deletedStore.hideCalls, [42]);
+  });
+
+  test('fetchByClient flags bouncedBack when progressStatus regresses from Assigned to Requested', () async {
+    final repo = CustomerServiceRequestRepository(
+      apiService: _FakeApiService([_requestWithProgress(1, 'Requested')]),
+      deletedStore: _FakeDeletedStore({}),
+      passcodeStore: _FakePasscodeStore(),
+      progressHistoryStore: _FakeProgressHistoryStore({1: 'Assigned'}),
+    );
+
+    final visible = await repo.fetchByClient(1);
+
+    expect(visible.single.bouncedBack, isTrue);
+  });
+
+  test('fetchByClient does not flag bouncedBack for a brand-new Requested request', () async {
+    final repo = CustomerServiceRequestRepository(
+      apiService: _FakeApiService([_requestWithProgress(1, 'Requested')]),
+      deletedStore: _FakeDeletedStore({}),
+      passcodeStore: _FakePasscodeStore(),
+      progressHistoryStore: _FakeProgressHistoryStore(),
+    );
+
+    final visible = await repo.fetchByClient(1);
+
+    expect(visible.single.bouncedBack, isFalse);
+  });
+
+  test('fetchByClient does not flag bouncedBack for normal forward progress', () async {
+    final repo = CustomerServiceRequestRepository(
+      apiService: _FakeApiService([_requestWithProgress(1, 'In Progress')]),
+      deletedStore: _FakeDeletedStore({}),
+      passcodeStore: _FakePasscodeStore(),
+      progressHistoryStore: _FakeProgressHistoryStore({1: 'Assigned'}),
+    );
+
+    final visible = await repo.fetchByClient(1);
+
+    expect(visible.single.bouncedBack, isFalse);
+  });
+
+  test('fetchById flags bouncedBack when progressStatus regresses from In Progress to Requested', () async {
+    final repo = CustomerServiceRequestRepository(
+      apiService: _FakeApiService([_requestWithProgress(7, 'Requested')]),
+      deletedStore: _FakeDeletedStore({}),
+      passcodeStore: _FakePasscodeStore(),
+      progressHistoryStore: _FakeProgressHistoryStore({7: 'In Progress'}),
+    );
+
+    final request = await repo.fetchById(7);
+
+    expect(request.bouncedBack, isTrue);
   });
 }

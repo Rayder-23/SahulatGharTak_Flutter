@@ -416,6 +416,10 @@ class _RequestCard extends StatelessWidget {
                               ),
                             ],
                           ),
+                          if (request.bouncedBack) ...[
+                            const SizedBox(height: 10),
+                            const _BouncedBackNotice(),
+                          ],
                           if (request.serviceDescription.trim().isNotEmpty) ...[
                             const SizedBox(height: 10),
                             Text(
@@ -707,6 +711,39 @@ class _RequestCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Shown when [CustomerServiceRequest.bouncedBack] is true — the provider
+/// cancelled after accepting, and the request has been reset to `Requested`
+/// so staff can find a new provider. Without this, the progress bar/status
+/// pill would silently revert with no explanation. See api.txt v3.22.
+class _BouncedBackNotice extends StatelessWidget {
+  const _BouncedBackNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.orange.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.info_outline_rounded, size: 17, color: Colors.orange),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Your provider had to cancel — we\'re finding you a new one.',
+              style: TextStyle(color: Colors.orange.shade900, fontSize: 12.5, fontWeight: FontWeight.w600, height: 1.3),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -34,6 +34,14 @@ class CustomerServiceRequest {
   final String? providerCnic;
   final String? passcode;
 
+  /// True when this fetch observed `progressStatus` regress from
+  /// `Assigned`/`In Progress` back to `Requested` for this same request UID,
+  /// compared to the last fetch — i.e. the provider cancelled an accepted
+  /// booking and the request is being re-dispatched (see api.txt v3.22).
+  /// Never comes from the API; set client-side by
+  /// [CustomerServiceRequestRepository] via [RequestProgressHistoryStore].
+  final bool bouncedBack;
+
   const CustomerServiceRequest({
     required this.uid,
     required this.clientUid,
@@ -61,7 +69,41 @@ class CustomerServiceRequest {
     this.providerProfilePhotoPath,
     this.providerCnic,
     this.passcode,
+    this.bouncedBack = false,
   });
+
+  /// Returns a copy with [bouncedBack] overridden — used by
+  /// [CustomerServiceRequestRepository] to flag a detected regression
+  /// without re-parsing the API response.
+  CustomerServiceRequest copyWithBouncedBack(bool value) => CustomerServiceRequest(
+        uid: uid,
+        clientUid: clientUid,
+        clientName: clientName,
+        categoryUid: categoryUid,
+        categoryName: categoryName,
+        clientAddressUid: clientAddressUid,
+        addressTitle: addressTitle,
+        serviceTitle: serviceTitle,
+        serviceDescription: serviceDescription,
+        preferredServiceDate: preferredServiceDate,
+        preferredServiceTime: preferredServiceTime,
+        isUrgent: isUrgent,
+        contactPerson: contactPerson,
+        contactNo: contactNo,
+        estimatedBudget: estimatedBudget,
+        status: status,
+        progressStatus: progressStatus,
+        remarks: remarks,
+        cancelReason: cancelReason,
+        createdOn: createdOn,
+        providerUid: providerUid,
+        providerName: providerName,
+        providerMobileNo: providerMobileNo,
+        providerProfilePhotoPath: providerProfilePhotoPath,
+        providerCnic: providerCnic,
+        passcode: passcode,
+        bouncedBack: value,
+      );
 
   factory CustomerServiceRequest.fromJson(Map<String, dynamic> json) {
     return CustomerServiceRequest(

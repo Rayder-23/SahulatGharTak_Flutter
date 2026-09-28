@@ -283,6 +283,10 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  if (request.bouncedBack) ...[
+                                    const _BouncedBackNotice(),
+                                    const SizedBox(height: 14),
+                                  ],
                                   Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.symmetric(
@@ -714,6 +718,40 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                   ),
                 ),
               ),
+      ),
+    );
+  }
+}
+
+/// Shown when [CustomerServiceRequest.bouncedBack] is true — the provider
+/// cancelled after accepting, and the request has been reset to `Requested`
+/// so staff can find a new provider. Without this, the progress bar/status
+/// pill would silently revert with no explanation. See api.txt v3.22.
+class _BouncedBackNotice extends StatelessWidget {
+  const _BouncedBackNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.orange.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.info_outline_rounded, size: 18, color: Colors.orange),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Your provider had to cancel — we\'re finding you a new one.',
+              style: TextStyle(color: Colors.orange.shade900, fontSize: 13, fontWeight: FontWeight.w600, height: 1.35),
+            ),
+          ),
+        ],
       ),
     );
   }
