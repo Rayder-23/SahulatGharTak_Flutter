@@ -15,6 +15,7 @@ import '../widgets/curved_profile_header.dart';
 import '../widgets/delete_account_dialog.dart';
 import '../widgets/message_dialog.dart';
 import 'add_address_screen.dart';
+import 'contact_us_screen.dart';
 import 'customer_registration_screen.dart';
 import 'edit_profile_screen.dart';
 import 'landing_screen.dart';
@@ -476,6 +477,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 label: const Text('Delete Account'),
               ),
               const SizedBox(height: 20),
+              OutlinedButton.icon(
+                style: kProminentOutlinedButtonStyle(_brandBlue),
+                icon: const Icon(Icons.support_agent_rounded),
+                onPressed: () => Navigator.of(context).pushNamed(ContactUsScreen.routeName),
+                label: const Text('Contact Us'),
+              ),
+              const SizedBox(height: 12),
               Center(
                 child: TextButton.icon(
                   icon: Icon(Icons.privacy_tip_outlined, color: Colors.grey[600]),

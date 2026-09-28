@@ -12,9 +12,9 @@ class ContactUsScreen extends StatelessWidget {
   static const phone1Digits = '03135355770';
   static const phone1WhatsApp = '923135355770';
 
-  static const phone2Display = '0315-5355770';
-  static const phone2Digits = '03155355770';
-  static const phone2WhatsApp = '923155355770';
+  static const phone2Display = '0325-5763450';
+  static const phone2Digits = '03255763450';
+  static const phone2WhatsApp = '923255763450';
 
   static const email = 'sahulatghartak@gmail.com';
 

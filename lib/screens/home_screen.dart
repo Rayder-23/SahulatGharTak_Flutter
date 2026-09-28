@@ -9,11 +9,13 @@ import '../utils/category_images.dart';
 import '../utils/service_catalog_style.dart';
 import '../utils/service_colors.dart';
 import '../utils/breakpoints.dart';
+import '../utils/constants.dart';
 import '../utils/guest_guard.dart';
 import '../utils/motion.dart';
 import '../widgets/decorative_glow_circle.dart';
 import '../widgets/featured_services_carousel.dart';
 import '../widgets/main_category_card.dart';
+import 'contact_us_screen.dart';
 import 'service_request_form_screen.dart';
 
 import '../widgets/bottom_nav.dart';
@@ -258,6 +260,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 const _SectionHeader(title: 'Customer Reviews'),
                 const SizedBox(height: 12),
                 const _ReviewsList(),
+                const SizedBox(height: 24),
+                OutlinedButton.icon(
+                  style: kProminentOutlinedButtonStyle(_brandBlue),
+                  icon: const Icon(Icons.support_agent_rounded),
+                  label: const Text('Contact Us'),
+                  onPressed: () => Navigator.of(context).pushNamed(ContactUsScreen.routeName),
+                ),
                 const SizedBox(height: 40),
               ],
             ),

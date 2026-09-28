@@ -21,6 +21,7 @@ import '../../../widgets/provider/provider_tab_header.dart' show providerBrandDa
 import '../../../widgets/primary_category_dialog.dart';
 import '../../../widgets/provider/tab_state_placeholder.dart';
 import '../../category_picker_screen.dart';
+import '../../contact_us_screen.dart';
 import '../../home_screen.dart';
 import '../../landing_screen.dart';
 
@@ -465,6 +466,16 @@ class _ProfileTabState extends State<ProfileTab> {
               ),
             ),
             const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                style: kProminentOutlinedButtonStyle(providerBrandBlue),
+                icon: const Icon(Icons.support_agent_rounded),
+                label: const Text('Contact Us'),
+                onPressed: () => Navigator.of(context).pushNamed(ContactUsScreen.routeName),
+              ),
+            ),
+            const SizedBox(height: 12),
             Center(
               child: TextButton.icon(
                 icon: Icon(Icons.privacy_tip_outlined, color: Colors.grey[600]),
