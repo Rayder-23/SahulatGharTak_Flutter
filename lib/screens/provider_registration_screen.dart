@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/category.dart';
+import '../models/service_title.dart';
 import '../providers/auth_provider.dart';
 import '../providers/city_provider.dart';
+import '../providers/provider_service_titles_provider.dart';
 import '../utils/constants.dart';
 import '../utils/input_formatters.dart';
 import '../utils/provider_terms_and_conditions.dart';
@@ -18,6 +20,7 @@ import 'category_picker_screen.dart';
 import 'login_screen.dart';
 import 'provider_dashboard_screen.dart';
 import 'provider_document_upload_screen.dart';
+import 'provider_service_title_picker_screen.dart';
 
 class ProviderRegistrationScreen extends StatefulWidget {
   static const routeName = '/register-provider';
@@ -39,6 +42,7 @@ class _ProviderRegistrationScreenState
   String? _selectedGender;
   Set<Category> _selectedCategories = {};
   int? _primaryCategoryId;
+  List<ServiceTitle> _selectedServiceTitles = [];
   String? _selectedCity;
   bool _obscurePassword = true;
   bool _agreedToTerms = false;
@@ -104,6 +108,23 @@ class _ProviderRegistrationScreenState
     });
   }
 
+  Future<void> _pickServiceTitles() async {
+    if (_selectedCategories.isEmpty) {
+      showAppToast(context, 'Select your categories first', type: AppToastType.error);
+      return;
+    }
+    final result = await Navigator.of(context).push<List<ServiceTitle>>(
+      MaterialPageRoute(
+        builder: (_) => ProviderServiceTitlePickerScreen(
+          categoryUids: _selectedCategories.map((c) => c.id).toSet(),
+          selectedTitleIds: _selectedServiceTitles.map((t) => t.id).toSet(),
+        ),
+      ),
+    );
+    if (result == null || !mounted) return;
+    setState(() => _selectedServiceTitles = result);
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCategories.isEmpty || _primaryCategoryId == null) {
@@ -145,6 +166,19 @@ class _ProviderRegistrationScreenState
       if (!mounted) return;
       final providerUid = authProvider.currentUser?.providerUid;
       if (providerUid != null) {
+        if (_selectedServiceTitles.isNotEmpty) {
+          // Best-effort: registration already succeeded, so a failure here
+          // shouldn't block the flow — the provider can set titles later
+          // from their profile's "Categories & Service Titles" screen.
+          final titlesSaved = await context.read<ProviderServiceTitlesProvider>().save(
+                providerUid,
+                serviceTitleIds: _selectedServiceTitles.map((t) => t.id).toList(),
+              );
+          if (mounted && !titlesSaved) {
+            showAppToast(context, 'Registered, but service titles could not be saved. You can set them later from your profile.', type: AppToastType.error);
+          }
+        }
+        if (!mounted) return;
         Navigator.of(context).pushReplacementNamed(
           ProviderDocumentUploadScreen.routeName,
           arguments: ProviderDocumentUploadArgs(providerUid: providerUid),
@@ -299,6 +333,29 @@ class _ProviderRegistrationScreenState
                   ],
                 );
               },
+            ),
+            const SizedBox(height: 20),
+            authFieldLabel('Service Titles (optional)'),
+            InkWell(
+              onTap: _pickServiceTitles,
+              borderRadius: BorderRadius.circular(14),
+              child: InputDecorator(
+                decoration: authFieldDecoration(
+                  hint: _selectedCategories.isEmpty ? 'Select categories first' : 'Optional — select service titles',
+                ).copyWith(
+                  suffixIcon: const Icon(Icons.chevron_right_rounded, color: Colors.black38),
+                ),
+                child: Text(
+                  _selectedServiceTitles.isEmpty
+                      ? (_selectedCategories.isEmpty ? 'Select categories first' : 'Optional — select service titles')
+                      : _selectedServiceTitles.map((t) => t.title).join(', '),
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: _selectedServiceTitles.isEmpty ? Colors.grey.shade600 : Colors.black87,
+                    fontWeight: _selectedServiceTitles.isEmpty ? FontWeight.normal : FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             authFieldLabel('City'),

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/category.dart';
 import '../../../providers/auth_provider.dart';
-import '../../../providers/provider_categories_provider.dart';
 import '../../../providers/provider_dashboard_provider.dart';
 import '../../../providers/provider_document_provider.dart';
 import '../../../providers/time_format_provider.dart';
@@ -12,18 +10,17 @@ import '../../../utils/date_time_formatter.dart';
 import '../../../utils/provider_availability_helper.dart';
 import '../../../utils/privacy_policy_launcher.dart';
 import '../../../utils/provider_routes.dart';
-import '../../../widgets/app_toast.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/curved_profile_header.dart';
 import '../../../widgets/delete_account_dialog.dart';
 import '../../../widgets/message_dialog.dart';
 import '../../../widgets/provider/provider_tab_header.dart' show providerBrandDark, providerBrandBlue, providerBrandAccent;
-import '../../../widgets/primary_category_dialog.dart';
+import '../../../widgets/provider/section_header_and_info_card.dart';
 import '../../../widgets/provider/tab_state_placeholder.dart';
-import '../../category_picker_screen.dart';
 import '../../contact_us_screen.dart';
 import '../../home_screen.dart';
 import '../../landing_screen.dart';
+import 'categories_and_titles_screen.dart';
 
 const _verifiedGreen = Color(0xFF16A34A);
 
@@ -51,70 +48,6 @@ class _ProfileTabState extends State<ProfileTab> {
       dashboard.loadProviderDetail(providerUid);
       dashboard.loadAvailabilityStatus(providerUid);
       context.read<ProviderDocumentProvider>().loadDocuments(providerUid);
-      context.read<ProviderCategoriesProvider>().load(providerUid);
-    }
-  }
-
-  Future<void> _editCategories(BuildContext context) async {
-    final providerUid = context.read<AuthProvider>().currentUser?.providerUid;
-    if (providerUid == null) return;
-
-    final categoriesProvider = context.read<ProviderCategoriesProvider>();
-    final currentIds = categoriesProvider.categories.map((c) => c.categoryUid).toSet();
-
-    final result = await Navigator.of(context).push<List<Category>>(
-      MaterialPageRoute(builder: (_) => CategoryPickerScreen(selectedCategoryIds: currentIds)),
-    );
-    if (result == null || result.isEmpty || !context.mounted) return;
-
-    final primaryMatches = categoriesProvider.categories.where((c) => c.isPrimary);
-    final currentPrimary = primaryMatches.isEmpty ? null : primaryMatches.first.categoryUid;
-
-    int primaryCategoryId;
-    if (result.length == 1) {
-      primaryCategoryId = result.first.id;
-    } else {
-      final chosen = await showPrimaryCategoryDialog(context, categories: result, initialPrimaryId: currentPrimary);
-      if (chosen == null || !context.mounted) return;
-      primaryCategoryId = chosen;
-    }
-
-    await _saveCategories(context, providerUid, categoryIds: result.map((c) => c.id).toList(), primaryCategoryId: primaryCategoryId);
-  }
-
-  /// Lets the provider change which of their *already-selected* categories is
-  /// primary at any time, without going through the full add/remove picker —
-  /// a standalone entry point to [showPrimaryCategoryDialog] alongside
-  /// [_editCategories]'s full "Edit" flow.
-  Future<void> _editPrimaryCategory(BuildContext context) async {
-    final providerUid = context.read<AuthProvider>().currentUser?.providerUid;
-    if (providerUid == null) return;
-
-    final categoriesProvider = context.read<ProviderCategoriesProvider>();
-    final categories = categoriesProvider.categories;
-    if (categories.length < 2) return;
-
-    final asCategories = categories
-        .map((c) => Category(id: c.categoryUid, serviceId: 0, serviceName: '', name: c.categoryName, description: null, createdOn: DateTime.now()))
-        .toList();
-    final primaryMatches = categories.where((c) => c.isPrimary);
-    final currentPrimary = primaryMatches.isEmpty ? null : primaryMatches.first.categoryUid;
-
-    final chosen = await showPrimaryCategoryDialog(context, categories: asCategories, initialPrimaryId: currentPrimary);
-    if (chosen == null || chosen == currentPrimary || !context.mounted) return;
-
-    await _saveCategories(context, providerUid, categoryIds: categories.map((c) => c.categoryUid).toList(), primaryCategoryId: chosen);
-  }
-
-  Future<void> _saveCategories(BuildContext context, int providerUid, {required List<int> categoryIds, required int primaryCategoryId}) async {
-    final categoriesProvider = context.read<ProviderCategoriesProvider>();
-    final success = await categoriesProvider.save(providerUid, categoryIds: categoryIds, primaryCategoryId: primaryCategoryId);
-    if (!context.mounted) return;
-
-    if (success) {
-      showAppToast(context, 'Categories updated', type: AppToastType.success);
-    } else {
-      showAppToast(context, categoriesProvider.error ?? 'Failed to update categories', type: AppToastType.error);
     }
   }
 
@@ -280,8 +213,8 @@ class _ProfileTabState extends State<ProfileTab> {
               ),
             ],
             const SizedBox(height: 20),
-            const _SectionHeader('Provider Details'),
-            _InfoCard(
+            const SectionHeader('Provider Details'),
+            InfoCard(
               children: [
                 ListTile(leading: const Icon(Icons.badge_rounded, color: providerBrandBlue), title: const Text('Provider ID'), subtitle: Text('${detail.uid}')),
                 const Divider(height: 1),
@@ -321,69 +254,10 @@ class _ProfileTabState extends State<ProfileTab> {
               ],
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                const Expanded(child: _SectionHeader('My Categories')),
-                Consumer<ProviderCategoriesProvider>(
-                  builder: (context, categoriesProvider, _) {
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (categoriesProvider.categories.length > 1) ...[
-                          TextButton.icon(
-                            onPressed: categoriesProvider.isSaving ? null : () => _editPrimaryCategory(context),
-                            icon: const Icon(Icons.star_rounded, size: 16),
-                            label: const Text('Edit Primary', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
-                            style: TextButton.styleFrom(foregroundColor: providerBrandBlue, padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                          ),
-                          const SizedBox(width: 14),
-                        ],
-                        TextButton.icon(
-                          onPressed: categoriesProvider.isSaving ? null : () => _editCategories(context),
-                          icon: const Icon(Icons.edit_rounded, size: 16),
-                          label: const Text('Edit', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
-                          style: TextButton.styleFrom(foregroundColor: providerBrandBlue, padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Consumer<ProviderCategoriesProvider>(
-              builder: (context, categoriesProvider, _) {
-                if (categoriesProvider.isLoading && categoriesProvider.categories.isEmpty) {
-                  return const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Center(child: CircularProgressIndicator()));
-                }
-                if (categoriesProvider.categories.isEmpty) {
-                  return _InfoCard(
-                    children: [
-                      ListTile(leading: const Icon(Icons.category_rounded, color: providerBrandBlue), title: const Text('Category'), subtitle: Text('${detail.categoryName} (ID: ${detail.categoryId})')),
-                    ],
-                  );
-                }
-                return _InfoCard(
-                  children: [
-                    for (var i = 0; i < categoriesProvider.categories.length; i++) ...[
-                      if (i != 0) const Divider(height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.category_rounded, color: providerBrandBlue),
-                        title: Text(categoriesProvider.categories[i].categoryName),
-                        trailing: categoriesProvider.categories[i].isPrimary
-                            ? const Chip(label: Text('Primary', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)), visualDensity: VisualDensity.compact)
-                            : null,
-                      ),
-                    ],
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            const _SectionHeader('Preferences'),
+            const SectionHeader('Preferences'),
             Consumer<TimeFormatProvider>(
               builder: (context, timeFormat, _) {
-                return _InfoCard(
+                return InfoCard(
                   children: [
                     SwitchListTile(
                       secondary: const Icon(Icons.schedule_rounded, color: providerBrandBlue),
@@ -398,8 +272,8 @@ class _ProfileTabState extends State<ProfileTab> {
               },
             ),
             const SizedBox(height: 16),
-            const _SectionHeader('Availability'),
-            _InfoCard(
+            const SectionHeader('Availability'),
+            InfoCard(
               children: [
                 ListTile(
                   leading: Icon(dashboard.isOnline ? Icons.wifi_tethering_rounded : Icons.wifi_tethering_off_rounded, color: dashboard.isOnline ? Colors.green : Colors.grey),
@@ -432,14 +306,26 @@ class _ProfileTabState extends State<ProfileTab> {
               ),
             ),
             const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                style: kProminentOutlinedButtonStyle(providerBrandBlue),
-                icon: const Icon(Icons.badge_outlined),
-                label: const Text('My Documents'),
-                onPressed: () => Navigator.of(context).pushNamed(ProviderRoutes.verificationDocuments),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    style: kProminentOutlinedButtonStyle(providerBrandBlue),
+                    icon: const Icon(Icons.badge_outlined),
+                    label: const Text('My Documents'),
+                    onPressed: () => Navigator.of(context).pushNamed(ProviderRoutes.verificationDocuments),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    style: kProminentOutlinedButtonStyle(providerBrandBlue),
+                    icon: const Icon(Icons.category_rounded),
+                    label: const Text('Categories'),
+                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CategoriesAndTitlesScreen())),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             SizedBox(
@@ -487,49 +373,6 @@ class _ProfileTabState extends State<ProfileTab> {
         ),
       ),
       ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  const _SectionHeader(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8, top: 4),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(width: 4, height: 16, decoration: BoxDecoration(color: providerBrandBlue, borderRadius: BorderRadius.circular(2))),
-            const SizedBox(width: 8),
-            Text(title, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800, color: Color(0xFF14213D), letterSpacing: -0.1)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// White, shadowed container used for grouped [ListTile] rows, matching the
-/// customer profile screen's card style (see `screens/profile_screen.dart`).
-class _InfoCard extends StatelessWidget {
-  final List<Widget> children;
-  const _InfoCard({required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [BoxShadow(color: providerBrandDark.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(children: children),
     );
   }
 }
