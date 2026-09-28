@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/provider/material_item.dart';
@@ -15,6 +16,7 @@ import '../../../widgets/app_toast.dart';
 import '../../../widgets/reason_dialog.dart';
 import '../../../widgets/status_progress_bar.dart';
 import '../../../widgets/themed_dropdown.dart';
+import 'client_location_map_screen.dart';
 
 const _brandDark = Color(0xFF0A4FA8);
 const _brandBlue = Color(0xFF016EE3);
@@ -285,7 +287,31 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                         _DetailRow(
                           label: booking.clientAddressTitle ?? 'Job Site',
                           icon: Icons.location_on_rounded,
-                          value: [booking.clientFullAddress, booking.clientArea, booking.clientCity].whereType<String>().join(', '),
+                          valueWidget: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  [booking.clientFullAddress, booking.clientArea, booking.clientCity].whereType<String>().join(', '),
+                                  style: const TextStyle(color: Color(0xFF1A2233), fontSize: 14, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              if (booking.hasClientLocation)
+                                IconButton(
+                                  visualDensity: VisualDensity.compact,
+                                  padding: const EdgeInsets.only(left: 6),
+                                  constraints: const BoxConstraints(),
+                                  icon: const Icon(Icons.map_rounded, color: kPrimaryColor, size: 20),
+                                  tooltip: 'View on map',
+                                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (_) => ClientLocationMapScreen(
+                                      location: LatLng(booking.clientLatitude!, booking.clientLongitude!),
+                                      addressLabel: [booking.clientFullAddress, booking.clientArea, booking.clientCity].whereType<String>().join(', '),
+                                    ),
+                                  )),
+                                ),
+                            ],
+                          ),
                         ),
                         if (formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime) != null)
                           _DetailRow(

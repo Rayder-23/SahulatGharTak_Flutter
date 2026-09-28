@@ -37,6 +37,13 @@ class ServiceBooking {
   final String? clientArea;
   final String? clientCity;
 
+  /// Client's saved address pin, when they dropped one — nullable, and
+  /// always both-or-neither (added api.txt v3.23, same both-or-neither
+  /// convention as `/client-addresses`). Both null means the client never
+  /// dropped a pin for that address, so the map icon simply doesn't show.
+  final double? clientLatitude;
+  final double? clientLongitude;
+
   const ServiceBooking({
     required this.uid,
     required this.requestUid,
@@ -75,7 +82,13 @@ class ServiceBooking {
     this.clientFullAddress,
     this.clientArea,
     this.clientCity,
+    this.clientLatitude,
+    this.clientLongitude,
   });
+
+  /// True when the client dropped a pin for this address, so the map icon
+  /// can be shown. Both fields are always null-together (see api.txt).
+  bool get hasClientLocation => clientLatitude != null && clientLongitude != null;
 
   /// True for the "Rejected" status. The backend never returns rejected
   /// bookings from GET /service-bookings (staff-only), so these only exist
@@ -122,6 +135,8 @@ class ServiceBooking {
       'clientFullAddress': clientFullAddress,
       'clientArea': clientArea,
       'clientCity': clientCity,
+      'clientLatitude': clientLatitude,
+      'clientLongitude': clientLongitude,
     };
   }
 
@@ -164,6 +179,8 @@ class ServiceBooking {
       clientFullAddress: json['clientFullAddress'] as String?,
       clientArea: json['clientArea'] as String?,
       clientCity: json['clientCity'] as String?,
+      clientLatitude: (json['clientLatitude'] as num?)?.toDouble(),
+      clientLongitude: (json['clientLongitude'] as num?)?.toDouble(),
     );
   }
 }
