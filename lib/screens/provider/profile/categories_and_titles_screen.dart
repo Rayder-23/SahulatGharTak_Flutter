@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/category.dart';
+import '../../../models/provider/provider_service_title.dart';
 import '../../../models/service_title.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/provider_categories_provider.dart';
@@ -95,9 +96,20 @@ class _CategoriesAndTitlesScreenState extends State<CategoriesAndTitlesScreen> {
 
     if (success) {
       showAppToast(context, 'Categories updated', type: AppToastType.success);
+      await _pruneOrphanedTitles(providerUid, categoryIds.toSet());
     } else {
       showAppToast(context, categoriesProvider.error ?? 'Failed to update categories', type: AppToastType.error);
     }
+  }
+
+  /// The backend keeps titles of a removed category until the next titles save
+  /// (api.txt "orphaned titles persist"); drop them now so the list only shows
+  /// titles under the provider's current categories.
+  Future<void> _pruneOrphanedTitles(int providerUid, Set<int> categoryIds) async {
+    final titlesProvider = context.read<ProviderServiceTitlesProvider>();
+    final kept = titlesProvider.serviceTitles.where((t) => categoryIds.contains(t.categoryUid)).toList();
+    if (kept.length == titlesProvider.serviceTitles.length) return;
+    await titlesProvider.save(providerUid, serviceTitleIds: kept.map((t) => t.serviceTitleUid).toList());
   }
 
   Future<void> _editServiceTitles(BuildContext context) async {
@@ -116,9 +128,9 @@ class _CategoriesAndTitlesScreenState extends State<CategoriesAndTitlesScreen> {
     final success = await titlesProvider.save(providerUid, serviceTitleIds: result.map((t) => t.id).toList());
     if (!context.mounted) return;
     if (success) {
-      showAppToast(context, 'Service titles updated', type: AppToastType.success);
+      showAppToast(context, 'Services updated', type: AppToastType.success);
     } else {
-      showAppToast(context, titlesProvider.error ?? 'Failed to update service titles', type: AppToastType.error);
+      showAppToast(context, titlesProvider.error ?? 'Failed to update services', type: AppToastType.error);
     }
   }
 
@@ -127,7 +139,7 @@ class _CategoriesAndTitlesScreenState extends State<CategoriesAndTitlesScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: ProviderTabHeader(
-        title: 'Categories & Service Titles',
+        title: 'Categories & Services',
         subtitle: 'Manage what you offer',
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
@@ -204,7 +216,7 @@ class _CategoriesAndTitlesScreenState extends State<CategoriesAndTitlesScreen> {
             const SizedBox(height: 20),
             Row(
               children: [
-                const Expanded(child: SectionHeader('My Service Titles')),
+                const Expanded(child: SectionHeader('My Services')),
                 Consumer<ProviderServiceTitlesProvider>(
                   builder: (context, titlesProvider, _) {
                     return TextButton.icon(
@@ -228,21 +240,33 @@ class _CategoriesAndTitlesScreenState extends State<CategoriesAndTitlesScreen> {
                     children: [
                       ListTile(
                         leading: Icon(Icons.label_outline_rounded, color: providerBrandBlue),
-                        title: Text('No service titles selected yet'),
+                        title: Text('No services selected yet'),
                         subtitle: Text('Optional — helps customers find you for specific jobs'),
                       ),
                     ],
                   );
                 }
+                final groups = <String, List<ProviderServiceTitle>>{};
+                for (final t in titlesProvider.serviceTitles) {
+                  groups.putIfAbsent(t.categoryName, () => []).add(t);
+                }
                 return InfoCard(
                   children: [
-                    for (var i = 0; i < titlesProvider.serviceTitles.length; i++) ...[
-                      if (i != 0) const Divider(height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.label_rounded, color: providerBrandBlue),
-                        title: Text(titlesProvider.serviceTitles[i].title),
-                        subtitle: Text(titlesProvider.serviceTitles[i].categoryName),
+                    for (final entry in groups.entries) ...[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                        child: Text(
+                          entry.key,
+                          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: providerBrandBlue),
+                        ),
                       ),
+                      for (final t in entry.value)
+                        ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.label_rounded, color: providerBrandBlue),
+                          title: Text(t.title),
+                        ),
+                      if (entry.key != groups.keys.last) const Divider(height: 1),
                     ],
                   ],
                 );

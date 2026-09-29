@@ -95,6 +95,7 @@ class _ProviderRegistrationScreenState
       setState(() {
         _selectedCategories = result.toSet();
         _primaryCategoryId = result.first.id;
+        _pruneServiceTitles();
       });
       return;
     }
@@ -105,7 +106,15 @@ class _ProviderRegistrationScreenState
     setState(() {
       _selectedCategories = result.toSet();
       _primaryCategoryId = chosen ?? result.first.id;
+      _pruneServiceTitles();
     });
+  }
+
+  /// Drops picked service titles whose category is no longer selected — the
+  /// backend rejects titles outside the provider's categories.
+  void _pruneServiceTitles() {
+    final categoryIds = _selectedCategories.map((c) => c.id).toSet();
+    _selectedServiceTitles = _selectedServiceTitles.where((t) => categoryIds.contains(t.categoryId)).toList();
   }
 
   Future<void> _pickServiceTitles() async {
@@ -175,7 +184,7 @@ class _ProviderRegistrationScreenState
                 serviceTitleIds: _selectedServiceTitles.map((t) => t.id).toList(),
               );
           if (mounted && !titlesSaved) {
-            showAppToast(context, 'Registered, but service titles could not be saved. You can set them later from your profile.', type: AppToastType.error);
+            showAppToast(context, 'Registered, but services could not be saved. You can set them later from your profile.', type: AppToastType.error);
           }
         }
         if (!mounted) return;
@@ -335,19 +344,19 @@ class _ProviderRegistrationScreenState
               },
             ),
             const SizedBox(height: 20),
-            authFieldLabel('Service Titles (optional)'),
+            authFieldLabel('Services (optional)'),
             InkWell(
               onTap: _pickServiceTitles,
               borderRadius: BorderRadius.circular(14),
               child: InputDecorator(
                 decoration: authFieldDecoration(
-                  hint: _selectedCategories.isEmpty ? 'Select categories first' : 'Optional — select service titles',
+                  hint: _selectedCategories.isEmpty ? 'Select categories first' : 'Optional — select services',
                 ).copyWith(
                   suffixIcon: const Icon(Icons.chevron_right_rounded, color: Colors.black38),
                 ),
                 child: Text(
                   _selectedServiceTitles.isEmpty
-                      ? (_selectedCategories.isEmpty ? 'Select categories first' : 'Optional — select service titles')
+                      ? (_selectedCategories.isEmpty ? 'Select categories first' : 'Optional — select services')
                       : _selectedServiceTitles.map((t) => t.title).join(', '),
                   style: TextStyle(
                     fontSize: 15,

@@ -9,7 +9,7 @@ class ProviderServiceTitlesApiService {
   Future<List<ProviderServiceTitle>> fetchServiceTitles(int providerUid) async {
     final response = await http.get(Uri.parse('$kApiBaseUrl/providers/$providerUid/service-titles')).timeout(kApiTimeout);
 
-    final json = _decode(response, 'Failed to load service titles');
+    final json = _decode(response, 'Failed to load services');
     final List<dynamic> data = json['data'] as List<dynamic>? ?? [];
     return data.map((item) => ProviderServiceTitle.fromJson(item as Map<String, dynamic>)).toList();
   }
@@ -26,7 +26,7 @@ class ProviderServiceTitlesApiService {
         )
         .timeout(kApiTimeout);
 
-    final json = _decode(response, 'Failed to update service titles');
+    final json = _decode(response, 'Failed to update services');
     final List<dynamic> data = json['data'] as List<dynamic>? ?? [];
     return data.map((item) => ProviderServiceTitle.fromJson(item as Map<String, dynamic>)).toList();
   }

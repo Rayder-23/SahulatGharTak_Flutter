@@ -5,6 +5,7 @@ import '../services/category_api_service.dart';
 import '../utils/api_error.dart';
 import '../utils/category_icons.dart';
 import '../utils/service_catalog_style.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/decorative_glow_circle.dart';
 
 // Shared brand gradient used across the app's other branded headers (home
@@ -13,6 +14,10 @@ import '../widgets/decorative_glow_circle.dart';
 const _brandDark = Color(0xFF0A4FA8);
 const _brandBlue = Color(0xFF016EE3);
 const _brandAccent = Color(0xFF4FC3F7);
+
+/// Maximum number of categories a provider may hold (api.txt v3.25 — the
+/// backend rejects more than this with a 400).
+const kMaxProviderCategories = 3;
 
 /// Full-screen multi-select category picker, used for provider registration
 /// (Feature 9 - multi-category support) and the "My Categories" management
@@ -94,6 +99,8 @@ class _CategoryPickerScreenState extends State<CategoryPickerScreen> {
     setState(() {
       if (_selectedIds.contains(category.id)) {
         _selectedIds.remove(category.id);
+      } else if (_selectedIds.length >= kMaxProviderCategories) {
+        showAppToast(context, 'You can select up to $kMaxProviderCategories categories', type: AppToastType.error);
       } else {
         _selectedIds.add(category.id);
       }
@@ -159,7 +166,7 @@ class _CategoryPickerScreenState extends State<CategoryPickerScreen> {
             minimumSize: const Size(double.infinity, 48),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
-          child: Text(_selectedIds.isEmpty ? 'Select at least one category' : 'Done (${_selectedIds.length} selected)'),
+          child: Text(_selectedIds.isEmpty ? 'Select 1 to $kMaxProviderCategories categories' : 'Done (${_selectedIds.length} of $kMaxProviderCategories selected)'),
         ),
       ),
     );

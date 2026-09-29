@@ -221,7 +221,7 @@ class _PickerHeader extends StatelessWidget {
                         ),
                         const Expanded(
                           child: Text(
-                            'Select Service Titles',
+                            'Select Services',
                             style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.2),
                           ),
                         ),
@@ -241,7 +241,7 @@ class _PickerHeader extends StatelessWidget {
                           onChanged: onQueryChanged,
                           style: const TextStyle(fontSize: 14),
                           decoration: InputDecoration(
-                            hintText: 'Search service titles...',
+                            hintText: 'Search services...',
                             hintStyle: TextStyle(color: Colors.grey.shade500),
                             prefixIcon: const Icon(Icons.search_rounded, color: _brandBlue),
                             suffixIcon: query.isEmpty
@@ -408,7 +408,7 @@ class _EmptyState extends StatelessWidget {
           children: [
             Icon(Icons.search_off_rounded, size: 48, color: Colors.grey.shade400),
             const SizedBox(height: 12),
-            Text('No service titles found', style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+            Text('No services found', style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
           ],
         ),
       ),
@@ -432,7 +432,7 @@ class _ErrorState extends StatelessWidget {
           children: [
             Icon(Icons.wifi_off_rounded, size: 48, color: Colors.red.shade300),
             const SizedBox(height: 12),
-            Text('Couldn\'t load service titles', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.grey.shade800)),
+            Text('Couldn\'t load services', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.grey.shade800)),
             const SizedBox(height: 6),
             Text(message, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
             const SizedBox(height: 16),
