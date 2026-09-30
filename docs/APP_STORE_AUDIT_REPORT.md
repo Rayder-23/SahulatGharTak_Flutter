@@ -73,14 +73,17 @@ Since this is a shared Flutter codebase (one `lib/` tree shipping to both iOS an
 
 ## 3. Metadata, Permissions & Config Verification
 
+**2026-09-30 update:** `ios/Podfile` now limits `permission_handler` to `PERMISSION_CAMERA` + `PERMISSION_LOCATION_WHENINUSE` (otherwise it compiles every permission API); Android manifest strips the unused `RECORD_AUDIO` and `READ_EXTERNAL_STORAGE` permissions merged in from plugins. Data-safety / App Privacy declarations should list: precise location (address pin, not tracked), photos (profile/CNIC), personal info, and Google Maps as a third-party SDK.
+
 ### 3.1 Info.plist Review
 
 | Permission Key | Present? | Description Quality |
 |---|---|---|
 | `NSCameraUsageDescription` | ✅ (`ios/Runner/Info.plist:29-30`) | Good — specific: *"...uses your camera to capture your profile photo and CNIC images during provider registration."* |
 | `NSPhotoLibraryUsageDescription` | ✅ (`ios/Runner/Info.plist:31-32`) | Good — specific: *"...needs access to your photo library to select your profile photo and CNIC images..."* |
-| `NSLocationWhenInUseUsageDescription` | ❌ Not present | Not currently needed — no `geolocator`/location plugin found in `pubspec.yaml`; address entry (`lib/screens/add_address_screen.dart`) appears to be manual text entry, not GPS-based. No action required unless location capture is added later. |
-| `NSMicrophoneUsageDescription` | ❌ Not present | No audio/video capture code found (`image_picker` is used for stills only) — not currently needed. |
+| `NSLocationWhenInUseUsageDescription` | ✅ | Required — `geolocator` + `permission_handler` power the address pin-drop map (`lib/screens/add_address_screen.dart`). |
+| `NSLocationAlwaysAndWhenInUseUsageDescription` | ✅ (added 2026-09-30) | Apple error 90683: `geolocator_apple` references the "Always" location API, so the key is required even though the app only requests when-in-use. String states location is never tracked in the background. |
+| `NSMicrophoneUsageDescription` | ✅ | Present because the `camera` plugin references the mic API; the app itself uses `enableAudio: false` and never records audio. |
 | `NSUserTrackingUsageDescription` (ATT) | ❌ Not present | No analytics/ad-tracking SDK found in `pubspec.yaml` — not currently needed. If any analytics SDK (Firebase Analytics, Facebook SDK, etc.) is added later, this key plus an ATT prompt becomes mandatory. |
 
 Both present permission strings are specific and user-facing (they name the exact feature — CNIC/profile photo capture), which is exactly what Apple's guidance ("purpose strings must explain why, in context") expects. No generic placeholder text ("This app needs your camera") was found.

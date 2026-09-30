@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- HTTPS only. The production API (https://sahulatghartak.com) and the local
+     dev backend (https://localhost:7265 / https://10.0.2.2:7265) are both
+     served over HTTPS, so no cleartext exception is needed. Do not add one:
+     Play flags apps that permit cleartext traffic. -->
 <network-security-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">sahulatghartak.com</domain>
-    </domain-config>
+    <base-config cleartextTrafficPermitted="false" />
 </network-security-config>

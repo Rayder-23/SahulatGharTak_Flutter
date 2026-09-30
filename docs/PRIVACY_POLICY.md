@@ -32,13 +32,15 @@ We collect different types of information depending on whether you use the App a
 - Service request details (e.g., service type, description, preferred schedule)
 
 ### 1.2 Information Collected Automatically
-- **Device permissions:** With your consent, the App requests access to your device **Camera** and **Photo Library/Gallery** solely to let you capture or select your profile photo and, for Providers, CNIC verification images.
+- **Device permissions:** With your consent, the App requests access to your device **Camera** and **Photo Library/Gallery** solely to let you capture or select your profile photo and, for Providers, CNIC verification images, and to your device **Location** (only while the App is open) solely to center the map and help you drop an accurate pin when saving an address. You can decline or revoke any of these in your device settings.
 - **Booking and transaction records:** Details of service requests, bookings, job status, cancellation/rejection reasons, and provider earnings/wallet activity within the App.
 - **Ratings and reviews:** Feedback and star ratings exchanged between Customers and Providers after a completed service.
 - **In-app notifications:** Booking status updates and alerts delivered within the App.
 
 ### 1.3 Information We Do Not Collect
-We do not collect precise, continuous, or background GPS/location data from your device. Location data is limited to the coordinates of addresses you manually save within the App. We do not integrate third-party advertising, analytics, or social media SDKs, and we do not process payment card details within the App — the App does not integrate any third-party payment gateway.
+We do not collect continuous or background location data. Your device location is read once, only while the App is open and only when you use the address map, to position the pin; what we store is the coordinates of the addresses you choose to save. We do not integrate third-party advertising, analytics, or social media SDKs, and we do not process payment card details within the App — the App does not integrate any third-party payment gateway.
+
+**Third-party components the App uses:** Google Maps (displays the address map and, like any map service, receives your device's IP address and map-usage data under [Google's Privacy Policy](https://policies.google.com/privacy)); Google ML Kit (on-device face/text/card detection that guides photo and CNIC capture — images are analysed on your device and are not sent to Google by this component). Address search/pin lookups are handled through our own servers.
 
 ---
 

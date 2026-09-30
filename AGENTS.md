@@ -82,7 +82,7 @@ These are fully wired to the live backend documented in `api.txt`:
 
 ### No local-DB feature
 
-Everything customer-facing runs on the real catalog flow (`ServiceCatalog` → `Category` → `ServiceRequestFormScreen`). The `sqflite` and `path` packages are still listed in `pubspec.yaml` but nothing in `lib/` imports either — dead weight pending removal, not evidence of an active local-DB feature.
+Everything customer-facing runs on the real catalog flow (`ServiceCatalog` → `Category` → `ServiceRequestFormScreen`). The unused `sqflite`, `path`, and `fl_chart` packages have been removed.
 
 ### Customer category browsing flow
 
@@ -166,11 +166,9 @@ All screens use named routes defined in `SahulatApp.routes` (`lib/main.dart`). A
 - `url_launcher` — `tel:`/WhatsApp/external links (`contact_actions.dart`, privacy policy launcher)
 - `dropdown_button2` — themed dropdown fields (e.g. the City selector)
 - `flutter_secure_storage` — persisted login session
-- `sqflite` / `path` — listed but **unused**; nothing in `lib/` imports either
 - `path_provider` — re-downloading already-uploaded provider documents to resend on partial re-upload (`ProviderDocumentProvider._resolveFile`), and temp-file output for `CaptureCropMapper`
 - `intl` — date/time formatting and `currency_formatter.dart`'s `NumberFormat`-based Rs formatting
 - `flutter_animate` — UI animations
-- `fl_chart` — listed but **unused**; nothing in `lib/` imports it (the wallet tab renders no charts)
 
 ## Project Skills (`.claude/skills/`)
 - **flutter-apply-architecture-best-practices** / **flutter-build-responsive-layout** / **flutter-animations** — Flutter reference workflows for layering (UI/Logic/Data), adaptive layout, and motion.
