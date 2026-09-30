@@ -1,3 +1,16 @@
+---
+status: stale
+type: audit
+reason: >-
+  Point-in-time layout audit from 2026-09-03 with five implementation passes reviewed
+  on 2026-09-04. Its baselines (13 analyzer issues, 17/17 tests) and screen counts are
+  out of date — the codebase has changed substantially since (address map screens,
+  provider category/service screens, more tests). Historical record only — do not use
+  as a current statement of layout coverage or as the lint/test baseline.
+superseded_by:
+  - AGENTS.md
+---
+
 # Responsive / Adaptive Layout Audit
 
 Audit date: 2026-09-03

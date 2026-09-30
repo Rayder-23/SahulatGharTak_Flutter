@@ -1,3 +1,17 @@
+---
+status: stale
+type: audit
+reason: >-
+  Point-in-time, read-only motion audit from 2026-09-03 (with follow-up sections
+  through the same pass). Its counts (127 .dart files, animation/reduced-motion call
+  sites) and its "no code changed" scope describe the codebase on that date; the app has
+  changed substantially since (GPS/address map, multi-category providers, service
+  titles, new screens). Historical record only — do not use as a current inventory of
+  the app's motion code.
+superseded_by:
+  - AGENTS.md
+---
+
 # Animation / Motion Audit
 
 Audit date: 2026-09-03

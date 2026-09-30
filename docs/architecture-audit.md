@@ -1,3 +1,8 @@
+---
+status: current
+type: audit
+---
+
 # Architecture Audit — Layered (UI / Logic / Data) Best Practices
 
 Audit date: 2026-09-03

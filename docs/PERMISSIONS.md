@@ -1,3 +1,8 @@
+---
+status: current
+type: reference
+---
+
 # Permissions & Platform Configuration Report
 
 Last reviewed: 2026-09-30. Covers what the app requests on Android and iOS, why, how each is handled in code, and the store-review implications. Cross-check with `docs/PRIVACY_POLICY.md` and `docs/APP_STORE_AUDIT_REPORT.md` when anything here changes.

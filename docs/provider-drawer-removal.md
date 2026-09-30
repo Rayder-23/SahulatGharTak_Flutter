@@ -1,3 +1,17 @@
+---
+status: stale
+type: decision-record
+reason: >-
+  Point-in-time record from 2026-08-03 of why the mock-backed provider dashboard
+  drawer and its 11 unbacked screens were deleted. The work is done and the
+  dashboard has since been rebuilt around real API-backed tabs (bookings, wallet,
+  profile, categories/services). Kept only as history of what was removed and which
+  parts were fake — do not use as current behavior documentation.
+superseded_by:
+  - AGENTS.md
+  - api.txt
+---
+
 # Provider Dashboard drawer removal
 
 **Date:** 2026-08-03

@@ -1,3 +1,8 @@
+---
+status: current
+type: audit
+---
+
 # App Store Compliance & Readiness Audit Report
 
 **Scope:** Static analysis of `lib/`, `ios/Runner/Info.plist`, `pubspec.yaml`, and routing/config.

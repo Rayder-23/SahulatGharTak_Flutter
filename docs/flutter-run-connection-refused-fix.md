@@ -1,3 +1,8 @@
+---
+status: current
+type: troubleshooting
+---
+
 # Fix: "Lost connection to device" / DDS connection refused on `flutter run` (Windows)
 
 **Date:** 2026-08-03 (updated same day with the actual root cause: corrupted emulator data)
