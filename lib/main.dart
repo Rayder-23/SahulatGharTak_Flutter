@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,12 +53,19 @@ import 'widgets/main_navigation_shell.dart';
 import 'screens/service_request_form_screen.dart';
 import 'screens/service_requests_screen.dart';
 import 'screens/subcategories_screen.dart';
-import 'screens/provider/notifications/notifications_screen.dart';
+import 'screens/notifications_screen.dart';
 import 'screens/provider/profile/edit_profile_screen.dart';
 import 'screens/provider/profile/verification_documents_screen.dart';
 import 'screens/provider/jobs/rejected_requests_screen.dart';
+import 'utils/active_role_tracker.dart';
 import 'utils/constants.dart';
 import 'utils/dev_http_overrides.dart';
+import 'utils/notification_router.dart';
+import 'data/repositories/notification_repository.dart';
+import 'firebase_options.dart';
+import 'providers/notification_provider.dart';
+import 'services/push_notification_service.dart';
+import 'widgets/push_host.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,6 +81,14 @@ void main() async {
     systemNavigationBarIconBrightness: Brightness.dark,
     systemNavigationBarContrastEnforced: false,
   ));
+  try {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  } catch (e) {
+    // Push is non-critical; the app must still start if Firebase can't.
+    debugPrint('Firebase init failed: $e');
+  }
   runApp(const SahulatApp());
 }
 
@@ -83,53 +100,93 @@ class SahulatApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => CategoryProvider(repository: CategoryRepository())),
-        ChangeNotifierProvider(create: (_) => CityProvider(repository: CityRepository())),
-        ChangeNotifierProvider(create: (_) => ServiceTitleProvider(repository: ServiceTitleRepository())),
-        ChangeNotifierProvider(create: (_) => ServiceCatalogProvider(repository: ServiceCatalogRepository())),
-        ChangeNotifierProvider(create: (_) => ProviderDashboardProvider(repository: ProviderDashboardRepository())),
-        ChangeNotifierProvider(create: (_) => ProviderBookingsProvider(repository: ProviderBookingsRepository())),
-        ChangeNotifierProvider(create: (_) => ClientAddressProvider(repository: ClientAddressRepository())),
-        ChangeNotifierProvider(create: (_) => CustomerServiceRequestProvider(repository: CustomerServiceRequestRepository())),
-        ChangeNotifierProvider(create: (_) => ProviderDocumentProvider(repository: ProviderDocumentRepository())),
-        ChangeNotifierProvider(create: (_) => ProviderWalletProvider(repository: ProviderWalletRepository())),
-        ChangeNotifierProvider(create: (_) => ProviderCategoriesProvider(repository: ProviderCategoriesRepository())),
-        ChangeNotifierProvider(create: (_) => ProviderServiceTitlesProvider(repository: ProviderServiceTitlesRepository())),
+        ChangeNotifierProvider(
+            create: (_) => CategoryProvider(repository: CategoryRepository())),
+        ChangeNotifierProvider(
+            create: (_) => CityProvider(repository: CityRepository())),
+        ChangeNotifierProvider(
+            create: (_) =>
+                ServiceTitleProvider(repository: ServiceTitleRepository())),
+        ChangeNotifierProvider(
+            create: (_) =>
+                ServiceCatalogProvider(repository: ServiceCatalogRepository())),
+        ChangeNotifierProvider(
+            create: (_) => ProviderDashboardProvider(
+                repository: ProviderDashboardRepository())),
+        ChangeNotifierProvider(
+            create: (_) => ProviderBookingsProvider(
+                repository: ProviderBookingsRepository())),
+        ChangeNotifierProvider(
+            create: (_) =>
+                ClientAddressProvider(repository: ClientAddressRepository())),
+        ChangeNotifierProvider(
+            create: (_) => CustomerServiceRequestProvider(
+                repository: CustomerServiceRequestRepository())),
+        ChangeNotifierProvider(
+            create: (_) => ProviderDocumentProvider(
+                repository: ProviderDocumentRepository())),
+        ChangeNotifierProvider(
+            create: (_) =>
+                ProviderWalletProvider(repository: ProviderWalletRepository())),
+        ChangeNotifierProvider(
+            create: (_) => ProviderCategoriesProvider(
+                repository: ProviderCategoriesRepository())),
+        ChangeNotifierProvider(
+            create: (_) => ProviderServiceTitlesProvider(
+                repository: ProviderServiceTitlesRepository())),
         ChangeNotifierProvider(create: (_) => TimeFormatProvider()),
+        ChangeNotifierProvider(
+            create: (_) =>
+                NotificationProvider(repository: NotificationRepository())),
       ],
-      child: MaterialApp(
-        title: 'Sahulat Ghar Tak',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: kPrimaryColor),
-          useMaterial3: true,
+      child: PushHost(
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          navigatorObservers: [RoleNavigatorObserver(activeRoleTracker)],
+          title: 'Sahulat Ghar Tak',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: kPrimaryColor),
+            useMaterial3: true,
+          ),
+          initialRoute: SplashScreen.routeName,
+          routes: {
+            SplashScreen.routeName: (_) => const SplashScreen(),
+            LandingScreen.routeName: (_) => const LandingScreen(),
+            ContactUsScreen.routeName: (_) => const ContactUsScreen(),
+            CustomerRegistrationScreen.routeName: (_) =>
+                const CustomerRegistrationScreen(),
+            ProviderRegistrationScreen.routeName: (_) =>
+                const ProviderRegistrationScreen(),
+            ProviderDocumentUploadScreen.routeName: (_) =>
+                const ProviderDocumentUploadScreen(),
+            LoginScreen.routeName: (_) => const LoginScreen(),
+            ForgotPasswordScreen.routeName: (_) => const ForgotPasswordScreen(),
+            ResetPasswordScreen.routeName: (_) => const ResetPasswordScreen(),
+            OtpVerificationScreen.routeName: (_) =>
+                const OtpVerificationScreen(),
+            ProviderDashboardScreen.routeName: (_) =>
+                const ProviderDashboardScreen(),
+            VerificationPendingScreen.routeName: (_) =>
+                const VerificationPendingScreen(),
+            HomeScreen.routeName: (_) => const MainNavigationShell(),
+            ProfileScreen.routeName: (_) => const ProfileScreen(),
+            AddAddressScreen.routeName: (_) => const AddAddressScreen(),
+            CustomerEditProfileScreen.routeName: (_) =>
+                const CustomerEditProfileScreen(),
+            SubCategoriesScreen.routeName: (_) => const SubCategoriesScreen(),
+            ServiceRequestFormScreen.routeName: (_) =>
+                const ServiceRequestFormScreen(),
+            ServiceRequestsScreen.routeName: (_) =>
+                const ServiceRequestsScreen(),
+            EditProfileScreen.routeName: (_) => const EditProfileScreen(),
+            VerificationDocumentsScreen.routeName: (_) =>
+                const VerificationDocumentsScreen(),
+            NotificationsScreen.routeName: (_) => const NotificationsScreen(),
+            RejectedRequestsScreen.routeName: (_) =>
+                const RejectedRequestsScreen(),
+          },
+          debugShowCheckedModeBanner: false,
         ),
-        initialRoute: SplashScreen.routeName,
-        routes: {
-          SplashScreen.routeName: (_) => const SplashScreen(),
-          LandingScreen.routeName: (_) => const LandingScreen(),
-          ContactUsScreen.routeName: (_) => const ContactUsScreen(),
-          CustomerRegistrationScreen.routeName: (_) => const CustomerRegistrationScreen(),
-          ProviderRegistrationScreen.routeName: (_) => const ProviderRegistrationScreen(),
-          ProviderDocumentUploadScreen.routeName: (_) => const ProviderDocumentUploadScreen(),
-          LoginScreen.routeName: (_) => const LoginScreen(),
-          ForgotPasswordScreen.routeName: (_) => const ForgotPasswordScreen(),
-          ResetPasswordScreen.routeName: (_) => const ResetPasswordScreen(),
-          OtpVerificationScreen.routeName: (_) => const OtpVerificationScreen(),
-          ProviderDashboardScreen.routeName: (_) => const ProviderDashboardScreen(),
-          VerificationPendingScreen.routeName: (_) => const VerificationPendingScreen(),
-          HomeScreen.routeName: (_) => const MainNavigationShell(),
-          ProfileScreen.routeName: (_) => const ProfileScreen(),
-          AddAddressScreen.routeName: (_) => const AddAddressScreen(),
-          CustomerEditProfileScreen.routeName: (_) => const CustomerEditProfileScreen(),
-          SubCategoriesScreen.routeName: (_) => const SubCategoriesScreen(),
-          ServiceRequestFormScreen.routeName: (_) => const ServiceRequestFormScreen(),
-          ServiceRequestsScreen.routeName: (_) => const ServiceRequestsScreen(),
-          EditProfileScreen.routeName: (_) => const EditProfileScreen(),
-          VerificationDocumentsScreen.routeName: (_) => const VerificationDocumentsScreen(),
-          NotificationsScreen.routeName: (_) => const NotificationsScreen(),
-          RejectedRequestsScreen.routeName: (_) => const RejectedRequestsScreen(),
-        },
-        debugShowCheckedModeBanner: false,
       ),
     );
   }

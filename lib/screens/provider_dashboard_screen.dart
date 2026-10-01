@@ -17,8 +17,14 @@ class ProviderDashboardScreen extends StatefulWidget {
   static const routeName = ProviderRoutes.dashboard;
   const ProviderDashboardScreen({super.key});
 
+  /// Asks the (possibly not yet mounted) dashboard to show a tab - used by
+  /// push-notification routing. Consumed once by the dashboard.
+  static final ValueNotifier<int?> _tabRequest = ValueNotifier<int?>(null);
+  static void requestTab(int tab) => _tabRequest.value = tab;
+
   @override
-  State<ProviderDashboardScreen> createState() => _ProviderDashboardScreenState();
+  State<ProviderDashboardScreen> createState() =>
+      _ProviderDashboardScreenState();
 }
 
 class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
@@ -36,7 +42,21 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   @override
   void initState() {
     super.initState();
+    ProviderDashboardScreen._tabRequest.addListener(_applyTabRequest);
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkVerification());
+  }
+
+  @override
+  void dispose() {
+    ProviderDashboardScreen._tabRequest.removeListener(_applyTabRequest);
+    super.dispose();
+  }
+
+  void _applyTabRequest() {
+    final tab = ProviderDashboardScreen._tabRequest.value;
+    if (tab == null || _checkingVerification || !mounted) return;
+    ProviderDashboardScreen._tabRequest.value = null;
+    setState(() => _index = tab);
   }
 
   Future<void> _checkVerification() async {
@@ -53,10 +73,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     if (!mounted) return;
 
     if (!documents.isVerified) {
-      Navigator.of(context).pushReplacementNamed(VerificationPendingScreen.routeName);
+      Navigator.of(context)
+          .pushReplacementNamed(VerificationPendingScreen.routeName);
       return;
     }
     setState(() => _checkingVerification = false);
+    _applyTabRequest(); // a push tap may have asked for a tab before we mounted
   }
 
   void _goToTab(int index) => setState(() => _index = index);
@@ -80,7 +102,9 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     // just opened even though nothing was actually revoked.
     if (!documents.isVerified && !documents.isLoadingExisting) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) Navigator.of(context).pushReplacementNamed(VerificationPendingScreen.routeName);
+        if (mounted)
+          Navigator.of(context)
+              .pushReplacementNamed(VerificationPendingScreen.routeName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }

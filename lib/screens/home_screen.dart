@@ -19,6 +19,7 @@ import 'contact_us_screen.dart';
 import 'service_request_form_screen.dart';
 
 import '../widgets/bottom_nav.dart';
+import '../widgets/notification_bell.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home';
@@ -265,7 +266,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: kProminentOutlinedButtonStyle(_brandBlue),
                   icon: const Icon(Icons.support_agent_rounded),
                   label: const Text('Contact Us'),
-                  onPressed: () => Navigator.of(context).pushNamed(ContactUsScreen.routeName),
+                  onPressed: () => Navigator.of(context)
+                      .pushNamed(ContactUsScreen.routeName),
                 ),
                 const SizedBox(height: 40),
               ],
@@ -374,6 +376,7 @@ class _HomeHeader extends StatelessWidget {
                             ],
                           ),
                         ),
+                        const NotificationBell(),
                       ],
                     ),
                     const SizedBox(height: 18),

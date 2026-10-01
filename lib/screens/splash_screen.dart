@@ -1,6 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+
+import '../data/repositories/notification_repository.dart';
+import '../models/app_config.dart';
+import '../utils/notification_router.dart';
+import '../utils/version_compare.dart';
+import 'update_required_screen.dart';
 
 import '../providers/auth_provider.dart';
 import '../providers/time_format_provider.dart';
@@ -27,12 +36,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _init() async {
     final authProvider = context.read<AuthProvider>();
+    final updateCheck = _checkForUpdate();
     await Future.wait([
       authProvider.tryAutoLogin(),
       Future.delayed(const Duration(seconds: 2)),
     ]);
 
     if (!mounted) return;
+
+    final update = await updateCheck;
+    if (!mounted) return;
+    if (update != null && update.$1 == AppUpdateKind.required) {
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (_) => UpdateRequiredScreen(config: update.$2)));
+      return;
+    }
 
     final userId = authProvider.currentUser?.userId;
     if (userId != null) await context.read<TimeFormatProvider>().load(userId);
@@ -48,6 +66,32 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.of(context).pushReplacementNamed(target);
     } else {
       Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+    }
+
+    // Now that a real screen is up: handle a notification tap that launched
+    // the app, then offer an optional update.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await routeColdStartPush();
+      final ctx = navigatorKey.currentContext;
+      if (update != null &&
+          update.$1 == AppUpdateKind.optional &&
+          ctx != null &&
+          ctx.mounted) {
+        showUpdatePrompt(ctx, update.$2);
+      }
+    });
+  }
+
+  /// Fails open: any error or slow response just means no update gate.
+  Future<(AppUpdateKind, AppConfig)?> _checkForUpdate() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      final config = await NotificationRepository()
+          .fetchAppConfig(Platform.isIOS ? 'ios' : 'android')
+          .timeout(const Duration(seconds: 5));
+      return (evaluateUpdate(info.version, config), config);
+    } catch (_) {
+      return null;
     }
   }
 
