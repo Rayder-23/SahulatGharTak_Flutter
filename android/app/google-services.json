@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "384526721514",
+    "project_id": "sahulatghartak-ef6ed",
+    "storage_bucket": "sahulatghartak-ef6ed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:384526721514:android:ee1b3a08c96b00b2fa9293",
+        "android_client_info": {
+          "package_name": "com.coditiumsols.sahulatghartak"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4WA-7w5dYS0HSDboiapGK6xildcclJXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
