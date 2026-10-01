@@ -11,7 +11,8 @@ class CustomerEditProfileScreen extends StatefulWidget {
   const CustomerEditProfileScreen({super.key});
 
   @override
-  State<CustomerEditProfileScreen> createState() => _CustomerEditProfileScreenState();
+  State<CustomerEditProfileScreen> createState() =>
+      _CustomerEditProfileScreenState();
 }
 
 class _CustomerEditProfileScreenState extends State<CustomerEditProfileScreen> {
@@ -77,7 +78,8 @@ class _CustomerEditProfileScreenState extends State<CustomerEditProfileScreen> {
       showAppToast(context, 'Profile updated', type: AppToastType.success);
       Navigator.of(context).pop();
     } else {
-      showAppToast(context, authProvider.error ?? 'Failed to update profile', type: AppToastType.error);
+      showAppToast(context, authProvider.error ?? 'Failed to update profile',
+          type: AppToastType.error);
     }
   }
 
@@ -100,17 +102,24 @@ class _CustomerEditProfileScreenState extends State<CustomerEditProfileScreen> {
                   authFieldLabel('Full Name'),
                   TextFormField(
                     controller: _nameController,
-                    decoration: authFieldDecoration(hint: 'Enter your full name'),
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    decoration:
+                        authFieldDecoration(hint: 'Enter your full name'),
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? 'Required' : null,
                   ),
                   const SizedBox(height: 20),
                   GenderSelector(
                     initialValue: _selectedGender,
-                    onChanged: (value) => setState(() => _selectedGender = value),
-                    validator: (v) => v == null ? 'Please select a gender' : null,
+                    onChanged: (value) =>
+                        setState(() => _selectedGender = value),
+                    validator: (v) =>
+                        v == null ? 'Please select a gender' : null,
                   ),
                   const SizedBox(height: 28),
-                  AuthPrimaryButton(label: 'Save Changes', isLoading: _saving, onPressed: _save),
+                  AuthPrimaryButton(
+                      label: 'Save Changes',
+                      isLoading: _saving,
+                      onPressed: _save),
                 ],
               ),
             ),

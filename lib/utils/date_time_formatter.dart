@@ -20,7 +20,8 @@ bool use24HourFormat = false;
 /// [pattern] should describe the date portion only (e.g. [kDatePattern] or
 /// [kCompactDatePattern]); pass [includeTime] to additionally append a
 /// time-of-day formatted per [use24HourFormat].
-String formatLocalDateTime(DateTime utc, String pattern, {bool includeTime = false, String timeSeparator = ', '}) {
+String formatLocalDateTime(DateTime utc, String pattern,
+    {bool includeTime = false, String timeSeparator = ', '}) {
   final local = utc.toLocal();
   final datePart = DateFormat(pattern).format(local);
   if (!includeTime) return datePart;

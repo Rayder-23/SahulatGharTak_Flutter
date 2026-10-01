@@ -14,7 +14,8 @@ import '../utils/api_error.dart';
 /// concurrently-fetching screens caused categories from one service to
 /// briefly appear under another.
 class CategoryProvider extends ChangeNotifier {
-  CategoryProvider({required CategoryRepository repository}) : _repository = repository {
+  CategoryProvider({required CategoryRepository repository})
+      : _repository = repository {
     // Deferred: lazy ChangeNotifierProvider construction can happen mid-build
     // (first context.watch/read call), and notifyListeners() firing
     // synchronously from a constructor while a widget's build() is still on

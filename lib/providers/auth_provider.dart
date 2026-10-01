@@ -11,8 +11,10 @@ import '../utils/api_error.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthApiService _apiService = AuthApiService();
-  final ProviderProfileApiService _providerProfileApiService = ProviderProfileApiService();
-  final ClientProfileApiService _clientProfileApiService = ClientProfileApiService();
+  final ProviderProfileApiService _providerProfileApiService =
+      ProviderProfileApiService();
+  final ClientProfileApiService _clientProfileApiService =
+      ClientProfileApiService();
   final SessionService _sessionService = SessionService();
 
   AuthData? _currentUser;
@@ -53,12 +55,16 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _currentUser = (await _apiService.login(mobileNo, password)).copyWith(mobileNo: mobileNo);
+      _currentUser = (await _apiService.login(mobileNo, password))
+          .copyWith(mobileNo: mobileNo);
 
       if (_currentUser!.role == 'Provider') {
         try {
-          final providerProfile = await _providerProfileApiService.fetchById(_currentUser!.userId);
-          _currentUser = _currentUser!.copyWith(categoryId: providerProfile.categoryUid, providerUid: providerProfile.uid);
+          final providerProfile =
+              await _providerProfileApiService.fetchById(_currentUser!.userId);
+          _currentUser = _currentUser!.copyWith(
+              categoryId: providerProfile.categoryUid,
+              providerUid: providerProfile.uid);
         } catch (_) {
           // Category lookup is non-critical to login; proceed without it if it fails.
         }
@@ -105,7 +111,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> sendOtp(String mobileNo, {String otpType = 'Registration'}) async {
+  Future<bool> sendOtp(String mobileNo,
+      {String otpType = 'Registration'}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -122,7 +129,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> resendOtp(String mobileNo, {String otpType = 'Registration'}) async {
+  Future<bool> resendOtp(String mobileNo,
+      {String otpType = 'Registration'}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -190,7 +198,8 @@ class AuthProvider extends ChangeNotifier {
         // register-provider's response is the authoritative source for providerUid
         // and clientId; the provider-profile lookup inside login() is best-effort
         // and may fail silently, and login()'s own response may race with this.
-        _currentUser = _currentUser?.copyWith(providerUid: result.providerUid, clientId: result.clientId);
+        _currentUser = _currentUser?.copyWith(
+            providerUid: result.providerUid, clientId: result.clientId);
         await _sessionService.saveSession(_currentUser!);
         notifyListeners();
       }
@@ -204,13 +213,15 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> resetPassword(String mobileNo, String otp, String newPassword, String confirmNewPassword) async {
+  Future<bool> resetPassword(String mobileNo, String otp, String newPassword,
+      String confirmNewPassword) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      await _apiService.resetPassword(mobileNo, otp, newPassword, confirmNewPassword);
+      await _apiService.resetPassword(
+          mobileNo, otp, newPassword, confirmNewPassword);
       return true;
     } catch (e) {
       _error = friendlyErrorMessage(e);
@@ -234,7 +245,10 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateClientDetail({required String fullName, required String cnic, required String gender}) async {
+  Future<bool> updateClientDetail(
+      {required String fullName,
+      required String cnic,
+      required String gender}) async {
     _error = null;
     try {
       _clientDetail = await _clientProfileApiService.updateDetail(

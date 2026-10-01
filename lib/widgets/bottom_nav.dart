@@ -5,14 +5,16 @@ import '../screens/home_screen.dart';
 import '../screens/profile_screen.dart';
 import '../utils/motion.dart';
 
-class AppBottomNavigation extends StatelessWidget implements PreferredSizeWidget {
+class AppBottomNavigation extends StatelessWidget
+    implements PreferredSizeWidget {
   final int currentIndex;
 
   /// When provided, tab taps are reported here instead of navigating via
   /// named routes. Used by [MainNavigationShell] to switch tabs in place.
   final ValueChanged<int>? onTabSelected;
 
-  const AppBottomNavigation({super.key, this.currentIndex = 0, this.onTabSelected});
+  const AppBottomNavigation(
+      {super.key, this.currentIndex = 0, this.onTabSelected});
 
   static const _routeNames = [
     HomeScreen.routeName,
@@ -140,9 +142,12 @@ class _NavItem extends StatelessWidget {
               AnimatedContainer(
                 duration: reduceMotion ? Duration.zero : kMediumAnimDuration,
                 curve: kEmphasizedCurve,
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
                 decoration: BoxDecoration(
-                  color: selected ? accentColor.withValues(alpha: 0.18) : Colors.transparent,
+                  color: selected
+                      ? accentColor.withValues(alpha: 0.18)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: selected
                       ? [

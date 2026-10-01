@@ -40,6 +40,7 @@ Future<void> openDirections(BuildContext context, LatLng destination) async {
   );
   final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
   if (!launched && context.mounted) {
-    showAppToast(context, 'Could not open Google Maps.', type: AppToastType.error);
+    showAppToast(context, 'Could not open Google Maps.',
+        type: AppToastType.error);
   }
 }

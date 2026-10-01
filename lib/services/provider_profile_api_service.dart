@@ -8,7 +8,9 @@ import '../utils/constants.dart';
 
 class ProviderProfileApiService {
   Future<ProviderDetailModel> fetchDetail(int providerUid) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/providers-detail/$providerUid')).timeout(kApiTimeout);
+    final response = await http
+        .get(Uri.parse('$kApiBaseUrl/providers-detail/$providerUid'))
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to load provider detail');
     return ProviderDetailModel.fromJson(json['data'] as Map<String, dynamic>);
@@ -37,7 +39,9 @@ class ProviderProfileApiService {
   }
 
   Future<ProviderProfileModel> fetchById(int userId) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/provider-profiles/$userId')).timeout(kApiTimeout);
+    final response = await http
+        .get(Uri.parse('$kApiBaseUrl/provider-profiles/$userId'))
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to load provider profile');
     return ProviderProfileModel.fromJson(json['data'] as Map<String, dynamic>);

@@ -113,7 +113,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       }
       showAppToast(
         context,
-        initial ? 'OTP sent to ${args.mobileNo}' : 'OTP resent to ${args.mobileNo}',
+        initial
+            ? 'OTP sent to ${args.mobileNo}'
+            : 'OTP resent to ${args.mobileNo}',
         type: AppToastType.success,
       );
     } else {
@@ -129,7 +131,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   Future<void> _verify() async {
     final otp = _enteredOtp;
     if (otp.length != _otpLength) {
-      showAppToast(context, 'Enter the complete 6-digit code', type: AppToastType.error);
+      showAppToast(context, 'Enter the complete 6-digit code',
+          type: AppToastType.error);
       return;
     }
 
@@ -158,7 +161,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
       if (loggedIn) {
         final userId = authProvider.currentUser?.userId;
-        if (userId != null) await context.read<TimeFormatProvider>().load(userId);
+        if (userId != null)
+          await context.read<TimeFormatProvider>().load(userId);
         if (!mounted) return;
 
         await showMessageDialog(
@@ -168,7 +172,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           type: MessageDialogType.success,
         );
         if (!mounted) return;
-        final target = authProvider.role == 'Provider' ? await resolveProviderEntryRoute(context) : HomeScreen.routeName;
+        final target = authProvider.role == 'Provider'
+            ? await resolveProviderEntryRoute(context)
+            : HomeScreen.routeName;
         if (!mounted) return;
         Navigator.of(context).pushNamedAndRemoveUntil(target, (route) => false);
       } else {

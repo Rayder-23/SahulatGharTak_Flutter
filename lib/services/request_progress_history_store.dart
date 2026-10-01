@@ -17,14 +17,16 @@ class RequestProgressHistoryStore {
     if (raw == null || raw.isEmpty) return {};
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;
-      return map.map((key, value) => MapEntry(int.parse(key), value as String?));
+      return map
+          .map((key, value) => MapEntry(int.parse(key), value as String?));
     } catch (_) {
       return {};
     }
   }
 
   Future<void> save(int clientUid, Map<int, String?> history) async {
-    final encoded = history.map((key, value) => MapEntry(key.toString(), value));
+    final encoded =
+        history.map((key, value) => MapEntry(key.toString(), value));
     await _storage.write(key: _keyFor(clientUid), value: jsonEncode(encoded));
   }
 }

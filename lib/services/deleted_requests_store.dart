@@ -24,6 +24,7 @@ class DeletedRequestsStore {
   Future<void> hide(int clientUid, int requestUid) async {
     final existing = await load(clientUid);
     existing.add(requestUid);
-    await _storage.write(key: _keyFor(clientUid), value: jsonEncode(existing.toList()));
+    await _storage.write(
+        key: _keyFor(clientUid), value: jsonEncode(existing.toList()));
   }
 }

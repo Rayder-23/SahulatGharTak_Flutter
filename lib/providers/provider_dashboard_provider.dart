@@ -7,7 +7,8 @@ import '../models/provider/service_request.dart';
 import '../utils/api_error.dart';
 
 class ProviderDashboardProvider extends ChangeNotifier {
-  ProviderDashboardProvider({required ProviderDashboardRepository repository}) : _repository = repository;
+  ProviderDashboardProvider({required ProviderDashboardRepository repository})
+      : _repository = repository;
 
   final ProviderDashboardRepository _repository;
 
@@ -30,7 +31,8 @@ class ProviderDashboardProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _availabilityStatus = await _repository.fetchAvailabilityStatus(providerUid);
+      _availabilityStatus =
+          await _repository.fetchAvailabilityStatus(providerUid);
     } catch (e) {
       _availabilityError = friendlyErrorMessage(e);
     } finally {
@@ -43,7 +45,8 @@ class ProviderDashboardProvider extends ChangeNotifier {
   /// and [availableTo] (format "HH:mm") are required by the API; when going
   /// offline, any existing timing is cleared server-side. Returns whether the
   /// call succeeded; on failure [availabilityError] carries the message.
-  Future<bool> setOnline(int providerUid, bool value, {String? availableFrom, String? availableTo}) async {
+  Future<bool> setOnline(int providerUid, bool value,
+      {String? availableFrom, String? availableTo}) async {
     _availabilityLoading = true;
     _availabilityError = null;
     notifyListeners();
@@ -91,7 +94,8 @@ class ProviderDashboardProvider extends ChangeNotifier {
   }
 
   void rejectRequest(int requestId) {
-    _incomingRequests = _incomingRequests.where((r) => r.id != requestId).toList();
+    _incomingRequests =
+        _incomingRequests.where((r) => r.id != requestId).toList();
     notifyListeners();
   }
 

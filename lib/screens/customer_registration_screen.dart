@@ -49,7 +49,8 @@ class _CustomerRegistrationScreenState
       return;
     }
     if (!_agreedToTerms) {
-      showAppToast(context, 'Please agree to the Terms and Conditions', type: AppToastType.error);
+      showAppToast(context, 'Please agree to the Terms and Conditions',
+          type: AppToastType.error);
       return;
     }
 

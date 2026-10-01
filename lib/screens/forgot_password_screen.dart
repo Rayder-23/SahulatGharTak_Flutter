@@ -30,7 +30,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     final mobileNo = digitsOnlyMobile(_mobileNoController.text);
     final authProvider = context.read<AuthProvider>();
-    final success = await authProvider.sendOtp(mobileNo, otpType: 'PasswordReset');
+    final success =
+        await authProvider.sendOtp(mobileNo, otpType: 'PasswordReset');
 
     if (!mounted) return;
 
@@ -71,7 +72,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               validator: mobileNumberValidator,
             ),
             const SizedBox(height: 28),
-            AuthPrimaryButton(label: 'Send Reset Code', isLoading: isLoading, onPressed: _submit),
+            AuthPrimaryButton(
+                label: 'Send Reset Code',
+                isLoading: isLoading,
+                onPressed: _submit),
           ],
         ),
       ),

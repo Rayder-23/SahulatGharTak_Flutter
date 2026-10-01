@@ -9,10 +9,16 @@ import '../data/repositories/provider_document_repository.dart';
 import '../models/provider/provider_documents.dart';
 import '../utils/api_error.dart';
 
-enum ProviderDocumentSlot { profilePhoto, cnicFront, cnicBack, policeVerification }
+enum ProviderDocumentSlot {
+  profilePhoto,
+  cnicFront,
+  cnicBack,
+  policeVerification
+}
 
 class ProviderDocumentProvider extends ChangeNotifier {
-  ProviderDocumentProvider({required ProviderDocumentRepository repository}) : _repository = repository;
+  ProviderDocumentProvider({required ProviderDocumentRepository repository})
+      : _repository = repository;
 
   final ProviderDocumentRepository _repository;
 
@@ -76,7 +82,11 @@ class ProviderDocumentProvider extends ChangeNotifier {
   /// saved - used by the "view/edit documents" screen to disable Save Changes
   /// when nothing was actually changed, since a no-op save would still be a
   /// wasted round trip.
-  bool get hasChanges => _profilePhoto != null || _cnicFront != null || _cnicBack != null || _policeVerification != null;
+  bool get hasChanges =>
+      _profilePhoto != null ||
+      _cnicFront != null ||
+      _cnicBack != null ||
+      _policeVerification != null;
 
   /// Loads the provider's currently uploaded documents (for the "view and
   /// change" screen reached from the profile page). Safe to call when the
@@ -89,10 +99,14 @@ class ProviderDocumentProvider extends ChangeNotifier {
     try {
       final docs = await _repository.fetchDocuments(providerUid);
       final version = docs?.updatedOn ?? docs?.createdOn;
-      _profilePhotoUrl = _repository.resolveUrl(docs?.profilePhotoPath, version: version);
-      _cnicFrontUrl = _repository.resolveUrl(docs?.cnicFrontImagePath, version: version);
-      _cnicBackUrl = _repository.resolveUrl(docs?.cnicBackImagePath, version: version);
-      _policeVerificationUrl = _repository.resolveUrl(docs?.policeVerificationPath, version: version);
+      _profilePhotoUrl =
+          _repository.resolveUrl(docs?.profilePhotoPath, version: version);
+      _cnicFrontUrl =
+          _repository.resolveUrl(docs?.cnicFrontImagePath, version: version);
+      _cnicBackUrl =
+          _repository.resolveUrl(docs?.cnicBackImagePath, version: version);
+      _policeVerificationUrl = _repository
+          .resolveUrl(docs?.policeVerificationPath, version: version);
       _isVerified = docs?.isVerified ?? false;
       _verificationRemarks = docs?.verificationRemarks;
     } catch (e) {
@@ -109,7 +123,9 @@ class ProviderDocumentProvider extends ChangeNotifier {
   /// ceiling and records the result.
   Future<void> setPickedImage(ProviderDocumentSlot slot, File file) async {
     try {
-      final isCnic = slot == ProviderDocumentSlot.cnicFront || slot == ProviderDocumentSlot.cnicBack || slot == ProviderDocumentSlot.policeVerification;
+      final isCnic = slot == ProviderDocumentSlot.cnicFront ||
+          slot == ProviderDocumentSlot.cnicBack ||
+          slot == ProviderDocumentSlot.policeVerification;
       final resolved = await _enforceSizeLimit(
         file,
         maxDimension: isCnic ? _cnicMaxDimension : _profilePhotoMaxDimension,
@@ -145,12 +161,14 @@ class ProviderDocumentProvider extends ChangeNotifier {
   /// side, so neither a full-resolution `takePicture()` output nor a
   /// gallery-sourced image can silently exceed the API's 5MB-per-file limit.
   /// Falls back to the original file if decoding fails.
-  Future<File> _enforceSizeLimit(File file, {required int maxDimension, required int quality}) async {
+  Future<File> _enforceSizeLimit(File file,
+      {required int maxDimension, required int quality}) async {
     final bytes = await file.readAsBytes();
     final decoded = img.decodeImage(bytes);
     if (decoded == null) return file;
 
-    final longestSide = decoded.width > decoded.height ? decoded.width : decoded.height;
+    final longestSide =
+        decoded.width > decoded.height ? decoded.width : decoded.height;
     final resized = longestSide > maxDimension
         ? img.copyResize(
             decoded,
@@ -160,7 +178,8 @@ class ProviderDocumentProvider extends ChangeNotifier {
         : decoded;
 
     final dir = await getTemporaryDirectory();
-    final outFile = File('${dir.path}/${DateTime.now().microsecondsSinceEpoch}_doc.jpg');
+    final outFile =
+        File('${dir.path}/${DateTime.now().microsecondsSinceEpoch}_doc.jpg');
     await outFile.writeAsBytes(img.encodeJpg(resized, quality: quality));
     return outFile;
   }
@@ -215,7 +234,8 @@ class ProviderDocumentProvider extends ChangeNotifier {
 
   Future<bool> _submit(int providerUid) async {
     if (!canUpload) {
-      _error = 'Please add your profile photo and both CNIC images before uploading.';
+      _error =
+          'Please add your profile photo and both CNIC images before uploading.';
       notifyListeners();
       return false;
     }
@@ -246,11 +266,17 @@ class ProviderDocumentProvider extends ChangeNotifier {
       _cnicFront = null;
       _cnicBack = null;
       _policeVerification = null;
-      final version = _uploadedDocuments?.updatedOn ?? _uploadedDocuments?.createdOn;
-      _profilePhotoUrl = _repository.resolveUrl(_uploadedDocuments?.profilePhotoPath, version: version);
-      _cnicFrontUrl = _repository.resolveUrl(_uploadedDocuments?.cnicFrontImagePath, version: version);
-      _cnicBackUrl = _repository.resolveUrl(_uploadedDocuments?.cnicBackImagePath, version: version);
-      _policeVerificationUrl = _repository.resolveUrl(_uploadedDocuments?.policeVerificationPath, version: version);
+      final version =
+          _uploadedDocuments?.updatedOn ?? _uploadedDocuments?.createdOn;
+      _profilePhotoUrl = _repository
+          .resolveUrl(_uploadedDocuments?.profilePhotoPath, version: version);
+      _cnicFrontUrl = _repository
+          .resolveUrl(_uploadedDocuments?.cnicFrontImagePath, version: version);
+      _cnicBackUrl = _repository
+          .resolveUrl(_uploadedDocuments?.cnicBackImagePath, version: version);
+      _policeVerificationUrl = _repository.resolveUrl(
+          _uploadedDocuments?.policeVerificationPath,
+          version: version);
       _isVerified = _uploadedDocuments?.isVerified ?? false;
       _verificationRemarks = _uploadedDocuments?.verificationRemarks;
       return true;

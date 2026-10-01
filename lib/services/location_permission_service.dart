@@ -6,15 +6,19 @@ enum LocationPermissionResult { granted, denied, permanentlyDenied }
 /// permission the GPS pin-drop flow needs, mirroring
 /// `CameraPermissionService`'s shape/result enum.
 class LocationPermissionService {
-  Future<LocationPermissionResult> ensureLocationPermission() => _ensure(Permission.locationWhenInUse);
+  Future<LocationPermissionResult> ensureLocationPermission() =>
+      _ensure(Permission.locationWhenInUse);
 
   Future<LocationPermissionResult> _ensure(Permission permission) async {
     var status = await permission.status;
-    if (status.isGranted || status.isLimited) return LocationPermissionResult.granted;
+    if (status.isGranted || status.isLimited)
+      return LocationPermissionResult.granted;
 
     status = await permission.request();
-    if (status.isGranted || status.isLimited) return LocationPermissionResult.granted;
-    if (status.isPermanentlyDenied) return LocationPermissionResult.permanentlyDenied;
+    if (status.isGranted || status.isLimited)
+      return LocationPermissionResult.granted;
+    if (status.isPermanentlyDenied)
+      return LocationPermissionResult.permanentlyDenied;
     return LocationPermissionResult.denied;
   }
 

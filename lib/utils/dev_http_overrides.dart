@@ -6,8 +6,9 @@ class DevHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) =>
-          _isTrustedDevHost(host);
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) =>
+              _isTrustedDevHost(host);
   }
 
   static bool _isTrustedDevHost(String host) {

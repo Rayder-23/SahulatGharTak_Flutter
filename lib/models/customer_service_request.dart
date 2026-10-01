@@ -75,7 +75,8 @@ class CustomerServiceRequest {
   /// Returns a copy with [bouncedBack] overridden — used by
   /// [CustomerServiceRequestRepository] to flag a detected regression
   /// without re-parsing the API response.
-  CustomerServiceRequest copyWithBouncedBack(bool value) => CustomerServiceRequest(
+  CustomerServiceRequest copyWithBouncedBack(bool value) =>
+      CustomerServiceRequest(
         uid: uid,
         clientUid: clientUid,
         clientName: clientName,
@@ -126,7 +127,9 @@ class CustomerServiceRequest {
       progressStatus: json['progressStatus'] as String?,
       remarks: json['remarks'] as String?,
       cancelReason: json['cancelReason'] as String?,
-      createdOn: json['createdOn'] != null ? DateTime.parse(json['createdOn'] as String) : DateTime.now(),
+      createdOn: json['createdOn'] != null
+          ? DateTime.parse(json['createdOn'] as String)
+          : DateTime.now(),
       providerUid: json['providerUid'] as int?,
       providerName: json['providerName'] as String?,
       providerMobileNo: json['providerMobileNo'] as String?,

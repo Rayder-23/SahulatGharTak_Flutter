@@ -20,16 +20,19 @@ class ProviderDocumentUploadScreen extends StatefulWidget {
   const ProviderDocumentUploadScreen({super.key});
 
   @override
-  State<ProviderDocumentUploadScreen> createState() => _ProviderDocumentUploadScreenState();
+  State<ProviderDocumentUploadScreen> createState() =>
+      _ProviderDocumentUploadScreenState();
 }
 
-class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScreen> {
+class _ProviderDocumentUploadScreenState
+    extends State<ProviderDocumentUploadScreen> {
   ProviderDocumentUploadArgs? _args;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _args ??= ModalRoute.of(context)!.settings.arguments as ProviderDocumentUploadArgs;
+    _args ??= ModalRoute.of(context)!.settings.arguments
+        as ProviderDocumentUploadArgs;
   }
 
   Future<void> _upload() async {
@@ -51,7 +54,9 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
       // rather than the dashboard - but `provider.isVerified` (fresh from
       // this very upload response) is checked rather than assumed, in case
       // an already-verified provider is replacing a document.
-      final target = provider.isVerified ? ProviderDashboardScreen.routeName : VerificationPendingScreen.routeName;
+      final target = provider.isVerified
+          ? ProviderDashboardScreen.routeName
+          : VerificationPendingScreen.routeName;
       Navigator.of(context).pushNamedAndRemoveUntil(target, (route) => false);
     } else {
       await showMessageDialog(
@@ -79,8 +84,11 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
             file: provider.profilePhoto,
             placeholderIcon: Icons.person_outline,
             label: 'Add profile photo',
-            onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.profilePhoto),
-            onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.profilePhoto),
+            onTap: () => showDocumentCaptureSheet(context,
+                slot: ProviderDocumentSlot.profilePhoto),
+            onRemove: () => context
+                .read<ProviderDocumentProvider>()
+                .removeImage(ProviderDocumentSlot.profilePhoto),
           ),
           const SizedBox(height: 20),
           authFieldLabel('CNIC Front'),
@@ -88,8 +96,11 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
             file: provider.cnicFront,
             placeholderIcon: Icons.credit_card,
             label: 'Add CNIC front image',
-            onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.cnicFront),
-            onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.cnicFront),
+            onTap: () => showDocumentCaptureSheet(context,
+                slot: ProviderDocumentSlot.cnicFront),
+            onRemove: () => context
+                .read<ProviderDocumentProvider>()
+                .removeImage(ProviderDocumentSlot.cnicFront),
           ),
           const SizedBox(height: 20),
           authFieldLabel('CNIC Back'),
@@ -97,8 +108,11 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
             file: provider.cnicBack,
             placeholderIcon: Icons.credit_card,
             label: 'Add CNIC back image',
-            onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.cnicBack),
-            onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.cnicBack),
+            onTap: () => showDocumentCaptureSheet(context,
+                slot: ProviderDocumentSlot.cnicBack),
+            onRemove: () => context
+                .read<ProviderDocumentProvider>()
+                .removeImage(ProviderDocumentSlot.cnicBack),
           ),
           const SizedBox(height: 20),
           authFieldLabel('Police Verification (optional)'),
@@ -106,15 +120,20 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
             file: provider.policeVerification,
             placeholderIcon: Icons.local_police_outlined,
             label: 'Add police verification certificate',
-            onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.policeVerification),
-            onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.policeVerification),
+            onTap: () => showDocumentCaptureSheet(context,
+                slot: ProviderDocumentSlot.policeVerification),
+            onRemove: () => context
+                .read<ProviderDocumentProvider>()
+                .removeImage(ProviderDocumentSlot.policeVerification),
           ),
           const SizedBox(height: 28),
           if (provider.isUploading) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
-                value: provider.uploadProgress > 0 ? provider.uploadProgress : null,
+                value: provider.uploadProgress > 0
+                    ? provider.uploadProgress
+                    : null,
                 minHeight: 8,
                 backgroundColor: const Color(0xFFF5F5F7),
                 valueColor: const AlwaysStoppedAnimation(kPrimaryColor),

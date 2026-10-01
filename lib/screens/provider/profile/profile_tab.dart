@@ -14,7 +14,8 @@ import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/curved_profile_header.dart';
 import '../../../widgets/delete_account_dialog.dart';
 import '../../../widgets/message_dialog.dart';
-import '../../../widgets/provider/provider_tab_header.dart' show providerBrandDark, providerBrandBlue, providerBrandAccent;
+import '../../../widgets/provider/provider_tab_header.dart'
+    show providerBrandDark, providerBrandBlue, providerBrandAccent;
 import '../../../widgets/provider/section_header_and_info_card.dart';
 import '../../../widgets/provider/tab_state_placeholder.dart';
 import '../../contact_us_screen.dart';
@@ -65,7 +66,8 @@ class _ProfileTabState extends State<ProfileTab> {
     await context.read<AuthProvider>().logout();
     if (!context.mounted) return;
     context.read<TimeFormatProvider>().reset();
-    Navigator.of(context).pushNamedAndRemoveUntil(LandingScreen.routeName, (route) => false);
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(LandingScreen.routeName, (route) => false);
   }
 
   Future<void> _deleteAccount(BuildContext context) async {
@@ -84,7 +86,8 @@ class _ProfileTabState extends State<ProfileTab> {
         type: MessageDialogType.success,
       );
       if (!context.mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(LandingScreen.routeName, (route) => false);
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(LandingScreen.routeName, (route) => false);
     } else {
       await showMessageDialog(
         context,
@@ -138,7 +141,11 @@ class _ProfileTabState extends State<ProfileTab> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -0.2),
+        titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.2),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -156,222 +163,315 @@ class _ProfileTabState extends State<ProfileTab> {
         onRefresh: () async => _loadProfile(),
         avatar: CircleAvatar(
           backgroundColor: providerBrandBlue,
-          backgroundImage: profilePhotoUrl != null ? NetworkImage(profilePhotoUrl) : null,
-          child: profilePhotoUrl == null ? const Icon(Icons.person, color: Colors.white, size: 42) : null,
+          backgroundImage:
+              profilePhotoUrl != null ? NetworkImage(profilePhotoUrl) : null,
+          child: profilePhotoUrl == null
+              ? const Icon(Icons.person, color: Colors.white, size: 42)
+              : null,
         ),
         child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.fromLTRB(20, _avatarRadius + 20, 20, 24),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Flexible(
-                  child: Text(
-                    detail.fullName,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF14213D), letterSpacing: -0.2),
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(20, _avatarRadius + 20, 20, 24),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      detail.fullName,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 21,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF14213D),
+                          letterSpacing: -0.2),
+                    ),
                   ),
+                  if (documents.isVerified)
+                    const Padding(
+                        padding: EdgeInsets.only(left: 6),
+                        child: Icon(Icons.verified_rounded,
+                            color: providerBrandBlue, size: 20)),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(detail.categoryName,
+                  style: TextStyle(
+                      color: Colors.black.withValues(alpha: 0.45),
+                      fontWeight: FontWeight.w500)),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
+                  const SizedBox(width: 4),
+                  Text(
+                      '${detail.averageRating.toStringAsFixed(1)} (${detail.totalReviews} reviews)',
+                      style: TextStyle(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          fontWeight: FontWeight.w500)),
+                ],
+              ),
+              if (currentUser != null) ...[
+                const SizedBox(height: 22),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ProfileStatBadge(
+                        icon: Icons.verified_user_rounded,
+                        label: 'ACCOUNT TYPE',
+                        value: currentUser.role,
+                        color: providerBrandBlue,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ProfileStatBadge(
+                        icon: Icons.tag_rounded,
+                        label: 'USER ID',
+                        value: '${currentUser.userId}',
+                        color: providerBrandAccent,
+                      ),
+                    ),
+                  ],
                 ),
-                if (documents.isVerified) const Padding(padding: EdgeInsets.only(left: 6), child: Icon(Icons.verified_rounded, color: providerBrandBlue, size: 20)),
               ],
-            ),
-            const SizedBox(height: 4),
-            Text(detail.categoryName, style: TextStyle(color: Colors.black.withValues(alpha: 0.45), fontWeight: FontWeight.w500)),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
-                const SizedBox(width: 4),
-                Text('${detail.averageRating.toStringAsFixed(1)} (${detail.totalReviews} reviews)', style: TextStyle(color: Colors.black.withValues(alpha: 0.6), fontWeight: FontWeight.w500)),
-              ],
-            ),
-            if (currentUser != null) ...[
-              const SizedBox(height: 22),
+              const SizedBox(height: 20),
+              const SectionHeader('Provider Details'),
+              InfoCard(
+                children: [
+                  ListTile(
+                      leading: const Icon(Icons.badge_rounded,
+                          color: providerBrandBlue),
+                      title: const Text('Provider ID'),
+                      subtitle: Text('${detail.uid}')),
+                  const Divider(height: 1),
+                  ListTile(
+                      leading: const Icon(Icons.phone_rounded,
+                          color: providerBrandBlue),
+                      title: const Text('Mobile Number'),
+                      subtitle: Text(detail.mobileNo)),
+                  const Divider(height: 1),
+                  ListTile(
+                      leading: const Icon(Icons.credit_card_rounded,
+                          color: providerBrandBlue),
+                      title: const Text('CNIC'),
+                      subtitle: Text(detail.cnic)),
+                  const Divider(height: 1),
+                  ListTile(
+                      leading: const Icon(Icons.wc_rounded,
+                          color: providerBrandBlue),
+                      title: const Text('Gender'),
+                      subtitle: Text(detail.gender)),
+                  const Divider(height: 1),
+                  ListTile(
+                      leading: const Icon(Icons.work_history_rounded,
+                          color: providerBrandBlue),
+                      title: const Text('Experience'),
+                      subtitle: Text('${detail.experienceYears} years')),
+                  if (detail.city != null && detail.city!.isNotEmpty) ...[
+                    const Divider(height: 1),
+                    ListTile(
+                        leading: const Icon(Icons.location_city_rounded,
+                            color: providerBrandBlue),
+                        title: const Text('City'),
+                        subtitle: Text(detail.city!)),
+                  ],
+                  const Divider(height: 1),
+                  ListTile(
+                      leading: const Icon(Icons.category_rounded,
+                          color: providerBrandBlue),
+                      title: const Text('Category'),
+                      subtitle: Text(
+                          '${detail.categoryName} (ID: ${detail.categoryId})')),
+                  if (detail.description.isNotEmpty) ...[
+                    const Divider(height: 1),
+                    ListTile(
+                        leading: const Icon(Icons.description_rounded,
+                            color: providerBrandBlue),
+                        title: const Text('Description'),
+                        subtitle: Text(detail.description)),
+                  ],
+                  const Divider(height: 1),
+                  ListTile(
+                      leading: const Icon(Icons.task_alt_rounded,
+                          color: providerBrandBlue),
+                      title: const Text('Jobs Completed'),
+                      subtitle: Text('${detail.totalJobsCompleted}')),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: Icon(Icons.verified_user_rounded,
+                        color: documents.isVerified
+                            ? _verifiedGreen
+                            : Colors.orange),
+                    title: const Text('Verification Status'),
+                    subtitle: !documents.isVerified &&
+                            documents.verificationRemarks != null &&
+                            documents.verificationRemarks!.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(documents.verificationRemarks!,
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.black54)),
+                          )
+                        : null,
+                    trailing:
+                        _VerificationBadge(isVerified: documents.isVerified),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                      leading: const Icon(Icons.event_rounded,
+                          color: providerBrandBlue),
+                      title: const Text('Member Since'),
+                      subtitle: Text(
+                          formatLocalDateTime(detail.createdOn, kDatePattern))),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const SectionHeader('Preferences'),
+              Consumer<TimeFormatProvider>(
+                builder: (context, timeFormat, _) {
+                  return InfoCard(
+                    children: [
+                      SwitchListTile(
+                        secondary: const Icon(Icons.schedule_rounded,
+                            color: providerBrandBlue),
+                        title: const Text('24-hour time'),
+                        subtitle: Text(timeFormat.use24Hour
+                            ? 'e.g. 14:30'
+                            : 'e.g. 2:30 PM'),
+                        value: timeFormat.use24Hour,
+                        activeThumbColor: providerBrandBlue,
+                        onChanged: (v) => timeFormat.setUse24Hour(v),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              const SectionHeader('Availability'),
+              InfoCard(
+                children: [
+                  ListTile(
+                    leading: Icon(
+                        dashboard.isOnline
+                            ? Icons.wifi_tethering_rounded
+                            : Icons.wifi_tethering_off_rounded,
+                        color: dashboard.isOnline ? Colors.green : Colors.grey),
+                    title: const Text('Status'),
+                    subtitle: Text(dashboard.isOnline
+                        ? 'Online — receiving new requests'
+                        : 'Offline'),
+                    trailing: dashboard.availabilityLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2))
+                        : Switch(
+                            value: dashboard.isOnline,
+                            activeThumbColor: Colors.green,
+                            onChanged: (v) =>
+                                toggleProviderOnlineStatus(context, v),
+                          ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.schedule_rounded,
+                        color: providerBrandBlue),
+                    title: const Text('Available Timing'),
+                    subtitle: Text(dashboard.availableTiming ??
+                        detail.availableTiming ??
+                        'Not set'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  style: kProminentOutlinedButtonStyle(providerBrandBlue),
+                  icon: const Icon(Icons.edit_rounded),
+                  label: const Text('Edit Profile'),
+                  onPressed: () => Navigator.of(context)
+                      .pushNamed(ProviderRoutes.editProfile),
+                ),
+              ),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
-                    child: ProfileStatBadge(
-                      icon: Icons.verified_user_rounded,
-                      label: 'ACCOUNT TYPE',
-                      value: currentUser.role,
-                      color: providerBrandBlue,
+                    child: OutlinedButton.icon(
+                      style: kProminentOutlinedButtonStyle(providerBrandBlue),
+                      icon: const Icon(Icons.badge_outlined),
+                      label: const Text('My Documents'),
+                      onPressed: () => Navigator.of(context)
+                          .pushNamed(ProviderRoutes.verificationDocuments),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ProfileStatBadge(
-                      icon: Icons.tag_rounded,
-                      label: 'USER ID',
-                      value: '${currentUser.userId}',
-                      color: providerBrandAccent,
+                    child: OutlinedButton.icon(
+                      style: kProminentOutlinedButtonStyle(providerBrandBlue),
+                      icon: const Icon(Icons.category_rounded),
+                      label: const Text('Categories'),
+                      onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) =>
+                                  const CategoriesAndTitlesScreen())),
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: kProminentFilledButtonStyle(providerBrandBlue),
+                  icon: const Icon(Icons.swap_horiz_rounded),
+                  label: const Text('Switch to Customer'),
+                  // pushReplacementNamed: don't leave the provider dashboard
+                  // on the stack to pop back into with stale data — switching
+                  // back the other way uses the mirrored "Switch to Provider"
+                  // button, which rebuilds it fresh.
+                  onPressed: () => Navigator.of(context)
+                      .pushReplacementNamed(HomeScreen.routeName),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  style: kProminentOutlinedButtonStyle(Colors.red),
+                  icon: const Icon(Icons.delete_forever_rounded),
+                  label: const Text('Delete Account'),
+                  onPressed: () => _deleteAccount(context),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  style: kProminentOutlinedButtonStyle(providerBrandBlue),
+                  icon: const Icon(Icons.support_agent_rounded),
+                  label: const Text('Contact Us'),
+                  onPressed: () => Navigator.of(context)
+                      .pushNamed(ContactUsScreen.routeName),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Center(
+                child: TextButton.icon(
+                  icon:
+                      Icon(Icons.privacy_tip_outlined, color: Colors.grey[600]),
+                  onPressed: () => openPrivacyPolicy(context),
+                  label: Text('Privacy Policy',
+                      style: TextStyle(color: Colors.grey[600])),
+                ),
               ),
             ],
-            const SizedBox(height: 20),
-            const SectionHeader('Provider Details'),
-            InfoCard(
-              children: [
-                ListTile(leading: const Icon(Icons.badge_rounded, color: providerBrandBlue), title: const Text('Provider ID'), subtitle: Text('${detail.uid}')),
-                const Divider(height: 1),
-                ListTile(leading: const Icon(Icons.phone_rounded, color: providerBrandBlue), title: const Text('Mobile Number'), subtitle: Text(detail.mobileNo)),
-                const Divider(height: 1),
-                ListTile(leading: const Icon(Icons.credit_card_rounded, color: providerBrandBlue), title: const Text('CNIC'), subtitle: Text(detail.cnic)),
-                const Divider(height: 1),
-                ListTile(leading: const Icon(Icons.wc_rounded, color: providerBrandBlue), title: const Text('Gender'), subtitle: Text(detail.gender)),
-                const Divider(height: 1),
-                ListTile(leading: const Icon(Icons.work_history_rounded, color: providerBrandBlue), title: const Text('Experience'), subtitle: Text('${detail.experienceYears} years')),
-                if (detail.city != null && detail.city!.isNotEmpty) ...[
-                  const Divider(height: 1),
-                  ListTile(leading: const Icon(Icons.location_city_rounded, color: providerBrandBlue), title: const Text('City'), subtitle: Text(detail.city!)),
-                ],
-                const Divider(height: 1),
-                ListTile(leading: const Icon(Icons.category_rounded, color: providerBrandBlue), title: const Text('Category'), subtitle: Text('${detail.categoryName} (ID: ${detail.categoryId})')),
-                if (detail.description.isNotEmpty) ...[
-                  const Divider(height: 1),
-                  ListTile(leading: const Icon(Icons.description_rounded, color: providerBrandBlue), title: const Text('Description'), subtitle: Text(detail.description)),
-                ],
-                const Divider(height: 1),
-                ListTile(leading: const Icon(Icons.task_alt_rounded, color: providerBrandBlue), title: const Text('Jobs Completed'), subtitle: Text('${detail.totalJobsCompleted}')),
-                const Divider(height: 1),
-                ListTile(
-                  leading: Icon(Icons.verified_user_rounded, color: documents.isVerified ? _verifiedGreen : Colors.orange),
-                  title: const Text('Verification Status'),
-                  subtitle: !documents.isVerified && documents.verificationRemarks != null && documents.verificationRemarks!.isNotEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Text(documents.verificationRemarks!, style: const TextStyle(fontSize: 12, color: Colors.black54)),
-                        )
-                      : null,
-                  trailing: _VerificationBadge(isVerified: documents.isVerified),
-                ),
-                const Divider(height: 1),
-                ListTile(leading: const Icon(Icons.event_rounded, color: providerBrandBlue), title: const Text('Member Since'), subtitle: Text(formatLocalDateTime(detail.createdOn, kDatePattern))),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const SectionHeader('Preferences'),
-            Consumer<TimeFormatProvider>(
-              builder: (context, timeFormat, _) {
-                return InfoCard(
-                  children: [
-                    SwitchListTile(
-                      secondary: const Icon(Icons.schedule_rounded, color: providerBrandBlue),
-                      title: const Text('24-hour time'),
-                      subtitle: Text(timeFormat.use24Hour ? 'e.g. 14:30' : 'e.g. 2:30 PM'),
-                      value: timeFormat.use24Hour,
-                      activeThumbColor: providerBrandBlue,
-                      onChanged: (v) => timeFormat.setUse24Hour(v),
-                    ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            const SectionHeader('Availability'),
-            InfoCard(
-              children: [
-                ListTile(
-                  leading: Icon(dashboard.isOnline ? Icons.wifi_tethering_rounded : Icons.wifi_tethering_off_rounded, color: dashboard.isOnline ? Colors.green : Colors.grey),
-                  title: const Text('Status'),
-                  subtitle: Text(dashboard.isOnline ? 'Online — receiving new requests' : 'Offline'),
-                  trailing: dashboard.availabilityLoading
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : Switch(
-                          value: dashboard.isOnline,
-                          activeThumbColor: Colors.green,
-                          onChanged: (v) => toggleProviderOnlineStatus(context, v),
-                        ),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.schedule_rounded, color: providerBrandBlue),
-                  title: const Text('Available Timing'),
-                  subtitle: Text(dashboard.availableTiming ?? detail.availableTiming ?? 'Not set'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                style: kProminentOutlinedButtonStyle(providerBrandBlue),
-                icon: const Icon(Icons.edit_rounded),
-                label: const Text('Edit Profile'),
-                onPressed: () => Navigator.of(context).pushNamed(ProviderRoutes.editProfile),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: kProminentOutlinedButtonStyle(providerBrandBlue),
-                    icon: const Icon(Icons.badge_outlined),
-                    label: const Text('My Documents'),
-                    onPressed: () => Navigator.of(context).pushNamed(ProviderRoutes.verificationDocuments),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: kProminentOutlinedButtonStyle(providerBrandBlue),
-                    icon: const Icon(Icons.category_rounded),
-                    label: const Text('Categories'),
-                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CategoriesAndTitlesScreen())),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: kProminentFilledButtonStyle(providerBrandBlue),
-                icon: const Icon(Icons.swap_horiz_rounded),
-                label: const Text('Switch to Customer'),
-                // pushReplacementNamed: don't leave the provider dashboard
-                // on the stack to pop back into with stale data — switching
-                // back the other way uses the mirrored "Switch to Provider"
-                // button, which rebuilds it fresh.
-                onPressed: () => Navigator.of(context).pushReplacementNamed(HomeScreen.routeName),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                style: kProminentOutlinedButtonStyle(Colors.red),
-                icon: const Icon(Icons.delete_forever_rounded),
-                label: const Text('Delete Account'),
-                onPressed: () => _deleteAccount(context),
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                style: kProminentOutlinedButtonStyle(providerBrandBlue),
-                icon: const Icon(Icons.support_agent_rounded),
-                label: const Text('Contact Us'),
-                onPressed: () => Navigator.of(context).pushNamed(ContactUsScreen.routeName),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Center(
-              child: TextButton.icon(
-                icon: Icon(Icons.privacy_tip_outlined, color: Colors.grey[600]),
-                onPressed: () => openPrivacyPolicy(context),
-                label: Text('Privacy Policy', style: TextStyle(color: Colors.grey[600])),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -388,15 +488,23 @@ class _VerificationBadge extends StatelessWidget {
     final color = isVerified ? _verifiedGreen : Colors.orange;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(20)),
+      decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(20)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(isVerified ? Icons.check_circle_rounded : Icons.hourglass_top_rounded, size: 14, color: color),
+          Icon(
+              isVerified
+                  ? Icons.check_circle_rounded
+                  : Icons.hourglass_top_rounded,
+              size: 14,
+              color: color),
           const SizedBox(width: 4),
           Text(
             isVerified ? 'Verified' : 'Pending',
-            style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 11.5),
+            style: TextStyle(
+                color: color, fontWeight: FontWeight.w700, fontSize: 11.5),
           ),
         ],
       ),

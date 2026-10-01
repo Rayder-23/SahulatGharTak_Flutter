@@ -5,7 +5,8 @@ import '../models/service_title.dart';
 import '../utils/api_error.dart';
 
 class ServiceTitleProvider extends ChangeNotifier {
-  ServiceTitleProvider({required ServiceTitleRepository repository}) : _repository = repository;
+  ServiceTitleProvider({required ServiceTitleRepository repository})
+      : _repository = repository;
 
   final ServiceTitleRepository _repository;
 

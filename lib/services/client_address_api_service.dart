@@ -7,11 +7,15 @@ import '../utils/constants.dart';
 
 class ClientAddressApiService {
   Future<List<ClientAddress>> fetchByClient(int clientUid) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/client-addresses?clientUid=$clientUid')).timeout(kApiTimeout);
+    final response = await http
+        .get(Uri.parse('$kApiBaseUrl/client-addresses?clientUid=$clientUid'))
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to load addresses');
     final List<dynamic> data = json['data'] as List<dynamic>? ?? [];
-    return data.map((item) => ClientAddress.fromJson(item as Map<String, dynamic>)).toList();
+    return data
+        .map((item) => ClientAddress.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<ClientAddress> create({
@@ -23,19 +27,21 @@ class ClientAddressApiService {
     double? latitude,
     double? longitude,
   }) async {
-    final response = await http.post(
-      Uri.parse('$kApiBaseUrl/client-addresses'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'clientUid': clientUid,
-        'addressTitle': addressTitle,
-        'fullAddress': fullAddress,
-        'area': area,
-        'city': city,
-        if (latitude != null) 'latitude': latitude,
-        if (longitude != null) 'longitude': longitude,
-      }),
-    ).timeout(kApiTimeout);
+    final response = await http
+        .post(
+          Uri.parse('$kApiBaseUrl/client-addresses'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'clientUid': clientUid,
+            'addressTitle': addressTitle,
+            'fullAddress': fullAddress,
+            'area': area,
+            'city': city,
+            if (latitude != null) 'latitude': latitude,
+            if (longitude != null) 'longitude': longitude,
+          }),
+        )
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to add address');
     return ClientAddress.fromJson(json['data'] as Map<String, dynamic>);
@@ -51,27 +57,31 @@ class ClientAddressApiService {
     double? latitude,
     double? longitude,
   }) async {
-    final response = await http.put(
-      Uri.parse('$kApiBaseUrl/client-addresses/$addressUid'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'addressUid': addressUid,
-        'clientUid': clientUid,
-        'addressTitle': addressTitle,
-        'fullAddress': fullAddress,
-        'area': area,
-        'city': city,
-        if (latitude != null) 'latitude': latitude,
-        if (longitude != null) 'longitude': longitude,
-      }),
-    ).timeout(kApiTimeout);
+    final response = await http
+        .put(
+          Uri.parse('$kApiBaseUrl/client-addresses/$addressUid'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'addressUid': addressUid,
+            'clientUid': clientUid,
+            'addressTitle': addressTitle,
+            'fullAddress': fullAddress,
+            'area': area,
+            'city': city,
+            if (latitude != null) 'latitude': latitude,
+            if (longitude != null) 'longitude': longitude,
+          }),
+        )
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to update address');
     return ClientAddress.fromJson(json['data'] as Map<String, dynamic>);
   }
 
   Future<void> delete(int addressUid) async {
-    final response = await http.delete(Uri.parse('$kApiBaseUrl/client-addresses/$addressUid')).timeout(kApiTimeout);
+    final response = await http
+        .delete(Uri.parse('$kApiBaseUrl/client-addresses/$addressUid'))
+        .timeout(kApiTimeout);
     _decode(response, 'Failed to delete address');
   }
 
@@ -83,7 +93,8 @@ class ClientAddressApiService {
       throw Exception('$errorPrefix (status ${response.statusCode})');
     }
 
-    final success = json['success'] as bool? ?? (response.statusCode >= 200 && response.statusCode < 300);
+    final success = json['success'] as bool? ??
+        (response.statusCode >= 200 && response.statusCode < 300);
     if (!success) {
       throw Exception(json['message'] as String? ?? errorPrefix);
     }

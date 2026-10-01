@@ -102,13 +102,17 @@ Future<void> _callNumber(BuildContext context, String mobileNo) async {
 /// list snapshot fetched before the booking was accepted). Shared between
 /// [RequestDetailScreen] and the requests-list card so the passcode action
 /// behaves identically from either place.
-Future<void> showRequestPasscodeDialog(BuildContext context, CustomerServiceRequest request) async {
+Future<void> showRequestPasscodeDialog(
+    BuildContext context, CustomerServiceRequest request) async {
   var passcode = request.passcode;
-  passcode ??= await context.read<CustomerServiceRequestProvider>().getStoredPasscode(request.uid);
+  passcode ??= await context
+      .read<CustomerServiceRequestProvider>()
+      .getStoredPasscode(request.uid);
   if (!context.mounted) return;
 
   if (passcode == null) {
-    showAppToast(context, 'Passcode not available yet.', type: AppToastType.info);
+    showAppToast(context, 'Passcode not available yet.',
+        type: AppToastType.info);
     return;
   }
 
@@ -206,7 +210,9 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
 
     showAppToast(
       context,
-      success ? 'Request cancelled' : (requestProvider.error ?? 'Failed to cancel request'),
+      success
+          ? 'Request cancelled'
+          : (requestProvider.error ?? 'Failed to cancel request'),
       type: success ? AppToastType.success : AppToastType.error,
     );
   }
@@ -240,7 +246,8 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
       showAppToast(context, 'Request deleted', type: AppToastType.success);
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     } else {
-      showAppToast(context, requestProvider.error ?? 'Failed to delete request', type: AppToastType.error);
+      showAppToast(context, requestProvider.error ?? 'Failed to delete request',
+          type: AppToastType.error);
     }
   }
 
@@ -366,14 +373,19 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                     children: [
                                       _DetailRow(
                                         label: 'Preferred Date',
-                                        value: formatScheduledDateTime(request.preferredServiceDate, null) ?? 'Not specified',
+                                        value: formatScheduledDateTime(
+                                                request.preferredServiceDate,
+                                                null) ??
+                                            'Not specified',
                                         icon: Icons.calendar_today_rounded,
                                         muted: request
                                             .preferredServiceDate.isEmpty,
                                       ),
                                       _DetailRow(
                                         label: 'Preferred Time',
-                                        value: formatScheduledDateTime(null, request.preferredServiceTime) ?? 'Not specified',
+                                        value: formatScheduledDateTime(null,
+                                                request.preferredServiceTime) ??
+                                            'Not specified',
                                         icon: Icons.access_time_rounded,
                                         muted: request
                                             .preferredServiceTime.isEmpty,
@@ -463,8 +475,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   style: const TextStyle(
-                                                      color:
-                                                          Color(0xFF1A2233),
+                                                      color: Color(0xFF1A2233),
                                                       fontSize: 14,
                                                       fontWeight:
                                                           FontWeight.w600),
@@ -474,8 +485,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                                   spacing: 4,
                                                   children: [
                                                     TextButton.icon(
-                                                      style: TextButton
-                                                          .styleFrom(
+                                                      style: TextButton.styleFrom(
                                                           padding:
                                                               const EdgeInsets
                                                                   .symmetric(
@@ -484,26 +494,23 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                                           visualDensity:
                                                               VisualDensity
                                                                   .compact),
-                                                      onPressed: () =>
-                                                          _callNumber(
-                                                              context,
-                                                              request
-                                                                  .providerMobileNo!),
+                                                      onPressed: () => _callNumber(
+                                                          context,
+                                                          request
+                                                              .providerMobileNo!),
                                                       icon: Icon(
                                                           Icons.call_rounded,
                                                           size: 16,
                                                           color: _brandBlue),
                                                       label: Text('Call',
                                                           style: TextStyle(
-                                                              color:
-                                                                  _brandBlue,
+                                                              color: _brandBlue,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w700)),
                                                     ),
                                                     TextButton.icon(
-                                                      style: TextButton
-                                                          .styleFrom(
+                                                      style: TextButton.styleFrom(
                                                           padding:
                                                               const EdgeInsets
                                                                   .symmetric(
@@ -512,11 +519,10 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                                           visualDensity:
                                                               VisualDensity
                                                                   .compact),
-                                                      onPressed: () =>
-                                                          openWhatsApp(
-                                                              context,
-                                                              request
-                                                                  .providerMobileNo!),
+                                                      onPressed: () => openWhatsApp(
+                                                          context,
+                                                          request
+                                                              .providerMobileNo!),
                                                       icon: const Icon(
                                                           Icons.chat,
                                                           size: 16,
@@ -607,7 +613,8 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                       _DetailRow(
                                         label: 'Estimated Budget',
                                         value: request.estimatedBudget > 0
-                                            ? formatCurrency(request.estimatedBudget)
+                                            ? formatCurrency(
+                                                request.estimatedBudget)
                                             : 'Not specified',
                                         icon: Icons
                                             .account_balance_wallet_rounded,
@@ -640,8 +647,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                       _DetailRow(
                                         label: 'Requested On',
                                         value: formatLocalDateTime(
-                                            request.createdOn,
-                                            kDatePattern,
+                                            request.createdOn, kDatePattern,
                                             includeTime: true),
                                         icon: Icons.schedule_rounded,
                                         compact: true,
@@ -743,12 +749,17 @@ class _BouncedBackNotice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline_rounded, size: 18, color: Colors.orange),
+          const Icon(Icons.info_outline_rounded,
+              size: 18, color: Colors.orange),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               'Your provider had to cancel — we\'re finding you a new one.',
-              style: TextStyle(color: Colors.orange.shade900, fontSize: 13, fontWeight: FontWeight.w600, height: 1.35),
+              style: TextStyle(
+                  color: Colors.orange.shade900,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  height: 1.35),
             ),
           ),
         ],

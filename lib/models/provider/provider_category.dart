@@ -5,7 +5,10 @@ class ProviderCategory {
   final String categoryName;
   final bool isPrimary;
 
-  const ProviderCategory({required this.categoryUid, required this.categoryName, required this.isPrimary});
+  const ProviderCategory(
+      {required this.categoryUid,
+      required this.categoryName,
+      required this.isPrimary});
 
   factory ProviderCategory.fromJson(Map<String, dynamic> json) {
     return ProviderCategory(

@@ -7,18 +7,27 @@ import '../utils/constants.dart';
 
 class CustomerServiceRequestApiService {
   Future<List<CustomerServiceRequest>> fetchByClient(int clientUid) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/customer-service-requests?clientUid=$clientUid')).timeout(kApiTimeout);
+    final response = await http
+        .get(Uri.parse(
+            '$kApiBaseUrl/customer-service-requests?clientUid=$clientUid'))
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to load service requests');
     final List<dynamic> data = json['data'] as List<dynamic>? ?? [];
-    return data.map((item) => CustomerServiceRequest.fromJson(item as Map<String, dynamic>)).toList();
+    return data
+        .map((item) =>
+            CustomerServiceRequest.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<CustomerServiceRequest> fetchById(int requestUid) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/customer-service-requests/$requestUid')).timeout(kApiTimeout);
+    final response = await http
+        .get(Uri.parse('$kApiBaseUrl/customer-service-requests/$requestUid'))
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to load service request');
-    return CustomerServiceRequest.fromJson(json['data'] as Map<String, dynamic>);
+    return CustomerServiceRequest.fromJson(
+        json['data'] as Map<String, dynamic>);
   }
 
   Future<CustomerServiceRequest> create({
@@ -35,27 +44,30 @@ class CustomerServiceRequestApiService {
     int? serviceTitleUid,
     String? remarks,
   }) async {
-    final response = await http.post(
-      Uri.parse('$kApiBaseUrl/customer-service-requests'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'clientUid': clientUid,
-        'categoryUid': categoryUid,
-        'clientAddressUid': clientAddressUid,
-        'serviceTitle': serviceTitle,
-        'serviceTitleUid': serviceTitleUid,
-        'serviceDescription': serviceDescription,
-        'preferredServiceDate': preferredServiceDate,
-        'preferredServiceTime': preferredServiceTime,
-        'isUrgent': isUrgent,
-        'contactPerson': contactPerson,
-        'contactNo': contactNo,
-        'remarks': remarks,
-      }),
-    ).timeout(kApiTimeout);
+    final response = await http
+        .post(
+          Uri.parse('$kApiBaseUrl/customer-service-requests'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'clientUid': clientUid,
+            'categoryUid': categoryUid,
+            'clientAddressUid': clientAddressUid,
+            'serviceTitle': serviceTitle,
+            'serviceTitleUid': serviceTitleUid,
+            'serviceDescription': serviceDescription,
+            'preferredServiceDate': preferredServiceDate,
+            'preferredServiceTime': preferredServiceTime,
+            'isUrgent': isUrgent,
+            'contactPerson': contactPerson,
+            'contactNo': contactNo,
+            'remarks': remarks,
+          }),
+        )
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to create service request');
-    return CustomerServiceRequest.fromJson(json['data'] as Map<String, dynamic>);
+    return CustomerServiceRequest.fromJson(
+        json['data'] as Map<String, dynamic>);
   }
 
   Future<CustomerServiceRequest> updateStatus({
@@ -74,29 +86,32 @@ class CustomerServiceRequestApiService {
     String? remarks,
     String? cancelReason,
   }) async {
-    final response = await http.put(
-      Uri.parse('$kApiBaseUrl/customer-service-requests/$requestUid'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'requestUid': requestUid,
-        'categoryUid': categoryUid,
-        'clientAddressUid': clientAddressUid,
-        'serviceTitle': serviceTitle,
-        'serviceTitleUid': serviceTitleUid,
-        'serviceDescription': serviceDescription,
-        'preferredServiceDate': preferredServiceDate,
-        'preferredServiceTime': preferredServiceTime,
-        'isUrgent': isUrgent,
-        'contactPerson': contactPerson,
-        'contactNo': contactNo,
-        'status': status,
-        'remarks': remarks,
-        'cancelReason': cancelReason,
-      }),
-    ).timeout(kApiTimeout);
+    final response = await http
+        .put(
+          Uri.parse('$kApiBaseUrl/customer-service-requests/$requestUid'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'requestUid': requestUid,
+            'categoryUid': categoryUid,
+            'clientAddressUid': clientAddressUid,
+            'serviceTitle': serviceTitle,
+            'serviceTitleUid': serviceTitleUid,
+            'serviceDescription': serviceDescription,
+            'preferredServiceDate': preferredServiceDate,
+            'preferredServiceTime': preferredServiceTime,
+            'isUrgent': isUrgent,
+            'contactPerson': contactPerson,
+            'contactNo': contactNo,
+            'status': status,
+            'remarks': remarks,
+            'cancelReason': cancelReason,
+          }),
+        )
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to update service request');
-    return CustomerServiceRequest.fromJson(json['data'] as Map<String, dynamic>);
+    return CustomerServiceRequest.fromJson(
+        json['data'] as Map<String, dynamic>);
   }
 
   Map<String, dynamic> _decode(http.Response response, String errorPrefix) {
@@ -107,7 +122,8 @@ class CustomerServiceRequestApiService {
       throw Exception('$errorPrefix (status ${response.statusCode})');
     }
 
-    final success = json['success'] as bool? ?? (response.statusCode >= 200 && response.statusCode < 300);
+    final success = json['success'] as bool? ??
+        (response.statusCode >= 200 && response.statusCode < 300);
     if (!success) {
       throw Exception(json['message'] as String? ?? errorPrefix);
     }

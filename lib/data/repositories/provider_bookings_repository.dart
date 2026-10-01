@@ -11,7 +11,9 @@ import '../../services/service_booking_api_service.dart';
 /// unviewed-rejected badge count) and call through to this class rather than
 /// talking to the API/store directly.
 class ProviderBookingsRepository {
-  ProviderBookingsRepository({ServiceBookingApiService? apiService, RejectedBookingsStore? rejectedStore})
+  ProviderBookingsRepository(
+      {ServiceBookingApiService? apiService,
+      RejectedBookingsStore? rejectedStore})
       : _apiService = apiService ?? ServiceBookingApiService(),
         _rejectedStore = rejectedStore ?? RejectedBookingsStore();
 
@@ -24,15 +26,20 @@ class ProviderBookingsRepository {
     return [...fetched, ...rejected];
   }
 
-  Future<int> loadRejectedSeenCount(int providerUid) => _rejectedStore.loadSeenCount(providerUid);
+  Future<int> loadRejectedSeenCount(int providerUid) =>
+      _rejectedStore.loadSeenCount(providerUid);
 
-  Future<void> saveRejectedSeenCount(int providerUid, int count) => _rejectedStore.saveSeenCount(providerUid, count);
+  Future<void> saveRejectedSeenCount(int providerUid, int count) =>
+      _rejectedStore.saveSeenCount(providerUid, count);
 
   Future<ServiceBooking> fetchById(int bookingUid, {int? providerUid}) {
     return _apiService.fetchById(bookingUid, providerUid: providerUid);
   }
 
-  Future<ServiceBooking> respond({required ServiceBooking booking, required bool accept, String? reason}) async {
+  Future<ServiceBooking> respond(
+      {required ServiceBooking booking,
+      required bool accept,
+      String? reason}) async {
     final updated = await _apiService.respond(
       bookingUid: booking.uid,
       providerUid: booking.providerUid,
@@ -46,7 +53,8 @@ class ProviderBookingsRepository {
   }
 
   Future<ServiceBooking> startJob(ServiceBooking booking) {
-    return _apiService.startJob(bookingUid: booking.uid, providerUid: booking.providerUid);
+    return _apiService.startJob(
+        bookingUid: booking.uid, providerUid: booking.providerUid);
   }
 
   Future<ServiceBooking> verifyCompletion(
@@ -68,7 +76,8 @@ class ProviderBookingsRepository {
     );
   }
 
-  Future<ServiceBooking> updateStatus(ServiceBooking booking, String status, {required double customerPaid, String? reason}) {
+  Future<ServiceBooking> updateStatus(ServiceBooking booking, String status,
+      {required double customerPaid, String? reason}) {
     return _apiService.updateBooking(
       bookingUid: booking.uid,
       providerUid: booking.providerUid,

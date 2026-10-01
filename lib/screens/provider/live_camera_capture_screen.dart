@@ -23,11 +23,15 @@ class LiveCameraCaptureScreen extends StatefulWidget {
   final ProviderDocumentSlot slot;
 
   @override
-  State<LiveCameraCaptureScreen> createState() => _LiveCameraCaptureScreenState();
+  State<LiveCameraCaptureScreen> createState() =>
+      _LiveCameraCaptureScreenState();
 }
 
 class _FrameState {
-  const _FrameState({this.warmedUp = false, this.isValid = false, this.message = 'Preparing scanner...'});
+  const _FrameState(
+      {this.warmedUp = false,
+      this.isValid = false,
+      this.message = 'Preparing scanner...'});
   final bool warmedUp;
   final bool isValid;
   final String message;
@@ -35,7 +39,8 @@ class _FrameState {
 
 enum _PermissionUiState { checking, granted, denied, permanentlyDenied }
 
-class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with WidgetsBindingObserver {
+class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen>
+    with WidgetsBindingObserver {
   CameraController? _controller;
   CameraDescription? _description;
   bool _initializing = true;
@@ -45,7 +50,8 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
   FaceFrameValidator? _faceValidator;
   CnicFrameValidator? _cnicValidator;
 
-  final ValueNotifier<_FrameState> _frameState = ValueNotifier(const _FrameState());
+  final ValueNotifier<_FrameState> _frameState =
+      ValueNotifier(const _FrameState());
   bool _isBusy = false;
   DateTime? _lastRun;
   bool _isCapturing = false;
@@ -55,10 +61,14 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
 
   bool get _isBack => widget.slot == ProviderDocumentSlot.cnicBack;
 
-  OutlineShape get _shape => widget.slot == ProviderDocumentSlot.profilePhoto ? OutlineShape.faceOval : OutlineShape.cnicCard;
+  OutlineShape get _shape => widget.slot == ProviderDocumentSlot.profilePhoto
+      ? OutlineShape.faceOval
+      : OutlineShape.cnicCard;
 
   CameraLensDirection get _lensDirection =>
-      widget.slot == ProviderDocumentSlot.profilePhoto ? CameraLensDirection.front : CameraLensDirection.back;
+      widget.slot == ProviderDocumentSlot.profilePhoto
+          ? CameraLensDirection.front
+          : CameraLensDirection.back;
 
   String get _defaultMessage {
     switch (widget.slot) {
@@ -84,10 +94,12 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final controller = _controller;
     if (controller == null || !controller.value.isInitialized) return;
-    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
       _teardownCamera();
       if (mounted) setState(() => _initializing = true);
-    } else if (state == AppLifecycleState.resumed && _permissionState == _PermissionUiState.granted) {
+    } else if (state == AppLifecycleState.resumed &&
+        _permissionState == _PermissionUiState.granted) {
       _initCamera();
     }
   }
@@ -98,13 +110,16 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
       _initError = null;
     });
 
-    final permissionResult = await CameraPermissionService().ensureCameraPermission();
+    final permissionResult =
+        await CameraPermissionService().ensureCameraPermission();
     if (!mounted) return;
     if (permissionResult != CameraPermissionResult.granted) {
       setState(() {
         _initializing = false;
         _permissionState =
-            permissionResult == CameraPermissionResult.permanentlyDenied ? _PermissionUiState.permanentlyDenied : _PermissionUiState.denied;
+            permissionResult == CameraPermissionResult.permanentlyDenied
+                ? _PermissionUiState.permanentlyDenied
+                : _PermissionUiState.denied;
       });
       return;
     }
@@ -112,15 +127,20 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
 
     try {
       final cameras = await availableCameras();
-      if (cameras.isEmpty) throw Exception('No camera is available on this device.');
-      final description = cameras.firstWhere((c) => c.lensDirection == _lensDirection, orElse: () => cameras.first);
+      if (cameras.isEmpty)
+        throw Exception('No camera is available on this device.');
+      final description = cameras.firstWhere(
+          (c) => c.lensDirection == _lensDirection,
+          orElse: () => cameras.first);
       _description = description;
 
       final controller = CameraController(
         description,
         ResolutionPreset.high,
         enableAudio: false,
-        imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888,
+        imageFormatGroup: Platform.isAndroid
+            ? ImageFormatGroup.nv21
+            : ImageFormatGroup.bgra8888,
       );
       await controller.initialize();
       if (!mounted) {
@@ -159,7 +179,8 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
   Future<void> _onFrame(CameraImage image) async {
     if (_isBusy || _disposed) return;
     final now = DateTime.now();
-    if (_lastRun != null && now.difference(_lastRun!) < const Duration(milliseconds: 350)) return;
+    if (_lastRun != null &&
+        now.difference(_lastRun!) < const Duration(milliseconds: 350)) return;
     _isBusy = true;
     _lastRun = now;
 
@@ -196,11 +217,15 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
       const detectionTimeout = Duration(seconds: 5);
       bool isValid;
       if (widget.slot == ProviderDocumentSlot.profilePhoto) {
-        isValid = await (_faceValidator?.hasFace(inputImage) ?? Future.value(false))
-            .timeout(detectionTimeout, onTimeout: () => false);
+        isValid =
+            await (_faceValidator?.hasFace(inputImage) ?? Future.value(false))
+                .timeout(detectionTimeout, onTimeout: () => false);
       } else {
-        final result = await (_cnicValidator?.validate(inputImage, isBack: _isBack) ?? Future.value(FrameValidationResult.invalid))
-            .timeout(detectionTimeout, onTimeout: () => FrameValidationResult.invalid);
+        final result =
+            await (_cnicValidator?.validate(inputImage, isBack: _isBack) ??
+                    Future.value(FrameValidationResult.invalid))
+                .timeout(detectionTimeout,
+                    onTimeout: () => FrameValidationResult.invalid);
         isValid = result.isValid;
       }
       if (_disposed) return;
@@ -226,12 +251,14 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
   Future<void> _capture() async {
     final controller = _controller;
     final state = _frameState.value;
-    if (controller == null || _isCapturing || !state.warmedUp || !state.isValid) return;
+    if (controller == null || _isCapturing || !state.warmedUp || !state.isValid)
+      return;
 
     setState(() => _isCapturing = true);
     try {
       final picture = await controller.takePicture();
-      final outlineRect = CaptureOutlineGeometry.rectFor(_previewBoxSize, _shape);
+      final outlineRect =
+          CaptureOutlineGeometry.rectFor(_previewBoxSize, _shape);
       final cropped = await CaptureCropMapper.cropToOutline(
         imageFile: File(picture.path),
         outlineRect: outlineRect,
@@ -241,7 +268,8 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
       Navigator.of(context).pop(cropped ?? File(picture.path));
     } catch (_) {
       if (!mounted) return;
-      showAppToast(context, 'Could not capture photo. Please try again.', type: AppToastType.error);
+      showAppToast(context, 'Could not capture photo. Please try again.',
+          type: AppToastType.error);
       setState(() => _isCapturing = false);
     }
   }
@@ -251,7 +279,8 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
     _controller = null;
     if (controller != null) {
       try {
-        if (controller.value.isStreamingImages) await controller.stopImageStream();
+        if (controller.value.isStreamingImages)
+          await controller.stopImageStream();
       } catch (_) {}
       try {
         await controller.dispose();
@@ -276,7 +305,9 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
     final previewSize = controller.value.previewSize;
     if (previewSize == null) return const SizedBox.shrink();
     final isLandscapeSensor = previewSize.width > previewSize.height;
-    final displaySize = isLandscapeSensor ? Size(previewSize.height, previewSize.width) : previewSize;
+    final displaySize = isLandscapeSensor
+        ? Size(previewSize.height, previewSize.width)
+        : previewSize;
 
     return ClipRect(
       child: OverflowBox(
@@ -304,12 +335,14 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
       body: SafeArea(
         child: Stack(
           children: [
-            if (_permissionState == _PermissionUiState.denied || _permissionState == _PermissionUiState.permanentlyDenied)
+            if (_permissionState == _PermissionUiState.denied ||
+                _permissionState == _PermissionUiState.permanentlyDenied)
               _buildPermissionDenied()
             else if (_initError != null)
               _buildError(_initError!)
             else if (_initializing || _controller == null)
-              const Center(child: CircularProgressIndicator(color: Colors.white))
+              const Center(
+                  child: CircularProgressIndicator(color: Colors.white))
             else
               _buildCaptureUi(_controller!),
             Positioned(
@@ -332,7 +365,8 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              _previewBoxSize = Size(constraints.maxWidth, constraints.maxHeight);
+              _previewBoxSize =
+                  Size(constraints.maxWidth, constraints.maxHeight);
               return Stack(
                 fit: StackFit.expand,
                 children: [
@@ -340,7 +374,8 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
                   ValueListenableBuilder<_FrameState>(
                     valueListenable: _frameState,
                     builder: (context, state, _) => CustomPaint(
-                      painter: CaptureOutlinePainter(shape: _shape, isValid: state.isValid),
+                      painter: CaptureOutlinePainter(
+                          shape: _shape, isValid: state.isValid),
                     ),
                   ),
                 ],
@@ -359,7 +394,10 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
                 children: [
                   Text(
                     state.warmedUp ? state.message : 'Preparing scanner...',
-                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 16),
                   GestureDetector(
@@ -369,13 +407,15 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
                       height: 72,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: enabled ? const Color(0xFF2ECC71) : Colors.white24,
+                        color:
+                            enabled ? const Color(0xFF2ECC71) : Colors.white24,
                         border: Border.all(color: Colors.white, width: 3),
                       ),
                       child: _isCapturing
                           ? const Padding(
                               padding: EdgeInsets.all(20),
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                  color: Colors.white, strokeWidth: 2),
                             )
                           : null,
                     ),
@@ -390,14 +430,16 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
   }
 
   Widget _buildPermissionDenied() {
-    final permanently = _permissionState == _PermissionUiState.permanentlyDenied;
+    final permanently =
+        _permissionState == _PermissionUiState.permanentlyDenied;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.no_photography_outlined, color: Colors.white, size: 48),
+            const Icon(Icons.no_photography_outlined,
+                color: Colors.white, size: 48),
             const SizedBox(height: 16),
             Text(
               permanently
@@ -408,7 +450,9 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: permanently ? () => CameraPermissionService().openSettings() : _initCamera,
+              onPressed: permanently
+                  ? () => CameraPermissionService().openSettings()
+                  : _initCamera,
               child: Text(permanently ? 'Open Settings' : 'Try Again'),
             ),
           ],
@@ -426,9 +470,12 @@ class _LiveCameraCaptureScreenState extends State<LiveCameraCaptureScreen> with 
           children: [
             const Icon(Icons.error_outline, color: Colors.white, size: 48),
             const SizedBox(height: 16),
-            Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
+            Text(message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white)),
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: _initCamera, child: const Text('Try Again')),
+            ElevatedButton(
+                onPressed: _initCamera, child: const Text('Try Again')),
           ],
         ),
       ),

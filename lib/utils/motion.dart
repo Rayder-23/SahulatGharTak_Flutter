@@ -24,4 +24,5 @@ const kEmphasizedCurve = Curves.easeOutCubic;
 /// Decorative animations should check this and fall back to an instant
 /// (`Duration.zero`) state change, or skip the animation outright when there
 /// is no state to preserve (e.g. a one-shot intro).
-bool prefersReducedMotion(BuildContext context) => MediaQuery.disableAnimationsOf(context);
+bool prefersReducedMotion(BuildContext context) =>
+    MediaQuery.disableAnimationsOf(context);

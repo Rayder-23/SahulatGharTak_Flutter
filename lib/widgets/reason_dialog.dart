@@ -63,7 +63,8 @@ class _ReasonDialogState extends State<_ReasonDialog> {
   bool get _isOther => _selected == _otherReasonValue;
 
   bool get _canConfirm =>
-      _selected != null && (!_isOther || _otherController.text.trim().isNotEmpty);
+      _selected != null &&
+      (!_isOther || _otherController.text.trim().isNotEmpty);
 
   @override
   void dispose() {
@@ -88,7 +89,12 @@ class _ReasonDialogState extends State<_ReasonDialog> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.22), blurRadius: 28, offset: const Offset(0, 12))],
+            boxShadow: [
+              BoxShadow(
+                  color: _brandDark.withValues(alpha: 0.22),
+                  blurRadius: 28,
+                  offset: const Offset(0, 12))
+            ],
           ),
           padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
           child: Column(
@@ -98,27 +104,40 @@ class _ReasonDialogState extends State<_ReasonDialog> {
                 width: 56,
                 height: 56,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: widget.color.withValues(alpha: 0.12), shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                    color: widget.color.withValues(alpha: 0.12),
+                    shape: BoxShape.circle),
                 child: Icon(widget.icon, color: widget.color, size: 28),
               ),
               const SizedBox(height: 16),
               Text(
                 widget.title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF1A2233), letterSpacing: -0.2),
+                style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1A2233),
+                    letterSpacing: -0.2),
               ),
               const SizedBox(height: 8),
               Text(
                 widget.message,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13.5, color: Colors.grey[600], height: 1.4, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    fontSize: 13.5,
+                    color: Colors.grey[600],
+                    height: 1.4,
+                    fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 18),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Reason',
-                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.grey[600]),
+                  style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.grey[600]),
                 ),
               ),
               const SizedBox(height: 6),
@@ -127,8 +146,10 @@ class _ReasonDialogState extends State<_ReasonDialog> {
                 hint: 'Select a reason',
                 accentColor: widget.color,
                 items: [
-                  ...widget.reasons.map((r) => ThemedDropdownItem(value: r, label: r)),
-                  const ThemedDropdownItem(value: _otherReasonValue, label: 'Other'),
+                  ...widget.reasons
+                      .map((r) => ThemedDropdownItem(value: r, label: r)),
+                  const ThemedDropdownItem(
+                      value: _otherReasonValue, label: 'Other'),
                 ],
                 onChanged: (v) => setState(() => _selected = v),
               ),
@@ -142,14 +163,25 @@ class _ReasonDialogState extends State<_ReasonDialog> {
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
                     hintText: 'Tell us more',
-                    hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14, fontWeight: FontWeight.w500),
+                    hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500),
                     isDense: true,
                     filled: true,
                     fillColor: const Color(0xFFF6F8FC),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: widget.color, width: 1.5)),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide:
+                            BorderSide(color: widget.color, width: 1.5)),
                   ),
                 ),
               ],
@@ -160,9 +192,11 @@ class _ReasonDialogState extends State<_ReasonDialog> {
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.grey.shade700,
-                        side: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                        side:
+                            BorderSide(color: Colors.grey.shade300, width: 1.5),
                         padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text(widget.cancelLabel),
@@ -174,13 +208,16 @@ class _ReasonDialogState extends State<_ReasonDialog> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: widget.color,
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: widget.color.withValues(alpha: 0.35),
+                        disabledBackgroundColor:
+                            widget.color.withValues(alpha: 0.35),
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: _canConfirm ? _confirm : null,
-                      child: Text(widget.confirmLabel, style: const TextStyle(fontWeight: FontWeight.w700)),
+                      child: Text(widget.confirmLabel,
+                          style: const TextStyle(fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],

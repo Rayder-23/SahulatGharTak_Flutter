@@ -14,7 +14,8 @@ class ClientLocationMapScreen extends StatelessWidget {
   final LatLng location;
   final String? addressLabel;
 
-  const ClientLocationMapScreen({super.key, required this.location, this.addressLabel});
+  const ClientLocationMapScreen(
+      {super.key, required this.location, this.addressLabel});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,9 @@ class ClientLocationMapScreen extends StatelessWidget {
         children: [
           GoogleMap(
             initialCameraPosition: CameraPosition(target: location, zoom: 16),
-            markers: {Marker(markerId: const MarkerId('client'), position: location)},
+            markers: {
+              Marker(markerId: const MarkerId('client'), position: location)
+            },
             zoomControlsEnabled: false,
           ),
           if (addressLabel != null && addressLabel!.trim().isNotEmpty)
@@ -37,17 +40,23 @@ class ClientLocationMapScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 color: Colors.white,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   child: Row(
                     children: [
-                      const Icon(Icons.location_on_rounded, color: kPrimaryColor, size: 20),
+                      const Icon(Icons.location_on_rounded,
+                          color: kPrimaryColor, size: 20),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           addressLabel!,
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Color(0xFF1A2233), height: 1.3),
+                          style: const TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1A2233),
+                              height: 1.3),
                         ),
                       ),
                     ],
@@ -64,7 +73,8 @@ class ClientLocationMapScreen extends StatelessWidget {
                 backgroundColor: kPrimaryColor,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () => openDirections(context, location),
               icon: const Icon(Icons.directions_rounded),

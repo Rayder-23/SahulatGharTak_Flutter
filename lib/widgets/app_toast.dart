@@ -57,7 +57,10 @@ void showAppToast(
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600),
             ),
           ),
         ],

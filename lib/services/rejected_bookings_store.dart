@@ -12,7 +12,8 @@ class RejectedBookingsStore {
   final _storage = const FlutterSecureStorage();
 
   String _keyFor(int providerUid) => 'rejectedBookings_$providerUid';
-  String _seenCountKeyFor(int providerUid) => 'rejectedBookingsSeenCount_$providerUid';
+  String _seenCountKeyFor(int providerUid) =>
+      'rejectedBookingsSeenCount_$providerUid';
 
   Future<List<ServiceBooking>> load(int providerUid) async {
     final raw = await _storage.read(key: _keyFor(providerUid));
@@ -20,7 +21,9 @@ class RejectedBookingsStore {
 
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((item) => ServiceBooking.fromJson(item as Map<String, dynamic>)).toList();
+      return list
+          .map((item) => ServiceBooking.fromJson(item as Map<String, dynamic>))
+          .toList();
     } catch (_) {
       return [];
     }
@@ -29,7 +32,9 @@ class RejectedBookingsStore {
   Future<void> add(int providerUid, ServiceBooking booking) async {
     final existing = await load(providerUid);
     final updated = [...existing.where((b) => b.uid != booking.uid), booking];
-    await _storage.write(key: _keyFor(providerUid), value: jsonEncode(updated.map((b) => b.toJson()).toList()));
+    await _storage.write(
+        key: _keyFor(providerUid),
+        value: jsonEncode(updated.map((b) => b.toJson()).toList()));
   }
 
   /// Number of rejected bookings that existed the last time the provider

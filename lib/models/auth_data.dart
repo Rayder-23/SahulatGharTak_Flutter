@@ -37,7 +37,9 @@ class AuthData {
       token: token,
       expiresAt: json['expiresAt'] != null
           ? DateTime.parse(json['expiresAt'] as String)
-          : (token.isNotEmpty ? _expiryFromToken(token) : DateTime.now().add(const Duration(days: 30))),
+          : (token.isNotEmpty
+              ? _expiryFromToken(token)
+              : DateTime.now().add(const Duration(days: 30))),
       categoryId: json['categoryId'] as int?,
       categoryName: json['categoryName'] as String?,
       providerUid: json['profileId'] as int?,
@@ -49,7 +51,8 @@ class AuthData {
   static DateTime _expiryFromToken(String token) {
     try {
       final payload = token.split('.')[1];
-      final decoded = utf8.decode(base64Url.decode(base64Url.normalize(payload)));
+      final decoded =
+          utf8.decode(base64Url.decode(base64Url.normalize(payload)));
       final exp = (jsonDecode(decoded) as Map<String, dynamic>)['exp'] as int;
       return DateTime.fromMillisecondsSinceEpoch(exp * 1000);
     } catch (_) {
@@ -105,11 +108,21 @@ class AuthData {
       role: map['role']!,
       token: map['token']!,
       expiresAt: DateTime.parse(map['expiresAt']!),
-      categoryId: (map['categoryId']?.isNotEmpty ?? false) ? int.parse(map['categoryId']!) : null,
-      categoryName: (map['categoryName']?.isNotEmpty ?? false) ? map['categoryName'] : null,
-      providerUid: (map['providerUid']?.isNotEmpty ?? false) ? int.parse(map['providerUid']!) : null,
-      clientId: (map['clientId']?.isNotEmpty ?? false) ? int.parse(map['clientId']!) : null,
-      providerId: (map['providerId']?.isNotEmpty ?? false) ? int.parse(map['providerId']!) : null,
+      categoryId: (map['categoryId']?.isNotEmpty ?? false)
+          ? int.parse(map['categoryId']!)
+          : null,
+      categoryName: (map['categoryName']?.isNotEmpty ?? false)
+          ? map['categoryName']
+          : null,
+      providerUid: (map['providerUid']?.isNotEmpty ?? false)
+          ? int.parse(map['providerUid']!)
+          : null,
+      clientId: (map['clientId']?.isNotEmpty ?? false)
+          ? int.parse(map['clientId']!)
+          : null,
+      providerId: (map['providerId']?.isNotEmpty ?? false)
+          ? int.parse(map['providerId']!)
+          : null,
     );
   }
 }

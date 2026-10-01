@@ -89,6 +89,7 @@ String? cnicValidator(String? v) {
 /// Validates a fully-typed Pakistani mobile number is exactly 11 digits.
 String? mobileNumberValidator(String? v) {
   if (v == null || v.trim().isEmpty) return 'Required';
-  if (digitsOnlyMobile(v).length != 11) return 'Enter a valid 11-digit mobile number';
+  if (digitsOnlyMobile(v).length != 11)
+    return 'Enter a valid 11-digit mobile number';
   return null;
 }

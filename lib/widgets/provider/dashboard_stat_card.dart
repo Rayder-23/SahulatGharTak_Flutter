@@ -37,7 +37,12 @@ class DashboardStatCard extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [color.withValues(alpha: 0.07), Colors.white],
             ),
-            boxShadow: [BoxShadow(color: const Color(0xFF0A4FA8).withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+            boxShadow: [
+              BoxShadow(
+                  color: const Color(0xFF0A4FA8).withValues(alpha: 0.06),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6))
+            ],
           ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
@@ -58,18 +63,28 @@ class DashboardStatCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     if (tappable)
-                      Icon(Icons.arrow_outward_rounded, size: 16, color: color.withValues(alpha: 0.55)),
+                      Icon(Icons.arrow_outward_rounded,
+                          size: 16, color: color.withValues(alpha: 0.55)),
                   ],
                 ),
                 const SizedBox(height: 14),
                 Text(
                   value,
-                  style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF12182B), letterSpacing: -0.3, height: 1),
+                  style: const TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF12182B),
+                      letterSpacing: -0.3,
+                      height: 1),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   label,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w600, height: 1.2),
+                  style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),

@@ -5,7 +5,8 @@ import '../../services/service_catalog_api_service.dart';
 /// merging/filtering — exists to give `ServiceCatalogProvider` an injectable
 /// data-source seam for testing.
 class ServiceCatalogRepository {
-  ServiceCatalogRepository({ServiceCatalogApiService? apiService}) : _apiService = apiService ?? ServiceCatalogApiService();
+  ServiceCatalogRepository({ServiceCatalogApiService? apiService})
+      : _apiService = apiService ?? ServiceCatalogApiService();
 
   final ServiceCatalogApiService _apiService;
 

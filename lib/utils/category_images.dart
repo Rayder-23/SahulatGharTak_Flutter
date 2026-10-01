@@ -2,7 +2,8 @@ const Map<String, String> _keywordImages = {
   'electric': 'assets/electrician01.jpeg',
   'plumb': 'assets/plumbing01.jpeg',
   'carpenter': 'assets/carpanter01.jpg',
-  'carpainter': 'assets/carpanter01.jpg', // common misspelling of "carpenter" in source data
+  'carpainter':
+      'assets/carpanter01.jpg', // common misspelling of "carpenter" in source data
   'paint': 'assets/painter01.jpg',
 };
 

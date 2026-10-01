@@ -52,7 +52,10 @@ class ProviderWallet {
       categoryName: json['categoryName'] as String? ?? '',
       balance: (json['balance'] as num?)?.toDouble() ?? 0,
       pendingPayoutTotal: (json['pendingPayoutTotal'] as num?)?.toDouble() ?? 0,
-      transactions: txns.map((t) => WalletTransactionEntry.fromJson(t as Map<String, dynamic>)).toList(),
+      transactions: txns
+          .map(
+              (t) => WalletTransactionEntry.fromJson(t as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

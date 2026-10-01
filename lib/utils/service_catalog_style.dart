@@ -11,9 +11,12 @@ class ServiceCatalogStyle {
 }
 
 const Map<String, ServiceCatalogStyle> _styleByName = {
-  'home maintenance': ServiceCatalogStyle(Icons.home_repair_service, Color(0xFF45B7D1)),
-  'specialized services': ServiceCatalogStyle(Icons.design_services, Color(0xFFBB8FCE)),
-  'property & legal services': ServiceCatalogStyle(Icons.real_estate_agent, Color(0xFFF7DC6F)),
+  'home maintenance':
+      ServiceCatalogStyle(Icons.home_repair_service, Color(0xFF45B7D1)),
+  'specialized services':
+      ServiceCatalogStyle(Icons.design_services, Color(0xFFBB8FCE)),
+  'property & legal services':
+      ServiceCatalogStyle(Icons.real_estate_agent, Color(0xFFF7DC6F)),
   'sahulat ride': ServiceCatalogStyle(Icons.local_taxi, Color(0xFFFF9F43)),
 };
 

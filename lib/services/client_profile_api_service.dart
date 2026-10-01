@@ -7,7 +7,9 @@ import '../utils/constants.dart';
 
 class ClientProfileApiService {
   Future<ClientDetailModel> fetchDetail(int clientUid) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/clients-detail/$clientUid')).timeout(kApiTimeout);
+    final response = await http
+        .get(Uri.parse('$kApiBaseUrl/clients-detail/$clientUid'))
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to load profile');
     return ClientDetailModel.fromJson(json['data'] as Map<String, dynamic>);

@@ -28,13 +28,18 @@ class ProviderServiceTitlePickerScreen extends StatefulWidget {
   /// Ids of titles already selected when this screen opens.
   final Set<int> selectedTitleIds;
 
-  const ProviderServiceTitlePickerScreen({super.key, required this.categoryUids, this.selectedTitleIds = const {}});
+  const ProviderServiceTitlePickerScreen(
+      {super.key,
+      required this.categoryUids,
+      this.selectedTitleIds = const {}});
 
   @override
-  State<ProviderServiceTitlePickerScreen> createState() => _ProviderServiceTitlePickerScreenState();
+  State<ProviderServiceTitlePickerScreen> createState() =>
+      _ProviderServiceTitlePickerScreenState();
 }
 
-class _ProviderServiceTitlePickerScreenState extends State<ProviderServiceTitlePickerScreen> {
+class _ProviderServiceTitlePickerScreenState
+    extends State<ProviderServiceTitlePickerScreen> {
   final _repository = ServiceTitleRepository();
   final _searchController = TextEditingController();
 
@@ -71,7 +76,8 @@ class _ProviderServiceTitlePickerScreenState extends State<ProviderServiceTitleP
       _error = null;
     });
     try {
-      final results = await Future.wait(widget.categoryUids.map((id) => _repository.fetchServiceTitles(id)));
+      final results = await Future.wait(
+          widget.categoryUids.map((id) => _repository.fetchServiceTitles(id)));
       if (!mounted) return;
       setState(() => _titles = results.expand((titles) => titles).toList());
     } catch (e) {
@@ -84,7 +90,13 @@ class _ProviderServiceTitlePickerScreenState extends State<ProviderServiceTitleP
 
   Map<String, List<ServiceTitle>> get _groupedFiltered {
     final query = _query.trim().toLowerCase();
-    final filtered = query.isEmpty ? _titles : _titles.where((t) => t.title.toLowerCase().contains(query) || t.categoryName.toLowerCase().contains(query)).toList();
+    final filtered = query.isEmpty
+        ? _titles
+        : _titles
+            .where((t) =>
+                t.title.toLowerCase().contains(query) ||
+                t.categoryName.toLowerCase().contains(query))
+            .toList();
 
     final groups = <String, List<ServiceTitle>>{};
     for (final title in filtered) {
@@ -137,11 +149,13 @@ class _ProviderServiceTitlePickerScreenState extends State<ProviderServiceTitleP
                         : groupNames.isEmpty
                             ? const _EmptyState()
                             : ListView.builder(
-                                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 8, 16, 24),
                                 itemCount: groupNames.length,
                                 itemBuilder: (context, index) {
                                   final categoryName = groupNames[index];
-                                  final style = styleForServiceName(categoryName, index);
+                                  final style =
+                                      styleForServiceName(categoryName, index);
                                   return _TitleGroupSection(
                                     categoryName: categoryName,
                                     style: style,
@@ -162,9 +176,12 @@ class _ProviderServiceTitlePickerScreenState extends State<ProviderServiceTitleP
             backgroundColor: _brandBlue,
             foregroundColor: Colors.white,
             minimumSize: const Size(double.infinity, 48),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
-          child: Text(_selectedIds.isEmpty ? 'Done (none selected)' : 'Done (${_selectedIds.length} selected)'),
+          child: Text(_selectedIds.isEmpty
+              ? 'Done (none selected)'
+              : 'Done (${_selectedIds.length} selected)'),
         ),
       ),
     );
@@ -188,23 +205,33 @@ class _PickerHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [_brandDark, _brandBlue]),
-        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
-        boxShadow: [BoxShadow(color: Color(0x330A4FA8), blurRadius: 16, offset: Offset(0, 6))],
+        gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [_brandDark, _brandBlue]),
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+              color: Color(0x330A4FA8), blurRadius: 16, offset: Offset(0, 6))
+        ],
       ),
       child: ClipRRect(
-        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
+        borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
         child: Stack(
           children: [
             Positioned(
               top: -30,
               right: -20,
-              child: DecorativeGlowCircle(baseSize: 110, color: _brandAccent.withValues(alpha: 0.14)),
+              child: DecorativeGlowCircle(
+                  baseSize: 110, color: _brandAccent.withValues(alpha: 0.14)),
             ),
             const Positioned(
               bottom: -40,
               left: -16,
-              child: DecorativeGlowCircle(baseSize: 90, color: Color.fromRGBO(255, 255, 255, 0.06)),
+              child: DecorativeGlowCircle(
+                  baseSize: 90, color: Color.fromRGBO(255, 255, 255, 0.06)),
             ),
             SafeArea(
               bottom: false,
@@ -216,13 +243,18 @@ class _PickerHeader extends StatelessWidget {
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          icon:
+                              const Icon(Icons.arrow_back, color: Colors.white),
                           onPressed: () => Navigator.of(context).maybePop(),
                         ),
                         const Expanded(
                           child: Text(
                             'Select Services',
-                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.2),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.2),
                           ),
                         ),
                       ],
@@ -234,7 +266,12 @@ class _PickerHeader extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(14),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 10, offset: const Offset(0, 4))],
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.12),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4))
+                          ],
                         ),
                         child: TextField(
                           controller: controller,
@@ -243,15 +280,18 @@ class _PickerHeader extends StatelessWidget {
                           decoration: InputDecoration(
                             hintText: 'Search services...',
                             hintStyle: TextStyle(color: Colors.grey.shade500),
-                            prefixIcon: const Icon(Icons.search_rounded, color: _brandBlue),
+                            prefixIcon: const Icon(Icons.search_rounded,
+                                color: _brandBlue),
                             suffixIcon: query.isEmpty
                                 ? null
                                 : IconButton(
-                                    icon: Icon(Icons.close_rounded, color: Colors.grey.shade500, size: 20),
+                                    icon: Icon(Icons.close_rounded,
+                                        color: Colors.grey.shade500, size: 20),
                                     onPressed: onClear,
                                   ),
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
@@ -296,7 +336,9 @@ class _TitleGroupSection extends StatelessWidget {
                 Container(
                   width: 32,
                   height: 32,
-                  decoration: BoxDecoration(color: style.color.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(9)),
+                  decoration: BoxDecoration(
+                      color: style.color.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(9)),
                   child: Icon(style.icon, size: 17, color: style.color),
                 ),
                 const SizedBox(width: 10),
@@ -305,7 +347,10 @@ class _TitleGroupSection extends StatelessWidget {
                     categoryName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF14213D)),
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF14213D)),
                   ),
                 ),
               ],
@@ -315,7 +360,12 @@ class _TitleGroupSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))],
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2))
+              ],
             ),
             child: Column(
               children: [
@@ -343,7 +393,11 @@ class _TitleTile extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _TitleTile({required this.title, required this.color, required this.selected, required this.onTap});
+  const _TitleTile(
+      {required this.title,
+      required this.color,
+      required this.selected,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -356,17 +410,25 @@ class _TitleTile extends StatelessWidget {
             Container(
               width: 38,
               height: 38,
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(11)),
+              decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(11)),
               child: Icon(Icons.label_rounded, size: 19, color: color),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title.title,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF14213D)),
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF14213D)),
               ),
             ),
-            if (selected) Icon(Icons.check_circle_rounded, color: color, size: 22) else const Icon(Icons.chevron_right_rounded, color: Colors.black26),
+            if (selected)
+              Icon(Icons.check_circle_rounded, color: color, size: 22)
+            else
+              const Icon(Icons.chevron_right_rounded, color: Colors.black26),
           ],
         ),
       ),
@@ -385,9 +447,12 @@ class _NoCategoriesState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.category_outlined, size: 48, color: Colors.grey.shade400),
+            Icon(Icons.category_outlined,
+                size: 48, color: Colors.grey.shade400),
             const SizedBox(height: 12),
-            Text('Select a category first', style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+            Text('Select a category first',
+                style: TextStyle(
+                    color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
           ],
         ),
       ),
@@ -406,9 +471,12 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off_rounded, size: 48, color: Colors.grey.shade400),
+            Icon(Icons.search_off_rounded,
+                size: 48, color: Colors.grey.shade400),
             const SizedBox(height: 12),
-            Text('No services found', style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+            Text('No services found',
+                style: TextStyle(
+                    color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
           ],
         ),
       ),
@@ -432,9 +500,13 @@ class _ErrorState extends StatelessWidget {
           children: [
             Icon(Icons.wifi_off_rounded, size: 48, color: Colors.red.shade300),
             const SizedBox(height: 12),
-            Text('Couldn\'t load services', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.grey.shade800)),
+            Text('Couldn\'t load services',
+                style: TextStyle(
+                    fontWeight: FontWeight.w700, color: Colors.grey.shade800)),
             const SizedBox(height: 6),
-            Text(message, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+            Text(message,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
             const SizedBox(height: 16),
             ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
           ],

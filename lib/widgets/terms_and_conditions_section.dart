@@ -20,7 +20,8 @@ class TermsAndConditionsSection extends StatefulWidget {
   });
 
   @override
-  State<TermsAndConditionsSection> createState() => _TermsAndConditionsSectionState();
+  State<TermsAndConditionsSection> createState() =>
+      _TermsAndConditionsSectionState();
 }
 
 class _TermsAndConditionsSectionState extends State<TermsAndConditionsSection> {
@@ -43,17 +44,24 @@ class _TermsAndConditionsSectionState extends State<TermsAndConditionsSection> {
               borderRadius: BorderRadius.circular(14),
               onTap: () => setState(() => _expanded = !_expanded),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                 child: Row(
                   children: [
                     const Expanded(
-                      child: Text('Terms & Conditions', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.black87)),
+                      child: Text('Terms & Conditions',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Colors.black87)),
                     ),
                     AnimatedRotation(
                       turns: _expanded ? 0.5 : 0,
-                      duration: reduceMotion ? Duration.zero : kQuickAnimDuration,
+                      duration:
+                          reduceMotion ? Duration.zero : kQuickAnimDuration,
                       curve: kStandardCurve,
-                      child: const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
+                      child: const Icon(Icons.keyboard_arrow_down,
+                          color: Colors.black54),
                     ),
                   ],
                 ),
@@ -72,17 +80,27 @@ class _TermsAndConditionsSectionState extends State<TermsAndConditionsSection> {
                         children: [
                           Text(
                             widget.termsTitle,
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                            style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87),
                           ),
                           const SizedBox(height: 10),
                           Text(
                             widget.termsBody,
-                            style: const TextStyle(fontSize: 13, height: 1.6, color: Colors.black87),
+                            style: const TextStyle(
+                                fontSize: 13,
+                                height: 1.6,
+                                color: Colors.black87),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             widget.termsClosing,
-                            style: const TextStyle(fontSize: 13, height: 1.5, fontWeight: FontWeight.bold, color: Colors.black87),
+                            style: const TextStyle(
+                                fontSize: 13,
+                                height: 1.5,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87),
                           ),
                         ],
                       ),
@@ -90,7 +108,9 @@ class _TermsAndConditionsSectionState extends State<TermsAndConditionsSection> {
                   ),
                 ),
               ),
-              crossFadeState: _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+              crossFadeState: _expanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
               duration: reduceMotion ? Duration.zero : kQuickAnimDuration,
               firstCurve: kStandardCurve,
               secondCurve: kStandardCurve,
@@ -109,7 +129,9 @@ class _TermsAndConditionsSectionState extends State<TermsAndConditionsSection> {
                       onChanged: (v) => widget.onChanged(v ?? false),
                     ),
                     const Expanded(
-                      child: Text('I agree to the Terms and Conditions', style: TextStyle(fontSize: 14, color: Colors.black87)),
+                      child: Text('I agree to the Terms and Conditions',
+                          style:
+                              TextStyle(fontSize: 14, color: Colors.black87)),
                     ),
                   ],
                 ),

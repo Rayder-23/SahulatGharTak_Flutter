@@ -116,8 +116,8 @@ class _PhoneContactTile extends StatelessWidget {
                 color: kPrimaryColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.contact_phone_rounded,
-                  color: kPrimaryColor),
+              child:
+                  const Icon(Icons.contact_phone_rounded, color: kPrimaryColor),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -156,7 +156,8 @@ class _PhoneContactTile extends StatelessWidget {
                   child: const SizedBox(
                     width: 44,
                     height: 44,
-                    child: Icon(Icons.call_rounded, color: Colors.white, size: 20),
+                    child:
+                        Icon(Icons.call_rounded, color: Colors.white, size: 20),
                   ),
                 ),
               ),

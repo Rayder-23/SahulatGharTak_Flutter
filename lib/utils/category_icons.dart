@@ -4,7 +4,8 @@ const Map<String, IconData> _keywordIcons = {
   'electric': Icons.electrical_services,
   'plumb': Icons.plumbing,
   'carpenter': Icons.handyman,
-  'carpainter': Icons.handyman, // common misspelling of "carpenter" in source data
+  'carpainter':
+      Icons.handyman, // common misspelling of "carpenter" in source data
   'paint': Icons.format_paint,
   'sofa': Icons.chair,
   'carpet': Icons.layers,

@@ -9,7 +9,8 @@ import '../utils/date_time_formatter.dart' as date_time_formatter;
 /// `use24HourFormat` flag in sync, since the shared formatters are plain
 /// functions with no provider/context access.
 class TimeFormatProvider extends ChangeNotifier {
-  TimeFormatProvider({TimeFormatService? service}) : _service = service ?? TimeFormatService();
+  TimeFormatProvider({TimeFormatService? service})
+      : _service = service ?? TimeFormatService();
 
   final TimeFormatService _service;
 

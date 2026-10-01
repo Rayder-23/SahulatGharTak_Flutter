@@ -22,7 +22,10 @@ class MainCategoryCard extends StatelessWidget {
 
     return Animate(
       delay: Duration(milliseconds: 60 * index),
-      effects: const [ScaleEffect(duration: Duration(milliseconds: 300)), FadeEffect()],
+      effects: const [
+        ScaleEffect(duration: Duration(milliseconds: 300)),
+        FadeEffect()
+      ],
       child: AspectRatio(
         aspectRatio: 1,
         child: OpenContainer(
@@ -30,7 +33,8 @@ class MainCategoryCard extends StatelessWidget {
           openElevation: 0,
           closedColor: const Color(0xFFF4F7FB),
           openColor: style.color,
-          closedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          closedShape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           transitionDuration: const Duration(milliseconds: 380),
           closedBuilder: (context, openContainer) {
             return Material(
@@ -42,8 +46,14 @@ class MainCategoryCard extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: style.color.withValues(alpha: 0.4)),
-                    boxShadow: [BoxShadow(color: style.color.withValues(alpha: 0.18), blurRadius: 12, offset: const Offset(0, 6))],
+                    border:
+                        Border.all(color: style.color.withValues(alpha: 0.4)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: style.color.withValues(alpha: 0.18),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6))
+                    ],
                   ),
                   padding: const EdgeInsets.all(8),
                   child: Column(
@@ -56,7 +66,8 @@ class MainCategoryCard extends StatelessWidget {
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 16),
                       ),
                     ],
                   ),
@@ -65,7 +76,8 @@ class MainCategoryCard extends StatelessWidget {
             );
           },
           openBuilder: (context, closeContainer) {
-            return SubCategoriesScreen(service: service, onClose: closeContainer);
+            return SubCategoriesScreen(
+                service: service, onClose: closeContainer);
           },
         ),
       ),

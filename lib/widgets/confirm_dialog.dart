@@ -26,7 +26,12 @@ Future<bool?> showConfirmDialog(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.22), blurRadius: 28, offset: const Offset(0, 12))],
+            boxShadow: [
+              BoxShadow(
+                  color: _brandDark.withValues(alpha: 0.22),
+                  blurRadius: 28,
+                  offset: const Offset(0, 12))
+            ],
           ),
           padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
           child: Column(
@@ -36,20 +41,30 @@ Future<bool?> showConfirmDialog(
                 width: 56,
                 height: 56,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.12),
+                    shape: BoxShape.circle),
                 child: Icon(icon, color: color, size: 28),
               ),
               const SizedBox(height: 16),
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF1A2233), letterSpacing: -0.2),
+                style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1A2233),
+                    letterSpacing: -0.2),
               ),
               const SizedBox(height: 8),
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13.5, color: Colors.grey[600], height: 1.4, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    fontSize: 13.5,
+                    color: Colors.grey[600],
+                    height: 1.4,
+                    fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 22),
               Row(
@@ -58,9 +73,11 @@ Future<bool?> showConfirmDialog(
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.grey.shade700,
-                        side: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                        side:
+                            BorderSide(color: Colors.grey.shade300, width: 1.5),
                         padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () => Navigator.of(dialogContext).pop(false),
                       child: Text(cancelLabel),
@@ -74,10 +91,12 @@ Future<bool?> showConfirmDialog(
                         foregroundColor: Colors.white,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () => Navigator.of(dialogContext).pop(true),
-                      child: Text(confirmLabel, style: const TextStyle(fontWeight: FontWeight.w700)),
+                      child: Text(confirmLabel,
+                          style: const TextStyle(fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],

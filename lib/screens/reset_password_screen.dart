@@ -73,13 +73,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final authProvider = context.read<AuthProvider>();
     setState(() => _resending = true);
 
-    final success = await authProvider.resendOtp(args.mobileNo, otpType: 'PasswordReset');
+    final success =
+        await authProvider.resendOtp(args.mobileNo, otpType: 'PasswordReset');
     if (!mounted) return;
     setState(() => _resending = false);
 
     if (success) {
       _startCooldown();
-      showAppToast(context, 'OTP resent to ${args.mobileNo}', type: AppToastType.success);
+      showAppToast(context, 'OTP resent to ${args.mobileNo}',
+          type: AppToastType.success);
     } else {
       await showMessageDialog(
         context,
@@ -93,7 +95,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_otp.length != 6) {
-      showAppToast(context, 'Enter the complete 6-digit code', type: AppToastType.error);
+      showAppToast(context, 'Enter the complete 6-digit code',
+          type: AppToastType.error);
       return;
     }
 
@@ -119,7 +122,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         type: MessageDialogType.success,
       );
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(LoginScreen.routeName, (route) => false);
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(LoginScreen.routeName, (route) => false);
     } else {
       await showMessageDialog(
         context,
@@ -138,7 +142,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     return AuthCardScaffold(
       title: 'Reset Password',
-      subtitle: 'Enter the code sent to ${args.mobileNo} and choose a new password',
+      subtitle:
+          'Enter the code sent to ${args.mobileNo} and choose a new password',
       avatarIcon: Icons.lock_reset,
       child: Form(
         key: _formKey,
@@ -148,23 +153,30 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             if (devOtp != null && devOtp.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(bottom: 24),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: kAccentColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: kAccentColor.withValues(alpha: 0.3)),
+                  border:
+                      Border.all(color: kAccentColor.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: kAccentColor, size: 20),
+                    const Icon(Icons.info_outline,
+                        color: kAccentColor, size: 20),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text.rich(
                         TextSpan(
-                          style: const TextStyle(fontSize: 13, color: Colors.black87),
+                          style: const TextStyle(
+                              fontSize: 13, color: Colors.black87),
                           children: [
                             const TextSpan(text: 'Development mode — OTP: '),
-                            TextSpan(text: devOtp, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text: devOtp,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
@@ -172,20 +184,29 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   ],
                 ),
               ),
-            OtpInputField(onChanged: (value) => _otp = value, prefillCode: devOtp),
+            OtpInputField(
+                onChanged: (value) => _otp = value, prefillCode: devOtp),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Didn't receive the code? ", style: TextStyle(color: Colors.black54)),
+                const Text("Didn't receive the code? ",
+                    style: TextStyle(color: Colors.black54)),
                 _resending
-                    ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    ? const SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2))
                     : GestureDetector(
                         onTap: _resendCooldown > 0 ? null : _resendOtp,
                         child: Text(
-                          _resendCooldown > 0 ? 'Resend in ${_resendCooldown}s' : 'Resend',
+                          _resendCooldown > 0
+                              ? 'Resend in ${_resendCooldown}s'
+                              : 'Resend',
                           style: TextStyle(
-                            color: _resendCooldown > 0 ? Colors.black38 : kPrimaryColor,
+                            color: _resendCooldown > 0
+                                ? Colors.black38
+                                : kPrimaryColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -200,11 +221,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               decoration: authFieldDecoration(
                 hint: 'Enter your new password',
                 suffixIcon: IconButton(
-                  icon: Icon(_obscureNewPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: Colors.black45),
-                  onPressed: () => setState(() => _obscureNewPassword = !_obscureNewPassword),
+                  icon: Icon(
+                      _obscureNewPassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: Colors.black45),
+                  onPressed: () => setState(
+                      () => _obscureNewPassword = !_obscureNewPassword),
                 ),
               ),
-              validator: (v) => (v == null || v.length < 6) ? 'Minimum 6 characters' : null,
+              validator: (v) =>
+                  (v == null || v.length < 6) ? 'Minimum 6 characters' : null,
             ),
             const SizedBox(height: 20),
             authFieldLabel('Confirm New Password'),
@@ -214,14 +241,24 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               decoration: authFieldDecoration(
                 hint: 'Re-enter your new password',
                 suffixIcon: IconButton(
-                  icon: Icon(_obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: Colors.black45),
-                  onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                  icon: Icon(
+                      _obscureConfirmPassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: Colors.black45),
+                  onPressed: () => setState(
+                      () => _obscureConfirmPassword = !_obscureConfirmPassword),
                 ),
               ),
-              validator: (v) => (v != _newPasswordController.text) ? 'Passwords do not match' : null,
+              validator: (v) => (v != _newPasswordController.text)
+                  ? 'Passwords do not match'
+                  : null,
             ),
             const SizedBox(height: 28),
-            AuthPrimaryButton(label: 'Reset Password', isLoading: _resetting, onPressed: _submit),
+            AuthPrimaryButton(
+                label: 'Reset Password',
+                isLoading: _resetting,
+                onPressed: _submit),
           ],
         ),
       ),

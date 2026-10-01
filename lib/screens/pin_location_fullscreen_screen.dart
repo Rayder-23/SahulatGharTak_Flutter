@@ -26,10 +26,12 @@ class PinLocationFullscreenScreen extends StatefulWidget {
   });
 
   @override
-  State<PinLocationFullscreenScreen> createState() => _PinLocationFullscreenScreenState();
+  State<PinLocationFullscreenScreen> createState() =>
+      _PinLocationFullscreenScreenState();
 }
 
-class _PinLocationFullscreenScreenState extends State<PinLocationFullscreenScreen> {
+class _PinLocationFullscreenScreenState
+    extends State<PinLocationFullscreenScreen> {
   final _geocodingApiService = GeocodingApiService();
   final _searchController = TextEditingController();
   GoogleMapController? _mapController;
@@ -61,7 +63,8 @@ class _PinLocationFullscreenScreenState extends State<PinLocationFullscreenScree
       });
       return;
     }
-    _debounce = Timer(const Duration(milliseconds: 500), () => _runSearch(query.trim()));
+    _debounce = Timer(
+        const Duration(milliseconds: 500), () => _runSearch(query.trim()));
   }
 
   Future<void> _runSearch(String query) async {
@@ -130,7 +133,8 @@ class _PinLocationFullscreenScreenState extends State<PinLocationFullscreenScree
                               child: SizedBox(
                                 height: 16,
                                 width: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               ),
                             )
                           : (_searchController.text.isNotEmpty
@@ -147,7 +151,9 @@ class _PinLocationFullscreenScreenState extends State<PinLocationFullscreenScree
                               : null),
                       filled: true,
                       fillColor: Colors.white,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none),
                       contentPadding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),
@@ -159,7 +165,11 @@ class _PinLocationFullscreenScreenState extends State<PinLocationFullscreenScree
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 8)],
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.15),
+                            blurRadius: 8)
+                      ],
                     ),
                     child: ListView.separated(
                       shrinkWrap: true,
@@ -171,7 +181,8 @@ class _PinLocationFullscreenScreenState extends State<PinLocationFullscreenScree
                         return ListTile(
                           dense: true,
                           leading: const Icon(Icons.place_outlined, size: 20),
-                          title: Text(result.displayName, maxLines: 2, overflow: TextOverflow.ellipsis),
+                          title: Text(result.displayName,
+                              maxLines: 2, overflow: TextOverflow.ellipsis),
                           onTap: () => _selectResult(result),
                         );
                       },
@@ -180,9 +191,14 @@ class _PinLocationFullscreenScreenState extends State<PinLocationFullscreenScree
                 if (_searchError != null)
                   Container(
                     margin: const EdgeInsets.only(top: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                    child: Text(_searchError!, style: const TextStyle(color: Colors.red, fontSize: 12.5)),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Text(_searchError!,
+                        style:
+                            const TextStyle(color: Colors.red, fontSize: 12.5)),
                   ),
               ],
             ),
@@ -195,7 +211,8 @@ class _PinLocationFullscreenScreenState extends State<PinLocationFullscreenScree
               child: Card(
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-                  child: Text('Tap the map to drop a pin', textAlign: TextAlign.center),
+                  child: Text('Tap the map to drop a pin',
+                      textAlign: TextAlign.center),
                 ),
               ),
             ),
@@ -208,9 +225,11 @@ class _PinLocationFullscreenScreenState extends State<PinLocationFullscreenScree
                 backgroundColor: kPrimaryColor,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
-              onPressed: _pin == null ? null : () => Navigator.of(context).pop(_pin),
+              onPressed:
+                  _pin == null ? null : () => Navigator.of(context).pop(_pin),
               icon: const Icon(Icons.check_rounded),
               label: const Text('Confirm Location'),
             ),

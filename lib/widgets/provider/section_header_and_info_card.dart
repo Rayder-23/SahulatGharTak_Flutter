@@ -17,9 +17,19 @@ class SectionHeader extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 4, height: 16, decoration: BoxDecoration(color: providerBrandBlue, borderRadius: BorderRadius.circular(2))),
+            Container(
+                width: 4,
+                height: 16,
+                decoration: BoxDecoration(
+                    color: providerBrandBlue,
+                    borderRadius: BorderRadius.circular(2))),
             const SizedBox(width: 8),
-            Text(title, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800, color: Color(0xFF14213D), letterSpacing: -0.1)),
+            Text(title,
+                style: const TextStyle(
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF14213D),
+                    letterSpacing: -0.1)),
           ],
         ),
       ),
@@ -39,7 +49,12 @@ class InfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [BoxShadow(color: providerBrandDark.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+        boxShadow: [
+          BoxShadow(
+              color: providerBrandDark.withValues(alpha: 0.06),
+              blurRadius: 18,
+              offset: const Offset(0, 6))
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(children: children),

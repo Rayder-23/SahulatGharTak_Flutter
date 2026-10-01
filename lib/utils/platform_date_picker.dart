@@ -13,7 +13,11 @@ Future<DateTime?> showPlatformDatePicker(
   required DateTime lastDate,
 }) {
   if (!Platform.isIOS) {
-    return showDatePicker(context: context, initialDate: initialDate, firstDate: firstDate, lastDate: lastDate);
+    return showDatePicker(
+        context: context,
+        initialDate: initialDate,
+        firstDate: firstDate,
+        lastDate: lastDate);
   }
   return _showCupertinoPickerSheet<DateTime>(
     context,
@@ -39,7 +43,8 @@ Future<TimeOfDay?> showPlatformTimePicker(
     return showTimePicker(context: context, initialTime: initialTime);
   }
   final now = DateTime.now();
-  final initialDateTime = DateTime(now.year, now.month, now.day, initialTime.hour, initialTime.minute);
+  final initialDateTime = DateTime(
+      now.year, now.month, now.day, initialTime.hour, initialTime.minute);
   final picked = await _showCupertinoPickerSheet<DateTime>(
     context,
     initial: initialDateTime,
@@ -57,7 +62,8 @@ Future<TimeOfDay?> showPlatformTimePicker(
 Future<T?> _showCupertinoPickerSheet<T>(
   BuildContext context, {
   required T initial,
-  required Widget Function(BuildContext context, ValueNotifier<T> selected) builder,
+  required Widget Function(BuildContext context, ValueNotifier<T> selected)
+      builder,
 }) {
   final selected = ValueNotifier<T>(initial);
   return showCupertinoModalPopup<T>(
@@ -77,7 +83,8 @@ Future<T?> _showCupertinoPickerSheet<T>(
                   CupertinoButton(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     onPressed: () => Navigator.of(context).pop(selected.value),
-                    child: const Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
+                    child: const Text('Done',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),

@@ -12,22 +12,28 @@ class ProviderDocumentApiService {
   /// Fetches the provider's currently uploaded documents, if any.
   /// Returns null when the provider hasn't uploaded documents yet (404).
   Future<ProviderDocumentsModel?> fetchDocuments(int providerUid) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/provider/$providerUid/documents')).timeout(kApiTimeout);
+    final response = await http
+        .get(Uri.parse('$kApiBaseUrl/provider/$providerUid/documents'))
+        .timeout(kApiTimeout);
 
     Map<String, dynamic> json;
     try {
       json = jsonDecode(response.body) as Map<String, dynamic>;
     } catch (_) {
-      throw Exception('Server error (status ${response.statusCode}). Please try again later.');
+      throw Exception(
+          'Server error (status ${response.statusCode}). Please try again later.');
     }
 
-    final success = json['success'] as bool? ?? (response.statusCode >= 200 && response.statusCode < 300);
+    final success = json['success'] as bool? ??
+        (response.statusCode >= 200 && response.statusCode < 300);
     if (!success) {
       if (response.statusCode == 404) return null;
-      throw Exception(json['message'] as String? ?? 'Failed to load documents (status ${response.statusCode}).');
+      throw Exception(json['message'] as String? ??
+          'Failed to load documents (status ${response.statusCode}).');
     }
 
-    return ProviderDocumentsModel.fromJson(json['data'] as Map<String, dynamic>);
+    return ProviderDocumentsModel.fromJson(
+        json['data'] as Map<String, dynamic>);
   }
 
   /// Uploads the provider's profile photo and CNIC images as multipart/form-data.
@@ -48,11 +54,17 @@ class ProviderDocumentApiService {
     void Function(double progress)? onProgress,
   }) async {
     final uri = Uri.parse('$kApiBaseUrl/provider/upload-documents');
-    final request = http.MultipartRequest('POST', uri)..fields['ProviderUID'] = providerUid.toString();
-    if (profilePhoto != null) request.files.add(await _imagePart('ProfilePhoto', profilePhoto));
-    if (cnicFront != null) request.files.add(await _imagePart('CNICFront', cnicFront));
-    if (cnicBack != null) request.files.add(await _imagePart('CNICBack', cnicBack));
-    if (policeVerification != null) request.files.add(await _imagePart('PoliceVerification', policeVerification));
+    final request = http.MultipartRequest('POST', uri)
+      ..fields['ProviderUID'] = providerUid.toString();
+    if (profilePhoto != null)
+      request.files.add(await _imagePart('ProfilePhoto', profilePhoto));
+    if (cnicFront != null)
+      request.files.add(await _imagePart('CNICFront', cnicFront));
+    if (cnicBack != null)
+      request.files.add(await _imagePart('CNICBack', cnicBack));
+    if (policeVerification != null)
+      request.files
+          .add(await _imagePart('PoliceVerification', policeVerification));
 
     final streamedResponse = await _sendWithProgress(request, onProgress);
     final response = await http.Response.fromStream(streamedResponse);
@@ -61,21 +73,26 @@ class ProviderDocumentApiService {
     try {
       json = jsonDecode(response.body) as Map<String, dynamic>;
     } catch (_) {
-      throw Exception('Server error (status ${response.statusCode}). Please try again later.');
+      throw Exception(
+          'Server error (status ${response.statusCode}). Please try again later.');
     }
 
-    final success = json['success'] as bool? ?? (response.statusCode >= 200 && response.statusCode < 300);
+    final success = json['success'] as bool? ??
+        (response.statusCode >= 200 && response.statusCode < 300);
     if (!success) {
-      throw Exception(json['message'] as String? ?? 'Failed to upload documents (status ${response.statusCode}).');
+      throw Exception(json['message'] as String? ??
+          'Failed to upload documents (status ${response.statusCode}).');
     }
 
-    return ProviderDocumentsModel.fromJson(json['data'] as Map<String, dynamic>);
+    return ProviderDocumentsModel.fromJson(
+        json['data'] as Map<String, dynamic>);
   }
 
   Future<http.MultipartFile> _imagePart(String field, File file) async {
     final ext = file.path.split('.').last.toLowerCase();
     final subtype = ext == 'png' ? 'png' : 'jpeg';
-    return http.MultipartFile.fromPath(field, file.path, contentType: MediaType('image', subtype));
+    return http.MultipartFile.fromPath(field, file.path,
+        contentType: MediaType('image', subtype));
   }
 
   /// Wraps [http.MultipartRequest.send] to report upload progress, since the

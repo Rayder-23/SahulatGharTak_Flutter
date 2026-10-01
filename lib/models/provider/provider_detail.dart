@@ -58,7 +58,9 @@ class ProviderDetailModel {
       availableTiming: json['availableTiming'] as String?,
       categoryId: json['categoryId'] as int? ?? 0,
       categoryName: json['categoryName'] as String? ?? '',
-      createdOn: json['createdOn'] != null ? DateTime.parse(json['createdOn'] as String) : DateTime.now(),
+      createdOn: json['createdOn'] != null
+          ? DateTime.parse(json['createdOn'] as String)
+          : DateTime.now(),
     );
   }
 

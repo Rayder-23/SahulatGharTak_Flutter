@@ -21,7 +21,8 @@ class CustomerServiceRequestRepository {
   })  : _apiService = apiService ?? CustomerServiceRequestApiService(),
         _passcodeStore = passcodeStore ?? RequestPasscodeStore(),
         _deletedStore = deletedStore ?? DeletedRequestsStore(),
-        _progressHistoryStore = progressHistoryStore ?? RequestProgressHistoryStore();
+        _progressHistoryStore =
+            progressHistoryStore ?? RequestProgressHistoryStore();
 
   final CustomerServiceRequestApiService _apiService;
   final RequestPasscodeStore _passcodeStore;
@@ -64,7 +65,8 @@ class CustomerServiceRequestRepository {
   /// Falls back to the on-device copy saved the last time this request's
   /// passcode was received from the API — keeps "Show Passcode" working
   /// even if the request is later refetched without a live connection.
-  Future<String?> getStoredPasscode(int requestUid) => _passcodeStore.load(requestUid);
+  Future<String?> getStoredPasscode(int requestUid) =>
+      _passcodeStore.load(requestUid);
 
   Future<CustomerServiceRequest> create({
     required int clientUid,
@@ -109,7 +111,8 @@ class CustomerServiceRequestRepository {
     return bounced ? request.copyWithBouncedBack(true) : request;
   }
 
-  Future<CustomerServiceRequest> cancel(CustomerServiceRequest request, {required String reason}) {
+  Future<CustomerServiceRequest> cancel(CustomerServiceRequest request,
+      {required String reason}) {
     return _apiService.updateStatus(
       requestUid: request.uid,
       categoryUid: request.categoryUid,
@@ -129,5 +132,6 @@ class CustomerServiceRequestRepository {
 
   /// Hides [requestUid] from [clientUid]'s list on-device. Never touches the
   /// backend — the request stays in the database.
-  Future<void> hide(int clientUid, int requestUid) => _deletedStore.hide(clientUid, requestUid);
+  Future<void> hide(int clientUid, int requestUid) =>
+      _deletedStore.hide(clientUid, requestUid);
 }

@@ -32,7 +32,8 @@ class ProviderProfileModel {
     );
   }
 
-  ProviderProfileModel copyWith({String? fullName, String? cnic, int? experienceYears}) {
+  ProviderProfileModel copyWith(
+      {String? fullName, String? cnic, int? experienceYears}) {
     return ProviderProfileModel(
       uid: uid,
       userUid: userUid,

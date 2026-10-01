@@ -37,7 +37,8 @@ class _RequestsTabState extends State<RequestsTab> {
   }
 
   void _viewDetails(BuildContext context, ServiceBooking booking) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => BookingDetailScreen(booking: booking)));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => BookingDetailScreen(booking: booking)));
   }
 
   Future<void> _accept(BuildContext context, ServiceBooking booking) async {
@@ -59,7 +60,8 @@ class _RequestsTabState extends State<RequestsTab> {
     final reason = await showReasonDialog(
       context,
       title: 'Reject Booking',
-      message: 'Are you sure you want to reject this booking for "${booking.requestTitle}"? This cannot be undone.',
+      message:
+          'Are you sure you want to reject this booking for "${booking.requestTitle}"? This cannot be undone.',
       confirmLabel: 'Yes, Reject',
       reasons: kProviderCancelReasons,
       icon: Icons.cancel_outlined,
@@ -72,7 +74,9 @@ class _RequestsTabState extends State<RequestsTab> {
     if (!context.mounted) return;
     showAppToast(
       context,
-      success ? 'Booking rejected' : (provider.error ?? 'Failed to reject booking'),
+      success
+          ? 'Booking rejected'
+          : (provider.error ?? 'Failed to reject booking'),
       type: success ? AppToastType.success : AppToastType.error,
     );
   }
@@ -80,14 +84,17 @@ class _RequestsTabState extends State<RequestsTab> {
   @override
   Widget build(BuildContext context) {
     final bookingsProvider = context.watch<ProviderBookingsProvider>();
-    final requests = bookingsProvider.bookings.where((b) => b.status == 'Pending').toList();
+    final requests =
+        bookingsProvider.bookings.where((b) => b.status == 'Pending').toList();
     final unviewedRejectedCount = bookingsProvider.unviewedRejectedCount;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: ProviderTabHeader(
         title: 'Incoming Requests',
-        subtitle: requests.isEmpty ? 'No requests right now' : '${requests.length} request${requests.length == 1 ? '' : 's'} waiting',
+        subtitle: requests.isEmpty
+            ? 'No requests right now'
+            : '${requests.length} request${requests.length == 1 ? '' : 's'} waiting',
         trailing: IconButton(
           icon: Badge(
             isLabelVisible: unviewedRejectedCount > 0,
@@ -95,7 +102,8 @@ class _RequestsTabState extends State<RequestsTab> {
             child: const Icon(Icons.history_rounded, color: Colors.white),
           ),
           tooltip: 'Rejected Requests',
-          onPressed: () => Navigator.of(context).pushNamed(RejectedRequestsScreen.routeName),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(RejectedRequestsScreen.routeName),
         ),
       ),
       body: bookingsProvider.loading && requests.isEmpty
@@ -118,7 +126,8 @@ class _RequestsTabState extends State<RequestsTab> {
                         icon: Icons.inbox_rounded,
                         color: kPrimaryColor,
                         title: 'No requests yet',
-                        message: 'New job assignments from staff will show up here as soon as they come in.',
+                        message:
+                            'New job assignments from staff will show up here as soon as they come in.',
                       ),
                     )
                   : RefreshIndicator(
@@ -130,7 +139,8 @@ class _RequestsTabState extends State<RequestsTab> {
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
                           final booking = requests[index];
-                          final updating = bookingsProvider.updatingUid == booking.uid;
+                          final updating =
+                              bookingsProvider.updatingUid == booking.uid;
                           return _IncomingRequestCard(
                             booking: booking,
                             updating: updating,
@@ -170,7 +180,12 @@ class _IncomingRequestCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [BoxShadow(color: const Color(0xFF0A4FA8).withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+        boxShadow: [
+          BoxShadow(
+              color: const Color(0xFF0A4FA8).withValues(alpha: 0.06),
+              blurRadius: 18,
+              offset: const Offset(0, 6))
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: IntrinsicHeight(
@@ -194,14 +209,22 @@ class _IncomingRequestCard extends StatelessWidget {
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
-                              colors: [kPrimaryColor, kPrimaryColor.withValues(alpha: 0.7)],
+                              colors: [
+                                kPrimaryColor,
+                                kPrimaryColor.withValues(alpha: 0.7)
+                              ],
                             ),
                             borderRadius: BorderRadius.circular(13),
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            booking.clientName.isNotEmpty ? booking.clientName[0].toUpperCase() : '?',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17),
+                            booking.clientName.isNotEmpty
+                                ? booking.clientName[0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 17),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -209,22 +232,38 @@ class _IncomingRequestCard extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(booking.clientName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF1A2233))),
+                              Text(booking.clientName,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 15,
+                                      color: Color(0xFF1A2233))),
                               const SizedBox(height: 2),
-                              Text(booking.requestTitle, style: TextStyle(color: Colors.grey[500], fontSize: 12.5, fontWeight: FontWeight.w600)),
+                              Text(booking.requestTitle,
+                                  style: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600)),
                             ],
                           ),
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(20)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                              color: statusColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(20)),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.hourglass_top_rounded, size: 13, color: statusColor),
+                              Icon(Icons.hourglass_top_rounded,
+                                  size: 13, color: statusColor),
                               SizedBox(width: 4),
-                              Text('Pending', style: TextStyle(color: statusColor, fontWeight: FontWeight.w700, fontSize: 11.5)),
+                              Text('Pending',
+                                  style: TextStyle(
+                                      color: statusColor,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 11.5)),
                             ],
                           ),
                         ),
@@ -236,45 +275,68 @@ class _IncomingRequestCard extends StatelessWidget {
                         booking.serviceDetail,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey[700], fontSize: 13, height: 1.35),
+                        style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 13,
+                            height: 1.35),
                       ),
                     ],
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: const Color(0xFFF6F8FC), borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(
+                          color: const Color(0xFFF6F8FC),
+                          borderRadius: BorderRadius.circular(12)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.location_on_rounded, size: 16, color: kPrimaryColor),
+                              const Icon(Icons.location_on_rounded,
+                                  size: 16, color: kPrimaryColor),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
-                                  [booking.clientFullAddress, booking.clientArea, booking.clientCity]
+                                  [
+                                    booking.clientFullAddress,
+                                    booking.clientArea,
+                                    booking.clientCity
+                                  ]
                                       .whereType<String>()
                                       .where((s) => s.trim().isNotEmpty)
                                       .join(', '),
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0xFF3A4658), fontSize: 13, fontWeight: FontWeight.w500, height: 1.3),
+                                  style: const TextStyle(
+                                      color: Color(0xFF3A4658),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.3),
                                 ),
                               ),
                             ],
                           ),
-                          if (formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime) != null) ...[
+                          if (formatScheduledDateTime(
+                                  booking.preferredServiceDate,
+                                  booking.preferredServiceTime) !=
+                              null) ...[
                             const SizedBox(height: 6),
                             Row(
                               children: [
-                                const Icon(Icons.event_rounded, size: 16, color: kPrimaryColor),
+                                const Icon(Icons.event_rounded,
+                                    size: 16, color: kPrimaryColor),
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
-                                    formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime)!,
+                                    formatScheduledDateTime(
+                                        booking.preferredServiceDate,
+                                        booking.preferredServiceTime)!,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(color: Color(0xFF3A4658), fontSize: 13, fontWeight: FontWeight.w500),
+                                    style: const TextStyle(
+                                        color: Color(0xFF3A4658),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500),
                                   ),
                                 ),
                               ],
@@ -283,13 +345,17 @@ class _IncomingRequestCard extends StatelessWidget {
                           const SizedBox(height: 6),
                           Row(
                             children: [
-                              const Icon(Icons.payments_rounded, size: 16, color: kPrimaryColor),
+                              const Icon(Icons.payments_rounded,
+                                  size: 16, color: kPrimaryColor),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   'Est. ${formatCurrency(booking.estimatedAmount)}',
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0xFF3A4658), fontSize: 13, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      color: Color(0xFF3A4658),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500),
                                 ),
                               ),
                             ],
@@ -300,11 +366,15 @@ class _IncomingRequestCard extends StatelessWidget {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Icon(Icons.schedule_rounded, size: 13, color: Colors.grey[400]),
+                        Icon(Icons.schedule_rounded,
+                            size: 13, color: Colors.grey[400]),
                         const SizedBox(width: 4),
                         Text(
                           'Requested ${formatLocalDateTime(booking.createdOn, kCompactDatePattern, includeTime: true)}',
-                          style: TextStyle(color: Colors.grey[400], fontSize: 11.5, fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                              color: Colors.grey[400],
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
@@ -315,12 +385,15 @@ class _IncomingRequestCard extends StatelessWidget {
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               foregroundColor: kPrimaryColor,
-                              side: BorderSide(color: kPrimaryColor.withValues(alpha: 0.4)),
+                              side: BorderSide(
+                                  color: kPrimaryColor.withValues(alpha: 0.4)),
                               padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
                             ),
                             onPressed: updating ? null : onViewDetails,
-                            child: const Text('Details', style: TextStyle(fontWeight: FontWeight.w700)),
+                            child: const Text('Details',
+                                style: TextStyle(fontWeight: FontWeight.w700)),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -331,12 +404,19 @@ class _IncomingRequestCard extends StatelessWidget {
                               foregroundColor: Colors.white,
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
                             ),
                             onPressed: updating ? null : onAccept,
                             child: updating
-                                ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                                : const Text('Accept', style: TextStyle(fontWeight: FontWeight.w700)),
+                                ? const SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white))
+                                : const Text('Accept',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w700)),
                           ),
                         ),
                         const SizedBox(width: 4),
@@ -344,7 +424,8 @@ class _IncomingRequestCard extends StatelessWidget {
                           color: Colors.red.withValues(alpha: 0.08),
                           shape: const CircleBorder(),
                           child: IconButton(
-                            icon: const Icon(Icons.close_rounded, color: Colors.red, size: 20),
+                            icon: const Icon(Icons.close_rounded,
+                                color: Colors.red, size: 20),
                             tooltip: 'Reject',
                             onPressed: updating ? null : onReject,
                           ),

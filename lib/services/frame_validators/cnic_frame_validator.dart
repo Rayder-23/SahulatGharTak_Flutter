@@ -3,7 +3,11 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 
 /// Result of checking a single live-camera frame against the CNIC criteria.
 class FrameValidationResult {
-  const FrameValidationResult({required this.isValid, this.matchedPattern = false, this.matchedKeyword = false, this.matchedBarcode = false});
+  const FrameValidationResult(
+      {required this.isValid,
+      this.matchedPattern = false,
+      this.matchedKeyword = false,
+      this.matchedBarcode = false});
 
   final bool isValid;
   final bool matchedPattern;
@@ -46,7 +50,8 @@ class CnicFrameValidator {
     'pakistan',
   ];
 
-  Future<FrameValidationResult> validate(InputImage image, {required bool isBack}) async {
+  Future<FrameValidationResult> validate(InputImage image,
+      {required bool isBack}) async {
     if (isBack) return _validateBack(image);
     return _validateFront(image);
   }
@@ -72,7 +77,8 @@ class CnicFrameValidator {
 
     final recognized = await _textRecognizer.processImage(image);
     final matchedPattern = _cnicPattern.hasMatch(recognized.text);
-    return FrameValidationResult(isValid: matchedPattern, matchedPattern: matchedPattern);
+    return FrameValidationResult(
+        isValid: matchedPattern, matchedPattern: matchedPattern);
   }
 
   Future<void> close() async {

@@ -23,12 +23,19 @@ class AddressPinMapView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
-      initialCameraPosition: CameraPosition(target: pin ?? initialCenter, zoom: 15),
+      initialCameraPosition:
+          CameraPosition(target: pin ?? initialCenter, zoom: 15),
       onMapCreated: onMapCreated,
       onTap: onPinChanged,
       markers: pin == null
           ? const {}
-          : {Marker(markerId: const MarkerId('pin'), position: pin!, draggable: true, onDragEnd: onPinChanged)},
+          : {
+              Marker(
+                  markerId: const MarkerId('pin'),
+                  position: pin!,
+                  draggable: true,
+                  onDragEnd: onPinChanged)
+            },
       myLocationEnabled: myLocationEnabled,
       myLocationButtonEnabled: myLocationEnabled,
       zoomControlsEnabled: false,

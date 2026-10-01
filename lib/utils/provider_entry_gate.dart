@@ -28,5 +28,7 @@ Future<String> resolveProviderEntryRoute(BuildContext context) async {
   final documents = context.read<ProviderDocumentProvider>();
   await documents.loadDocuments(providerUid);
 
-  return documents.isVerified ? ProviderDashboardScreen.routeName : VerificationPendingScreen.routeName;
+  return documents.isVerified
+      ? ProviderDashboardScreen.routeName
+      : VerificationPendingScreen.routeName;
 }

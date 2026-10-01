@@ -10,7 +10,8 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final duration = prefersReducedMotion(context) ? Duration.zero : kQuickAnimDuration;
+    final duration =
+        prefersReducedMotion(context) ? Duration.zero : kQuickAnimDuration;
     return AnimatedSize(
       duration: duration,
       curve: kStandardCurve,
@@ -22,9 +23,14 @@ class StatusChip extends StatelessWidget {
         child: Container(
           key: ValueKey<String>(label),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12)),
           child: Text(label,
-              maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 12)),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  color: color, fontWeight: FontWeight.w600, fontSize: 12)),
         ),
       ),
     );

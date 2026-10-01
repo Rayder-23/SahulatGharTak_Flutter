@@ -88,7 +88,8 @@ class ServiceBooking {
 
   /// True when the client dropped a pin for this address, so the map icon
   /// can be shown. Both fields are always null-together (see api.txt).
-  bool get hasClientLocation => clientLatitude != null && clientLongitude != null;
+  bool get hasClientLocation =>
+      clientLatitude != null && clientLongitude != null;
 
   /// True for the "Rejected" status. The backend never returns rejected
   /// bookings from GET /service-bookings (staff-only), so these only exist
@@ -168,9 +169,15 @@ class ServiceBooking {
       rejectReason: json['rejectReason'] as String?,
       cancelReason: json['cancelReason'] as String?,
       passcode: json['passcode'] as String?,
-      acceptedOn: json['acceptedOn'] != null ? DateTime.parse(json['acceptedOn'] as String) : null,
-      completedOn: json['completedOn'] != null ? DateTime.parse(json['completedOn'] as String) : null,
-      createdOn: json['createdOn'] != null ? DateTime.parse(json['createdOn'] as String) : DateTime.now(),
+      acceptedOn: json['acceptedOn'] != null
+          ? DateTime.parse(json['acceptedOn'] as String)
+          : null,
+      completedOn: json['completedOn'] != null
+          ? DateTime.parse(json['completedOn'] as String)
+          : null,
+      createdOn: json['createdOn'] != null
+          ? DateTime.parse(json['createdOn'] as String)
+          : DateTime.now(),
       providerMobileNo: json['providerMobileNo'] as String?,
       providerProfilePhotoPath: json['providerProfilePhotoPath'] as String?,
       providerCnic: json['providerCnic'] as String?,

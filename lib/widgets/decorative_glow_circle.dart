@@ -7,7 +7,8 @@ class DecorativeGlowCircle extends StatelessWidget {
   final double baseSize;
   final Color color;
 
-  const DecorativeGlowCircle({super.key, required this.baseSize, required this.color});
+  const DecorativeGlowCircle(
+      {super.key, required this.baseSize, required this.color});
 
   @override
   Widget build(BuildContext context) {

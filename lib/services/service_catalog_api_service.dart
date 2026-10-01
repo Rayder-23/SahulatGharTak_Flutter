@@ -7,13 +7,17 @@ import '../utils/constants.dart';
 
 class ServiceCatalogApiService {
   Future<List<ServiceCatalog>> fetchServices() async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/services')).timeout(kApiTimeout);
+    final response =
+        await http.get(Uri.parse('$kApiBaseUrl/services')).timeout(kApiTimeout);
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to load services (status ${response.statusCode})');
+      throw Exception(
+          'Failed to load services (status ${response.statusCode})');
     }
 
     final List<dynamic> data = jsonDecode(response.body);
-    return data.map((json) => ServiceCatalog.fromJson(json as Map<String, dynamic>)).toList();
+    return data
+        .map((json) => ServiceCatalog.fromJson(json as Map<String, dynamic>))
+        .toList();
   }
 }

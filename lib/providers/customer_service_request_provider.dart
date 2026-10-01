@@ -5,7 +5,9 @@ import '../models/customer_service_request.dart';
 import '../utils/api_error.dart';
 
 class CustomerServiceRequestProvider extends ChangeNotifier {
-  CustomerServiceRequestProvider({required CustomerServiceRequestRepository repository}) : _repository = repository;
+  CustomerServiceRequestProvider(
+      {required CustomerServiceRequestRepository repository})
+      : _repository = repository;
 
   final CustomerServiceRequestRepository _repository;
 
@@ -45,7 +47,8 @@ class CustomerServiceRequestProvider extends ChangeNotifier {
     }
   }
 
-  Future<String?> getStoredPasscode(int requestUid) => _repository.getStoredPasscode(requestUid);
+  Future<String?> getStoredPasscode(int requestUid) =>
+      _repository.getStoredPasscode(requestUid);
 
   Future<bool> createRequest({
     required int clientUid,
@@ -135,20 +138,23 @@ class CustomerServiceRequestProvider extends ChangeNotifier {
   Future<CustomerServiceRequest> fetchRequestById(int requestUid) async {
     final request = await _repository.fetchById(requestUid);
     if (_requests.any((r) => r.uid == request.uid)) {
-      _requests = _requests.map((r) => r.uid == request.uid ? request : r).toList();
+      _requests =
+          _requests.map((r) => r.uid == request.uid ? request : r).toList();
       notifyListeners();
     }
     return request;
   }
 
-  Future<bool> cancelRequest(CustomerServiceRequest request, {required String reason}) async {
+  Future<bool> cancelRequest(CustomerServiceRequest request,
+      {required String reason}) async {
     _cancellingUid = request.uid;
     _error = null;
     notifyListeners();
 
     try {
       final updated = await _repository.cancel(request, reason: reason);
-      _requests = _requests.map((r) => r.uid == updated.uid ? updated : r).toList();
+      _requests =
+          _requests.map((r) => r.uid == updated.uid ? updated : r).toList();
       return true;
     } catch (e) {
       _error = friendlyErrorMessage(e);

@@ -32,10 +32,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     final profile = context.read<ProviderDashboardProvider>().providerDetail;
     _nameController = TextEditingController(text: profile?.fullName ?? '');
-    _cnicController = TextEditingController(text: formatCnicForDisplay(profile?.cnic ?? ''));
+    _cnicController =
+        TextEditingController(text: formatCnicForDisplay(profile?.cnic ?? ''));
     _experienceYears = profile?.experienceYears ?? 0;
     _selectedCity = profile?.city;
-    _selectedGender = profile?.gender.isNotEmpty == true ? profile?.gender : null;
+    _selectedGender =
+        profile?.gender.isNotEmpty == true ? profile?.gender : null;
     context.read<CityProvider>().loadCities();
   }
 
@@ -69,7 +71,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       showAppToast(context, 'Profile updated', type: AppToastType.success);
       Navigator.of(context).pop();
     } else {
-      showAppToast(context, dashboard.profileError ?? 'Failed to update profile', type: AppToastType.error);
+      showAppToast(
+          context, dashboard.profileError ?? 'Failed to update profile',
+          type: AppToastType.error);
     }
   }
 
@@ -95,7 +99,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: authFieldDecoration(hint: 'Enter your full name'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Required' : null,
               ),
               const SizedBox(height: 20),
               GenderSelector(
@@ -134,7 +139,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: Text(
                         '$_experienceYears ${_experienceYears == 1 ? 'year' : 'years'}',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w600),
                       ),
                     ),
                     IconButton(
@@ -157,19 +163,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: Center(child: CircularProgressIndicator()),
                     );
                   }
-                  if (cityProvider.error != null && cityProvider.cities.isEmpty) {
-                    return InlineFieldError(message: cityProvider.error!, onRetry: cityProvider.loadCities);
+                  if (cityProvider.error != null &&
+                      cityProvider.cities.isEmpty) {
+                    return InlineFieldError(
+                        message: cityProvider.error!,
+                        onRetry: cityProvider.loadCities);
                   }
                   return ThemedDropdownField<String>(
                     value: _selectedCity,
                     hint: 'Select your city',
-                    items: cityProvider.cities.map((c) => ThemedDropdownItem(value: c, label: c)).toList(),
+                    items: cityProvider.cities
+                        .map((c) => ThemedDropdownItem(value: c, label: c))
+                        .toList(),
                     onChanged: (v) => setState(() => _selectedCity = v),
                   );
                 },
               ),
               const SizedBox(height: 28),
-              AuthPrimaryButton(label: 'Save Changes', isLoading: _saving, onPressed: _save, color: providerBrandBlue),
+              AuthPrimaryButton(
+                  label: 'Save Changes',
+                  isLoading: _saving,
+                  onPressed: _save,
+                  color: providerBrandBlue),
             ],
           ),
         ),

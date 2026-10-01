@@ -10,7 +10,8 @@ class ProviderBottomNavigation extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTabSelected;
 
-  const ProviderBottomNavigation({super.key, required this.currentIndex, required this.onTabSelected});
+  const ProviderBottomNavigation(
+      {super.key, required this.currentIndex, required this.onTabSelected});
 
   static const _icons = [
     Icons.home_rounded,
@@ -121,9 +122,12 @@ class _ProviderNavItem extends StatelessWidget {
               AnimatedContainer(
                 duration: reduceMotion ? Duration.zero : kMediumAnimDuration,
                 curve: kEmphasizedCurve,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: selected ? accentColor.withValues(alpha: 0.18) : Colors.transparent,
+                  color: selected
+                      ? accentColor.withValues(alpha: 0.18)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: selected
                       ? [

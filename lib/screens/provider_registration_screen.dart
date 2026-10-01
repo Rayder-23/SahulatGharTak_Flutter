@@ -60,7 +60,8 @@ class _ProviderRegistrationScreenState
     // already-cached client detail (e.g. the user just visited Edit
     // Profile) so there's no flash of an empty value while this resolves.
     final cachedGender = authProvider.clientDetail?.gender;
-    if (cachedGender != null && cachedGender.isNotEmpty) _selectedGender = cachedGender;
+    if (cachedGender != null && cachedGender.isNotEmpty)
+      _selectedGender = cachedGender;
     _loadGender();
     context.read<CityProvider>().loadCities();
   }
@@ -70,7 +71,8 @@ class _ProviderRegistrationScreenState
     await authProvider.fetchClientDetail();
     if (!mounted) return;
     final gender = authProvider.clientDetail?.gender;
-    if (gender != null && gender.isNotEmpty) setState(() => _selectedGender = gender);
+    if (gender != null && gender.isNotEmpty)
+      setState(() => _selectedGender = gender);
   }
 
   @override
@@ -87,7 +89,8 @@ class _ProviderRegistrationScreenState
     final result = await Navigator.of(context).push<List<Category>>(
       MaterialPageRoute(
           builder: (_) => CategoryPickerScreen(
-              selectedCategoryIds: _selectedCategories.map((c) => c.id).toSet())),
+              selectedCategoryIds:
+                  _selectedCategories.map((c) => c.id).toSet())),
     );
     if (result == null || result.isEmpty || !mounted) return;
 
@@ -101,7 +104,8 @@ class _ProviderRegistrationScreenState
     }
 
     final currentPrimary = _primaryCategoryId;
-    final chosen = await showPrimaryCategoryDialog(context, categories: result, initialPrimaryId: currentPrimary);
+    final chosen = await showPrimaryCategoryDialog(context,
+        categories: result, initialPrimaryId: currentPrimary);
     if (!mounted) return;
     setState(() {
       _selectedCategories = result.toSet();
@@ -114,12 +118,15 @@ class _ProviderRegistrationScreenState
   /// backend rejects titles outside the provider's categories.
   void _pruneServiceTitles() {
     final categoryIds = _selectedCategories.map((c) => c.id).toSet();
-    _selectedServiceTitles = _selectedServiceTitles.where((t) => categoryIds.contains(t.categoryId)).toList();
+    _selectedServiceTitles = _selectedServiceTitles
+        .where((t) => categoryIds.contains(t.categoryId))
+        .toList();
   }
 
   Future<void> _pickServiceTitles() async {
     if (_selectedCategories.isEmpty) {
-      showAppToast(context, 'Select your categories first', type: AppToastType.error);
+      showAppToast(context, 'Select your categories first',
+          type: AppToastType.error);
       return;
     }
     final result = await Navigator.of(context).push<List<ServiceTitle>>(
@@ -137,7 +144,8 @@ class _ProviderRegistrationScreenState
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCategories.isEmpty || _primaryCategoryId == null) {
-      showAppToast(context, 'Please select at least one category', type: AppToastType.error);
+      showAppToast(context, 'Please select at least one category',
+          type: AppToastType.error);
       return;
     }
     if (_selectedGender == null) {
@@ -145,7 +153,8 @@ class _ProviderRegistrationScreenState
       return;
     }
     if (!_agreedToTerms) {
-      showAppToast(context, 'Please agree to the Terms and Conditions', type: AppToastType.error);
+      showAppToast(context, 'Please agree to the Terms and Conditions',
+          type: AppToastType.error);
       return;
     }
 
@@ -179,12 +188,16 @@ class _ProviderRegistrationScreenState
           // Best-effort: registration already succeeded, so a failure here
           // shouldn't block the flow — the provider can set titles later
           // from their profile's "Categories & Service Titles" screen.
-          final titlesSaved = await context.read<ProviderServiceTitlesProvider>().save(
-                providerUid,
-                serviceTitleIds: _selectedServiceTitles.map((t) => t.id).toList(),
-              );
+          final titlesSaved =
+              await context.read<ProviderServiceTitlesProvider>().save(
+                    providerUid,
+                    serviceTitleIds:
+                        _selectedServiceTitles.map((t) => t.id).toList(),
+                  );
           if (mounted && !titlesSaved) {
-            showAppToast(context, 'Registered, but services could not be saved. You can set them later from your profile.', type: AppToastType.error);
+            showAppToast(context,
+                'Registered, but services could not be saved. You can set them later from your profile.',
+                type: AppToastType.error);
           }
         }
         if (!mounted) return;
@@ -239,7 +252,9 @@ class _ProviderRegistrationScreenState
                   child: _LockedInfoChip(
                     icon: Icons.phone_rounded,
                     label: 'MOBILE NUMBER',
-                    value: _phoneController.text.isEmpty ? '-' : _phoneController.text,
+                    value: _phoneController.text.isEmpty
+                        ? '-'
+                        : _phoneController.text,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -259,7 +274,8 @@ class _ProviderRegistrationScreenState
               keyboardType: TextInputType.number,
               inputFormatters: [CnicInputFormatter()],
               decoration: authFieldDecoration(hint: 'XXXXX-XXXXXXX-X').copyWith(
-                hintStyle: TextStyle(color: Colors.grey.shade400, fontWeight: FontWeight.normal),
+                hintStyle: TextStyle(
+                    color: Colors.grey.shade400, fontWeight: FontWeight.normal),
               ),
               validator: cnicValidator,
             ),
@@ -309,7 +325,9 @@ class _ProviderRegistrationScreenState
                         child: Text(
                           _selectedCategories.isEmpty
                               ? 'Select your categories'
-                              : _selectedCategories.map((c) => c.name).join(', '),
+                              : _selectedCategories
+                                  .map((c) => c.name)
+                                  .join(', '),
                           style: TextStyle(
                             fontSize: 15,
                             color: _selectedCategories.isEmpty
@@ -324,7 +342,11 @@ class _ProviderRegistrationScreenState
                     ),
                     if (_selectedCategories.length > 1) ...[
                       const SizedBox(height: 10),
-                      Text('Set primary category', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+                      Text('Set primary category',
+                          style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700)),
                       const SizedBox(height: 6),
                       Wrap(
                         spacing: 8,
@@ -334,7 +356,8 @@ class _ProviderRegistrationScreenState
                           return ChoiceChip(
                             label: Text(category.name),
                             selected: isPrimary,
-                            onSelected: (_) => setState(() => _primaryCategoryId = category.id),
+                            onSelected: (_) => setState(
+                                () => _primaryCategoryId = category.id),
                           );
                         }).toList(),
                       ),
@@ -350,18 +373,27 @@ class _ProviderRegistrationScreenState
               borderRadius: BorderRadius.circular(14),
               child: InputDecorator(
                 decoration: authFieldDecoration(
-                  hint: _selectedCategories.isEmpty ? 'Select categories first' : 'Optional — select services',
+                  hint: _selectedCategories.isEmpty
+                      ? 'Select categories first'
+                      : 'Optional — select services',
                 ).copyWith(
-                  suffixIcon: const Icon(Icons.chevron_right_rounded, color: Colors.black38),
+                  suffixIcon: const Icon(Icons.chevron_right_rounded,
+                      color: Colors.black38),
                 ),
                 child: Text(
                   _selectedServiceTitles.isEmpty
-                      ? (_selectedCategories.isEmpty ? 'Select categories first' : 'Optional — select services')
+                      ? (_selectedCategories.isEmpty
+                          ? 'Select categories first'
+                          : 'Optional — select services')
                       : _selectedServiceTitles.map((t) => t.title).join(', '),
                   style: TextStyle(
                     fontSize: 15,
-                    color: _selectedServiceTitles.isEmpty ? Colors.grey.shade600 : Colors.black87,
-                    fontWeight: _selectedServiceTitles.isEmpty ? FontWeight.normal : FontWeight.w600,
+                    color: _selectedServiceTitles.isEmpty
+                        ? Colors.grey.shade600
+                        : Colors.black87,
+                    fontWeight: _selectedServiceTitles.isEmpty
+                        ? FontWeight.normal
+                        : FontWeight.w600,
                   ),
                 ),
               ),
@@ -377,7 +409,9 @@ class _ProviderRegistrationScreenState
                   );
                 }
                 if (cityProvider.error != null && cityProvider.cities.isEmpty) {
-                  return InlineFieldError(message: cityProvider.error!, onRetry: cityProvider.loadCities);
+                  return InlineFieldError(
+                      message: cityProvider.error!,
+                      onRetry: cityProvider.loadCities);
                 }
                 return ThemedDropdownField<String>(
                   value: _selectedCity,
@@ -480,7 +514,8 @@ class _LockedInfoChip extends StatelessWidget {
   final String label;
   final String value;
 
-  const _LockedInfoChip({required this.icon, required this.label, required this.value});
+  const _LockedInfoChip(
+      {required this.icon, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -502,13 +537,20 @@ class _LockedInfoChip extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(fontSize: 10, color: Colors.black45, fontWeight: FontWeight.w600, letterSpacing: 0.3),
+                  style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.black45,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3),
                 ),
                 Text(
                   value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Color(0xFF1A2233)),
+                  style: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1A2233)),
                 ),
               ],
             ),

@@ -7,7 +7,9 @@ import '../utils/constants.dart';
 
 class ProviderWalletApiService {
   Future<ProviderWallet> fetchWallet(int providerUid) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/providers-wallet/$providerUid')).timeout(kApiTimeout);
+    final response = await http
+        .get(Uri.parse('$kApiBaseUrl/providers-wallet/$providerUid'))
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to load wallet');
     return ProviderWallet.fromJson(json['data'] as Map<String, dynamic>);
@@ -21,7 +23,8 @@ class ProviderWalletApiService {
       throw Exception('$errorPrefix (status ${response.statusCode})');
     }
 
-    final success = json['success'] as bool? ?? (response.statusCode >= 200 && response.statusCode < 300);
+    final success = json['success'] as bool? ??
+        (response.statusCode >= 200 && response.statusCode < 300);
     if (!success) {
       throw Exception(json['message'] as String? ?? errorPrefix);
     }

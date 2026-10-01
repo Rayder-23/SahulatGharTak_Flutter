@@ -34,13 +34,19 @@ class _RejectedRequestsScreenState extends State<RejectedRequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rejected = context.watch<ProviderBookingsProvider>().bookings.where((b) => b.isRejected).toList();
+    final rejected = context
+        .watch<ProviderBookingsProvider>()
+        .bookings
+        .where((b) => b.isRejected)
+        .toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: ProviderTabHeader(
         title: 'Rejected Requests',
-        subtitle: rejected.isEmpty ? 'No rejected requests' : '${rejected.length} request${rejected.length == 1 ? '' : 's'}',
+        subtitle: rejected.isEmpty
+            ? 'No rejected requests'
+            : '${rejected.length} request${rejected.length == 1 ? '' : 's'}',
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
           onPressed: () => Navigator.of(context).maybePop(),
@@ -57,7 +63,8 @@ class _RejectedRequestsScreenState extends State<RejectedRequestsScreen> {
               padding: const EdgeInsets.all(16),
               itemCount: rejected.length,
               separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) => _RejectedCard(booking: rejected[index]),
+              itemBuilder: (context, index) =>
+                  _RejectedCard(booking: rejected[index]),
             ),
     );
   }
@@ -77,14 +84,20 @@ class _RejectedCard extends StatelessWidget {
       openElevation: 0,
       closedColor: const Color(0xFFF4F7FB),
       openColor: const Color(0xFFF4F7FB),
-      closedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      closedShape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       transitionDuration: const Duration(milliseconds: 380),
       closedBuilder: (context, openContainer) {
         return Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
-            boxShadow: [BoxShadow(color: const Color(0xFF0A4FA8).withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+            boxShadow: [
+              BoxShadow(
+                  color: const Color(0xFF0A4FA8).withValues(alpha: 0.06),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6))
+            ],
           ),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -111,19 +124,27 @@ class _RejectedCard extends StatelessWidget {
                                       booking.requestTitle,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16.5, color: Color(0xFF1A2233), height: 1.2),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 16.5,
+                                          color: Color(0xFF1A2233),
+                                          height: 1.2),
                                     ),
                                     const SizedBox(height: 2),
                                     Row(
                                       children: [
-                                        Icon(Icons.person_outline_rounded, size: 13, color: Colors.grey[500]),
+                                        Icon(Icons.person_outline_rounded,
+                                            size: 13, color: Colors.grey[500]),
                                         const SizedBox(width: 3),
                                         Expanded(
                                           child: Text(
                                             booking.clientName,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(color: Colors.grey[500], fontSize: 12.5, fontWeight: FontWeight.w600),
+                                            style: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 12.5,
+                                                fontWeight: FontWeight.w600),
                                           ),
                                         ),
                                       ],
@@ -133,14 +154,22 @@ class _RejectedCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(20)),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                    color: color.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(20)),
                                 child: const Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.cancel_rounded, size: 13, color: color),
+                                    Icon(Icons.cancel_rounded,
+                                        size: 13, color: color),
                                     SizedBox(width: 4),
-                                    Text('Rejected', style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 11.5)),
+                                    Text('Rejected',
+                                        style: TextStyle(
+                                            color: color,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 11.5)),
                                   ],
                                 ),
                               ),
@@ -152,19 +181,31 @@ class _RejectedCard extends StatelessWidget {
                               booking.serviceDetail,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: Colors.grey[700], fontSize: 13.5, height: 1.35),
+                              style: TextStyle(
+                                  color: Colors.grey[700],
+                                  fontSize: 13.5,
+                                  height: 1.35),
                             ),
                           ],
                           const SizedBox(height: 12),
                           Container(
                             padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(color: const Color(0xFFF6F8FC), borderRadius: BorderRadius.circular(12)),
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFF6F8FC),
+                                borderRadius: BorderRadius.circular(12)),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (booking.clientAddressTitle != null) _InfoRow(icon: Icons.location_on_rounded, text: booking.clientAddressTitle!),
-                                if (booking.clientAddressTitle != null) const SizedBox(height: 6),
-                                _InfoRow(icon: Icons.payments_rounded, text: 'Final ${formatCurrency(booking.finalAmount)}'),
+                                if (booking.clientAddressTitle != null)
+                                  _InfoRow(
+                                      icon: Icons.location_on_rounded,
+                                      text: booking.clientAddressTitle!),
+                                if (booking.clientAddressTitle != null)
+                                  const SizedBox(height: 6),
+                                _InfoRow(
+                                    icon: Icons.payments_rounded,
+                                    text:
+                                        'Final ${formatCurrency(booking.finalAmount)}'),
                               ],
                             ),
                           ),
@@ -181,7 +222,8 @@ class _RejectedCard extends StatelessWidget {
         );
       },
       openBuilder: (context, closeContainer) {
-        return BookingDetailScreen(booking: booking, onClose: closeContainer, readOnly: true);
+        return BookingDetailScreen(
+            booking: booking, onClose: closeContainer, readOnly: true);
       },
     );
   }
@@ -203,7 +245,10 @@ class _InfoRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(color: Color(0xFF3A4658), fontSize: 13, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+                color: Color(0xFF3A4658),
+                fontSize: 13,
+                fontWeight: FontWeight.w500),
             overflow: TextOverflow.ellipsis,
           ),
         ),

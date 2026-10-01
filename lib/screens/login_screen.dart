@@ -54,7 +54,9 @@ class _LoginScreenState extends State<LoginScreen> {
       // Login — otherwise LandingScreen remains underneath and a back-press
       // from the dashboard drops the user onto what looks like a logged-out
       // screen, even though the session is still active.
-      final target = role == 'Provider' ? await resolveProviderEntryRoute(context) : HomeScreen.routeName;
+      final target = role == 'Provider'
+          ? await resolveProviderEntryRoute(context)
+          : HomeScreen.routeName;
       if (!mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil(target, (route) => false);
     } else if (authProvider.isUnverified) {

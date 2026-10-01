@@ -7,11 +7,15 @@ import '../utils/constants.dart';
 
 class ProviderCategoriesApiService {
   Future<List<ProviderCategory>> fetchCategories(int providerUid) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/providers/$providerUid/categories')).timeout(kApiTimeout);
+    final response = await http
+        .get(Uri.parse('$kApiBaseUrl/providers/$providerUid/categories'))
+        .timeout(kApiTimeout);
 
     final json = _decode(response, 'Failed to load categories');
     final List<dynamic> data = json['data'] as List<dynamic>? ?? [];
-    return data.map((item) => ProviderCategory.fromJson(item as Map<String, dynamic>)).toList();
+    return data
+        .map((item) => ProviderCategory.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List<ProviderCategory>> replaceCategories(
@@ -32,7 +36,9 @@ class ProviderCategoriesApiService {
 
     final json = _decode(response, 'Failed to update categories');
     final List<dynamic> data = json['data'] as List<dynamic>? ?? [];
-    return data.map((item) => ProviderCategory.fromJson(item as Map<String, dynamic>)).toList();
+    return data
+        .map((item) => ProviderCategory.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Map<String, dynamic> _decode(http.Response response, String errorPrefix) {
@@ -43,7 +49,8 @@ class ProviderCategoriesApiService {
       throw Exception('$errorPrefix (status ${response.statusCode})');
     }
 
-    final success = json['success'] as bool? ?? (response.statusCode >= 200 && response.statusCode < 300);
+    final success = json['success'] as bool? ??
+        (response.statusCode >= 200 && response.statusCode < 300);
     if (!success) {
       throw Exception(json['message'] as String? ?? errorPrefix);
     }

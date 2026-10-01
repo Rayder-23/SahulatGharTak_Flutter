@@ -17,10 +17,12 @@ class VerificationDocumentsScreen extends StatefulWidget {
   const VerificationDocumentsScreen({super.key});
 
   @override
-  State<VerificationDocumentsScreen> createState() => _VerificationDocumentsScreenState();
+  State<VerificationDocumentsScreen> createState() =>
+      _VerificationDocumentsScreenState();
 }
 
-class _VerificationDocumentsScreenState extends State<VerificationDocumentsScreen> {
+class _VerificationDocumentsScreenState
+    extends State<VerificationDocumentsScreen> {
   int? _providerUid;
 
   @override
@@ -93,12 +95,18 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                         Container(
                           margin: const EdgeInsets.only(bottom: 16),
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
+                          decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12)),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                              const Icon(Icons.error_outline,
+                                  color: Colors.red, size: 20),
                               const SizedBox(width: 10),
-                              Expanded(child: Text(provider.loadError!, style: const TextStyle(color: Colors.red, fontSize: 13))),
+                              Expanded(
+                                  child: Text(provider.loadError!,
+                                      style: const TextStyle(
+                                          color: Colors.red, fontSize: 13))),
                             ],
                           ),
                         ),
@@ -106,41 +114,69 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: (provider.isVerified ? Colors.green : Colors.orange).withValues(alpha: 0.1),
+                          color: (provider.isVerified
+                                  ? Colors.green
+                                  : Colors.orange)
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: (provider.isVerified ? Colors.green : Colors.orange).withValues(alpha: 0.3)),
+                          border: Border.all(
+                              color: (provider.isVerified
+                                      ? Colors.green
+                                      : Colors.orange)
+                                  .withValues(alpha: 0.3)),
                         ),
                         child: Row(
                           children: [
-                            Icon(provider.isVerified ? Icons.verified : Icons.hourglass_top, color: provider.isVerified ? Colors.green : Colors.orange, size: 20),
+                            Icon(
+                                provider.isVerified
+                                    ? Icons.verified
+                                    : Icons.hourglass_top,
+                                color: provider.isVerified
+                                    ? Colors.green
+                                    : Colors.orange,
+                                size: 20),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                provider.isVerified ? 'Your documents are verified.' : 'Your documents are pending verification.',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                                provider.isVerified
+                                    ? 'Your documents are verified.'
+                                    : 'Your documents are pending verification.',
+                                style: const TextStyle(
+                                    fontSize: 13, fontWeight: FontWeight.w600),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      if (provider.verificationRemarks != null && provider.verificationRemarks!.isNotEmpty) ...[
+                      if (provider.verificationRemarks != null &&
+                          provider.verificationRemarks!.isNotEmpty) ...[
                         Padding(
                           padding: const EdgeInsets.only(bottom: 20),
-                          child: Text('Remarks: ${provider.verificationRemarks}', style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                          child: Text(
+                              'Remarks: ${provider.verificationRemarks}',
+                              style: const TextStyle(
+                                  color: Colors.black54, fontSize: 13)),
                         ),
                       ],
-                      const Text('Profile Photo', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                      const Text('Profile Photo',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 14)),
                       const SizedBox(height: 8),
                       DocumentImageSlot(
                         file: provider.profilePhoto,
                         networkUrl: provider.profilePhotoUrl,
                         placeholderIcon: Icons.person_outline,
                         label: 'Add profile photo',
-                        onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.profilePhoto),
-                        onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.profilePhoto),
+                        onTap: () => showDocumentCaptureSheet(context,
+                            slot: ProviderDocumentSlot.profilePhoto),
+                        onRemove: () => context
+                            .read<ProviderDocumentProvider>()
+                            .removeImage(ProviderDocumentSlot.profilePhoto),
                       ),
                       const SizedBox(height: 20),
-                      const Text('CNIC Front', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                      const Text('CNIC Front',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 14)),
                       const SizedBox(height: 8),
                       DocumentImageSlot(
                         file: provider.cnicFront,
@@ -148,11 +184,16 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                         placeholderIcon: Icons.credit_card,
                         label: 'Add CNIC front image',
                         locked: provider.isVerified,
-                        onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.cnicFront),
-                        onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.cnicFront),
+                        onTap: () => showDocumentCaptureSheet(context,
+                            slot: ProviderDocumentSlot.cnicFront),
+                        onRemove: () => context
+                            .read<ProviderDocumentProvider>()
+                            .removeImage(ProviderDocumentSlot.cnicFront),
                       ),
                       const SizedBox(height: 20),
-                      const Text('CNIC Back', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                      const Text('CNIC Back',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 14)),
                       const SizedBox(height: 8),
                       DocumentImageSlot(
                         file: provider.cnicBack,
@@ -160,18 +201,24 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                         placeholderIcon: Icons.credit_card,
                         label: 'Add CNIC back image',
                         locked: provider.isVerified,
-                        onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.cnicBack),
-                        onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.cnicBack),
+                        onTap: () => showDocumentCaptureSheet(context,
+                            slot: ProviderDocumentSlot.cnicBack),
+                        onRemove: () => context
+                            .read<ProviderDocumentProvider>()
+                            .removeImage(ProviderDocumentSlot.cnicBack),
                       ),
                       if (provider.isVerified) ...[
                         const SizedBox(height: 8),
                         Text(
                           'Your CNIC is locked after verification. Contact support if it needs to change.',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                          style:
+                              TextStyle(color: Colors.grey[600], fontSize: 12),
                         ),
                       ],
                       const SizedBox(height: 20),
-                      const Text('Police Verification (optional)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                      const Text('Police Verification (optional)',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 14)),
                       const SizedBox(height: 8),
                       DocumentImageSlot(
                         file: provider.policeVerification,
@@ -179,14 +226,19 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                         placeholderIcon: Icons.local_police_outlined,
                         label: 'Add police verification certificate',
                         locked: provider.isVerified,
-                        onTap: () => showDocumentCaptureSheet(context, slot: ProviderDocumentSlot.policeVerification),
-                        onRemove: () => context.read<ProviderDocumentProvider>().removeImage(ProviderDocumentSlot.policeVerification),
+                        onTap: () => showDocumentCaptureSheet(context,
+                            slot: ProviderDocumentSlot.policeVerification),
+                        onRemove: () => context
+                            .read<ProviderDocumentProvider>()
+                            .removeImage(
+                                ProviderDocumentSlot.policeVerification),
                       ),
                       if (provider.isVerified) ...[
                         const SizedBox(height: 8),
                         Text(
                           'Your Police Verification document is locked after verification. Contact support if it needs to change.',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                          style:
+                              TextStyle(color: Colors.grey[600], fontSize: 12),
                         ),
                       ],
                       const SizedBox(height: 28),
@@ -194,17 +246,21 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: LinearProgressIndicator(
-                            value: provider.uploadProgress > 0 ? provider.uploadProgress : null,
+                            value: provider.uploadProgress > 0
+                                ? provider.uploadProgress
+                                : null,
                             minHeight: 8,
                             backgroundColor: const Color(0xFFF5F5F7),
-                            valueColor: const AlwaysStoppedAnimation(providerBrandBlue),
+                            valueColor:
+                                const AlwaysStoppedAnimation(providerBrandBlue),
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Uploading... ${(provider.uploadProgress * 100).clamp(0, 100).toStringAsFixed(0)}%',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.black54, fontSize: 13),
+                          style: const TextStyle(
+                              color: Colors.black54, fontSize: 13),
                         ),
                         const SizedBox(height: 20),
                       ],
@@ -212,9 +268,17 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                         height: 52,
                         child: ElevatedButton(
                           style: kProminentFilledButtonStyle(providerBrandBlue),
-                          onPressed: provider.canUpload && provider.hasChanges && !provider.isUploading ? _save : null,
+                          onPressed: provider.canUpload &&
+                                  provider.hasChanges &&
+                                  !provider.isUploading
+                              ? _save
+                              : null,
                           child: provider.isUploading
-                              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white))
                               : const Text('Save Changes'),
                         ),
                       ),
@@ -224,7 +288,8 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                           child: Text(
                             'Profile photo, CNIC front and CNIC back are all required.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.black54, fontSize: 12),
+                            style:
+                                TextStyle(color: Colors.black54, fontSize: 12),
                           ),
                         )
                       else if (!provider.hasChanges)
@@ -233,7 +298,8 @@ class _VerificationDocumentsScreenState extends State<VerificationDocumentsScree
                           child: Text(
                             'Replace a photo above to save changes.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.black54, fontSize: 12),
+                            style:
+                                TextStyle(color: Colors.black54, fontSize: 12),
                           ),
                         ),
                     ],

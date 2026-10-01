@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 /// the exact literal values the API's computed `progressStatus` field uses
 /// (see docs/status-workflow.md) — not derived from [CustomerServiceRequest.status],
 /// which stays coarse (Initiated/Assigned/Completed/Cancelled) on the backend.
-const List<String> kRequestStatusSteps = ['Requested', 'Assigned', 'In Progress', 'Completed'];
+const List<String> kRequestStatusSteps = [
+  'Requested',
+  'Assigned',
+  'In Progress',
+  'Completed'
+];
 
 /// Maps a [CustomerServiceRequest.progressStatus] value to its index in
 /// [kRequestStatusSteps]. Null/unrecognized values resolve to step 0 — call
@@ -20,7 +25,12 @@ int requestProgressStep(String? progressStatus) {
 bool isRequestCancelled(String? progressStatus) => progressStatus == null;
 
 /// Step labels for a provider's [ServiceBooking] journey.
-const List<String> kBookingStatusSteps = ['Requested', 'Accepted', 'In Progress', 'Completed'];
+const List<String> kBookingStatusSteps = [
+  'Requested',
+  'Accepted',
+  'In Progress',
+  'Completed'
+];
 
 /// Maps a [ServiceBooking.status] string to its index in
 /// [kBookingStatusSteps]. Unrecognized/initial statuses (e.g. "Pending")
@@ -41,6 +51,7 @@ int bookingStatusStep(String status) {
 
 /// True when [status] is a terminal state (Cancelled/Rejected) that doesn't
 /// fit the forward progression in [kBookingStatusSteps].
-bool isBookingStatusTerminal(String status) => status == 'Cancelled' || status == 'Rejected';
+bool isBookingStatusTerminal(String status) =>
+    status == 'Cancelled' || status == 'Rejected';
 
 const Color kBrandActiveColor = Color(0xFF016EE3);

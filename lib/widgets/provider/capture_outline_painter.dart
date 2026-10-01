@@ -43,14 +43,16 @@ class CaptureOutlinePainter extends CustomPainter {
     final rect = CaptureOutlineGeometry.rectFor(size, shape);
     final shapePath = shape == OutlineShape.faceOval
         ? (Path()..addOval(rect))
-        : (Path()..addRRect(RRect.fromRectAndRadius(rect, const Radius.circular(16))));
+        : (Path()
+          ..addRRect(RRect.fromRectAndRadius(rect, const Radius.circular(16))));
 
     final scrimPath = Path.combine(
       PathOperation.difference,
       Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height)),
       shapePath,
     );
-    canvas.drawPath(scrimPath, Paint()..color = Colors.black.withValues(alpha: 0.55));
+    canvas.drawPath(
+        scrimPath, Paint()..color = Colors.black.withValues(alpha: 0.55));
 
     final strokeColor = isValid ? const Color(0xFF2ECC71) : Colors.white;
     canvas.drawPath(
@@ -63,5 +65,6 @@ class CaptureOutlinePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CaptureOutlinePainter oldDelegate) => oldDelegate.isValid != isValid || oldDelegate.shape != shape;
+  bool shouldRepaint(covariant CaptureOutlinePainter oldDelegate) =>
+      oldDelegate.isValid != isValid || oldDelegate.shape != shape;
 }

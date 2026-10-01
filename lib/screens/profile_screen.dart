@@ -57,14 +57,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _editAddress(ClientAddress address) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => AddAddressScreen(existing: address)));
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => AddAddressScreen(existing: address)));
   }
 
   Future<void> _deleteAddress(ClientAddress address) async {
     final confirmed = await showConfirmDialog(
       context,
       title: 'Delete Address',
-      message: 'Are you sure you want to delete "${address.addressTitle}"? This cannot be undone.',
+      message:
+          'Are you sure you want to delete "${address.addressTitle}"? This cannot be undone.',
       confirmLabel: 'Delete',
       icon: Icons.delete_outline_rounded,
       color: Colors.red,
@@ -75,8 +77,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final success = await addressProvider.deleteAddress(address.uid);
     if (!mounted) return;
 
-    final message = success ? 'Address deleted' : (addressProvider.error ?? 'Failed to delete address');
-    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
+    final message = success
+        ? 'Address deleted'
+        : (addressProvider.error ?? 'Failed to delete address');
+    showAppToast(context, message,
+        type: success ? AppToastType.success : AppToastType.error);
   }
 
   Future<void> _logout(BuildContext context) async {
@@ -93,7 +98,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await context.read<AuthProvider>().logout();
     if (!context.mounted) return;
     context.read<TimeFormatProvider>().reset();
-    Navigator.of(context).pushNamedAndRemoveUntil(LandingScreen.routeName, (route) => false);
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(LandingScreen.routeName, (route) => false);
   }
 
   Future<void> _deleteAccount(BuildContext context) async {
@@ -112,7 +118,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         type: MessageDialogType.success,
       );
       if (!context.mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(LandingScreen.routeName, (route) => false);
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(LandingScreen.routeName, (route) => false);
     } else {
       await showMessageDialog(
         context,
@@ -131,7 +138,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user == null) {
       return Scaffold(
         backgroundColor: const Color(0xFFF4F7FB),
-        bottomNavigationBar: widget.embedded ? null : const AppBottomNavigation(currentIndex: 2),
+        bottomNavigationBar:
+            widget.embedded ? null : const AppBottomNavigation(currentIndex: 2),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -142,20 +150,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Container(
                     width: 76,
                     height: 76,
-                    decoration: BoxDecoration(color: _brandBlue.withValues(alpha: 0.1), shape: BoxShape.circle),
-                    child: const Icon(Icons.person_outline_rounded, size: 36, color: _brandBlue),
+                    decoration: BoxDecoration(
+                        color: _brandBlue.withValues(alpha: 0.1),
+                        shape: BoxShape.circle),
+                    child: const Icon(Icons.person_outline_rounded,
+                        size: 36, color: _brandBlue),
                   ),
                   const SizedBox(height: 18),
                   const Text(
                     'You\'re browsing as a guest',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF14213D)),
+                    style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF14213D)),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Log in or create an account to save addresses, request services, and track your bookings.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13.5, color: Colors.grey[600], height: 1.4),
+                    style: TextStyle(
+                        fontSize: 13.5, color: Colors.grey[600], height: 1.4),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
@@ -166,10 +181,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         backgroundColor: _brandBlue,
                         foregroundColor: Colors.white,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                       ),
-                      onPressed: () => Navigator.of(context).pushNamed(LoginScreen.routeName),
-                      child: const Text('Log In', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                      onPressed: () => Navigator.of(context)
+                          .pushNamed(LoginScreen.routeName),
+                      child: const Text('Log In',
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w700)),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -179,11 +198,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: _brandBlue,
-                        side: BorderSide(color: _brandBlue.withValues(alpha: 0.4)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        side: BorderSide(
+                            color: _brandBlue.withValues(alpha: 0.4)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                       ),
-                      onPressed: () => Navigator.of(context).pushNamed(CustomerRegistrationScreen.routeName),
-                      child: const Text('Create Account', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                      onPressed: () => Navigator.of(context)
+                          .pushNamed(CustomerRegistrationScreen.routeName),
+                      child: const Text('Create Account',
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -203,7 +227,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -0.2),
+        titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.2),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout_rounded),
@@ -212,7 +240,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: widget.embedded ? null : const AppBottomNavigation(currentIndex: 2),
+      bottomNavigationBar:
+          widget.embedded ? null : const AppBottomNavigation(currentIndex: 2),
       body: CurvedProfileHeader(
         color: _brandBlue,
         headerColors: const [_brandDark, _brandBlue],
@@ -223,7 +252,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           backgroundColor: _brandBlue,
           child: Text(
             user.username.isNotEmpty ? user.username[0].toUpperCase() : '?',
-            style: const TextStyle(fontSize: 32, color: Colors.white, fontWeight: FontWeight.w700),
+            style: const TextStyle(
+                fontSize: 32, color: Colors.white, fontWeight: FontWeight.w700),
           ),
         ),
         child: SingleChildScrollView(
@@ -235,13 +265,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text(
                 user.username,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Color(0xFF14213D), letterSpacing: -0.2),
+                style: const TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF14213D),
+                    letterSpacing: -0.2),
               ),
               const SizedBox(height: 4),
               Text(
                 user.mobileNo,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black.withValues(alpha: 0.45), fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 22),
               Row(
@@ -277,9 +313,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(18),
-                  boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+                  boxShadow: [
+                    BoxShadow(
+                        color: _brandDark.withValues(alpha: 0.06),
+                        blurRadius: 18,
+                        offset: const Offset(0, 6))
+                  ],
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: Column(
                   children: [
                     _InfoTile(label: 'Mobile Number', value: user.mobileNo),
@@ -292,7 +334,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
-                onPressed: () => Navigator.of(context).pushNamed(CustomerEditProfileScreen.routeName),
+                onPressed: () => Navigator.of(context)
+                    .pushNamed(CustomerEditProfileScreen.routeName),
                 style: kProminentOutlinedButtonStyle(_brandBlue),
                 icon: const Icon(Icons.edit_rounded),
                 label: const Text('Edit Profile'),
@@ -301,46 +344,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Addresses', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF14213D), letterSpacing: -0.2)),
+                  const Text('Addresses',
+                      style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF14213D),
+                          letterSpacing: -0.2)),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _brandBlue,
                       foregroundColor: Colors.white,
                       elevation: 3,
                       shadowColor: _brandBlue.withValues(alpha: 0.4),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
-                    onPressed: () => Navigator.of(context).pushNamed(AddAddressScreen.routeName),
+                    onPressed: () => Navigator.of(context)
+                        .pushNamed(AddAddressScreen.routeName),
                     icon: const Icon(Icons.add_location_alt_rounded, size: 18),
-                    label: const Text('Add', style: TextStyle(fontWeight: FontWeight.w700)),
+                    label: const Text('Add',
+                        style: TextStyle(fontWeight: FontWeight.w700)),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               if (addressState.loading)
-                const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Center(child: CircularProgressIndicator()))
+                const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(child: CircularProgressIndicator()))
               else if (addressState.error != null)
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+                    boxShadow: [
+                      BoxShadow(
+                          color: _brandDark.withValues(alpha: 0.06),
+                          blurRadius: 18,
+                          offset: const Offset(0, 6))
+                    ],
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text('Couldn\'t load addresses', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF1A2233))),
+                      const Text('Couldn\'t load addresses',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1A2233))),
                       const SizedBox(height: 6),
-                      Text(addressState.error!, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                      Text(addressState.error!,
+                          textAlign: TextAlign.center,
+                          style:
+                              TextStyle(color: Colors.grey[600], fontSize: 13)),
                       const SizedBox(height: 14),
                       OutlinedButton.icon(
                         onPressed: _loadAddresses,
                         icon: const Icon(Icons.refresh_rounded, size: 18),
                         label: const Text('Retry'),
-                        style: OutlinedButton.styleFrom(foregroundColor: _brandBlue, side: BorderSide(color: _brandBlue.withValues(alpha: 0.4))),
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: _brandBlue,
+                            side: BorderSide(
+                                color: _brandBlue.withValues(alpha: 0.4))),
                       ),
                     ],
                   ),
@@ -348,21 +418,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
               else if (addressState.addresses.isEmpty)
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+                    boxShadow: [
+                      BoxShadow(
+                          color: _brandDark.withValues(alpha: 0.06),
+                          blurRadius: 18,
+                          offset: const Offset(0, 6))
+                    ],
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text('No addresses added yet', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF1A2233), fontSize: 14.5)),
+                      const Text('No addresses added yet',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1A2233),
+                              fontSize: 14.5)),
                       const SizedBox(height: 4),
                       Text(
                         'Add one so providers know where to reach you.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.black.withValues(alpha: 0.45), fontSize: 12.5, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            color: Colors.black.withValues(alpha: 0.45),
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -372,7 +455,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+                    boxShadow: [
+                      BoxShadow(
+                          color: _brandDark.withValues(alpha: 0.06),
+                          blurRadius: 18,
+                          offset: const Offset(0, 6))
+                    ],
                   ),
                   child: Column(
                     children: [
@@ -381,50 +469,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           leading: Container(
                             width: 38,
                             height: 38,
-                            decoration: BoxDecoration(color: _brandBlue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(11)),
-                            child: Icon(Icons.location_on_rounded, color: _brandBlue, size: 20),
+                            decoration: BoxDecoration(
+                                color: _brandBlue.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(11)),
+                            child: Icon(Icons.location_on_rounded,
+                                color: _brandBlue, size: 20),
                           ),
                           title: Row(
                             children: [
-                              Flexible(child: Text(address.addressTitle, style: const TextStyle(fontWeight: FontWeight.w700))),
+                              Flexible(
+                                  child: Text(address.addressTitle,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w700))),
                               const SizedBox(width: 6),
                               if (address.hasLocation)
-                                const Icon(Icons.location_on_rounded, size: 15, color: _brandBlue)
+                                const Icon(Icons.location_on_rounded,
+                                    size: 15, color: _brandBlue)
                               else
                                 GestureDetector(
                                   onTap: () => _editAddress(address),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: Colors.orange.withValues(alpha: 0.12),
+                                      color:
+                                          Colors.orange.withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
-                                    child: const Text('Set location', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: Colors.orange)),
+                                    child: const Text('Set location',
+                                        style: TextStyle(
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.orange)),
                                   ),
                                 ),
                             ],
                           ),
-                          subtitle: Text('${address.fullAddress}, ${address.area}, ${address.city}'),
+                          subtitle: Text(
+                              '${address.fullAddress}, ${address.area}, ${address.city}'),
                           trailing: addressState.deletingUid == address.uid
-                              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2))
                               : PopupMenuButton<String>(
                                   onSelected: (value) {
                                     if (value == 'edit') _editAddress(address);
-                                    if (value == 'delete') _deleteAddress(address);
+                                    if (value == 'delete')
+                                      _deleteAddress(address);
                                   },
                                   itemBuilder: (context) => const [
-                                    PopupMenuItem(value: 'edit', child: ListTile(leading: Icon(Icons.edit), title: Text('Edit'), contentPadding: EdgeInsets.zero)),
-                                    PopupMenuItem(value: 'delete', child: ListTile(leading: Icon(Icons.delete, color: Colors.red), title: Text('Delete', style: TextStyle(color: Colors.red)), contentPadding: EdgeInsets.zero)),
+                                    PopupMenuItem(
+                                        value: 'edit',
+                                        child: ListTile(
+                                            leading: Icon(Icons.edit),
+                                            title: Text('Edit'),
+                                            contentPadding: EdgeInsets.zero)),
+                                    PopupMenuItem(
+                                        value: 'delete',
+                                        child: ListTile(
+                                            leading: Icon(Icons.delete,
+                                                color: Colors.red),
+                                            title: Text('Delete',
+                                                style: TextStyle(
+                                                    color: Colors.red)),
+                                            contentPadding: EdgeInsets.zero)),
                                   ],
                                 ),
                         ),
-                        if (address != addressState.addresses.last) const Divider(height: 1),
+                        if (address != addressState.addresses.last)
+                          const Divider(height: 1),
                       ],
                     ],
                   ),
                 ),
               const SizedBox(height: 28),
-              const Text('Preferences', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF14213D), letterSpacing: -0.2)),
+              const Text('Preferences',
+                  style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF14213D),
+                      letterSpacing: -0.2)),
               const SizedBox(height: 8),
               Consumer<TimeFormatProvider>(
                 builder: (context, timeFormat, _) {
@@ -432,12 +558,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(18),
-                      boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+                      boxShadow: [
+                        BoxShadow(
+                            color: _brandDark.withValues(alpha: 0.06),
+                            blurRadius: 18,
+                            offset: const Offset(0, 6))
+                      ],
                     ),
                     child: SwitchListTile(
-                      secondary: const Icon(Icons.schedule_rounded, color: _brandBlue),
+                      secondary:
+                          const Icon(Icons.schedule_rounded, color: _brandBlue),
                       title: const Text('24-hour time'),
-                      subtitle: Text(timeFormat.use24Hour ? 'e.g. 14:30' : 'e.g. 2:30 PM'),
+                      subtitle: Text(
+                          timeFormat.use24Hour ? 'e.g. 14:30' : 'e.g. 2:30 PM'),
                       value: timeFormat.use24Hour,
                       activeThumbColor: _brandBlue,
                       onChanged: (v) => timeFormat.setUse24Hour(v),
@@ -466,7 +599,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ElevatedButton.icon(
                   style: kProminentFilledButtonStyle(_brandBlue),
                   icon: const Icon(Icons.engineering_rounded),
-                  onPressed: () => Navigator.of(context).pushNamed(ProviderRegistrationScreen.routeName),
+                  onPressed: () => Navigator.of(context)
+                      .pushNamed(ProviderRegistrationScreen.routeName),
                   label: const Text('Become a Provider'),
                 ),
               const SizedBox(height: 12),
@@ -480,15 +614,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               OutlinedButton.icon(
                 style: kProminentOutlinedButtonStyle(_brandBlue),
                 icon: const Icon(Icons.support_agent_rounded),
-                onPressed: () => Navigator.of(context).pushNamed(ContactUsScreen.routeName),
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(ContactUsScreen.routeName),
                 label: const Text('Contact Us'),
               ),
               const SizedBox(height: 12),
               Center(
                 child: TextButton.icon(
-                  icon: Icon(Icons.privacy_tip_outlined, color: Colors.grey[600]),
+                  icon:
+                      Icon(Icons.privacy_tip_outlined, color: Colors.grey[600]),
                   onPressed: () => openPrivacyPolicy(context),
-                  label: Text('Privacy Policy', style: TextStyle(color: Colors.grey[600])),
+                  label: Text('Privacy Policy',
+                      style: TextStyle(color: Colors.grey[600])),
                 ),
               ),
             ],
@@ -510,8 +647,16 @@ class _InfoTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]))),
-          Expanded(child: Text(value, style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.right)),
+          Expanded(
+              child: Text(label,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.grey[600]))),
+          Expanded(
+              child: Text(value,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  textAlign: TextAlign.right)),
         ],
       ),
     );

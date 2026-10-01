@@ -18,25 +18,30 @@ import 'provider_tab_header.dart';
 /// camera-with-detection flow, or a gallery pick cropped into the same
 /// fixed aspect ratio. Used by both the first-time registration upload
 /// screen and the later "view/replace documents" screen so they can't drift.
-Future<void> showDocumentCaptureSheet(BuildContext context, {required ProviderDocumentSlot slot}) async {
+Future<void> showDocumentCaptureSheet(BuildContext context,
+    {required ProviderDocumentSlot slot}) async {
   final source = await showModalBottomSheet<ImageSource>(
     context: context,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
     builder: (sheetContext) => SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 16, bottom: 8),
-            child: Text('Select Image Source', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            child: Text('Select Image Source',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
           ListTile(
-            leading: const Icon(Icons.photo_camera_outlined, color: providerBrandBlue),
+            leading: const Icon(Icons.photo_camera_outlined,
+                color: providerBrandBlue),
             title: const Text('Take Photo'),
             onTap: () => Navigator.of(sheetContext).pop(ImageSource.camera),
           ),
           ListTile(
-            leading: const Icon(Icons.photo_library_outlined, color: providerBrandBlue),
+            leading: const Icon(Icons.photo_library_outlined,
+                color: providerBrandBlue),
             title: const Text('Choose from Gallery'),
             onTap: () => Navigator.of(sheetContext).pop(ImageSource.gallery),
           ),
@@ -69,7 +74,10 @@ Future<void> showDocumentCaptureSheet(BuildContext context, {required ProviderDo
 
   if (!context.mounted) return;
   if (provider.error != null) {
-    await showMessageDialog(context, title: 'Something Went Wrong', message: provider.error!, type: MessageDialogType.error);
+    await showMessageDialog(context,
+        title: 'Something Went Wrong',
+        message: provider.error!,
+        type: MessageDialogType.error);
   }
 }
 
@@ -83,20 +91,25 @@ Future<File?> _captureWithPlainCamera(BuildContext context) async {
   final cropped = await ImageCropper().cropImage(
     sourcePath: xFile.path,
     uiSettings: [
-      AndroidUiSettings(toolbarTitle: 'Crop Image', toolbarColor: providerBrandBlue, toolbarWidgetColor: Colors.white),
+      AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          toolbarColor: providerBrandBlue,
+          toolbarWidgetColor: Colors.white),
       IOSUiSettings(title: 'Crop Image'),
     ],
   );
   return cropped == null ? null : File(cropped.path);
 }
 
-Future<File?> _pickFromGalleryAndCrop(BuildContext context, ProviderDocumentSlot slot) async {
+Future<File?> _pickFromGalleryAndCrop(
+    BuildContext context, ProviderDocumentSlot slot) async {
   // requestFullMetadata: false keeps iOS on the permission-free
   // PHPickerViewController path - the default (true) triggers an extra
   // PHAsset metadata fetch that prompts for full photo-library access even
   // though the picker itself never needs it. Safe here since the picked
   // file goes straight into image_cropper next, which re-encodes it anyway.
-  final xFile = await ImagePicker().pickImage(source: ImageSource.gallery, requestFullMetadata: false);
+  final xFile = await ImagePicker()
+      .pickImage(source: ImageSource.gallery, requestFullMetadata: false);
   if (xFile == null || !context.mounted) return null;
 
   final isProfilePhoto = slot == ProviderDocumentSlot.profilePhoto;
@@ -122,7 +135,8 @@ Future<File?> _pickFromGalleryAndCrop(BuildContext context, ProviderDocumentSlot
         toolbarWidgetColor: Colors.white,
         lockAspectRatio: !isPoliceVerification,
       ),
-      IOSUiSettings(title: title, aspectRatioLockEnabled: !isPoliceVerification),
+      IOSUiSettings(
+          title: title, aspectRatioLockEnabled: !isPoliceVerification),
     ],
   );
   if (cropped == null) return null;
@@ -135,12 +149,19 @@ Future<File?> _pickFromGalleryAndCrop(BuildContext context, ProviderDocumentSlot
   if (!context.mounted) return null;
   if (!isValid) {
     final message = switch (slot) {
-      ProviderDocumentSlot.profilePhoto => 'No face was detected in that photo. Please choose a clearer one.',
-      ProviderDocumentSlot.cnicFront => 'That doesn\'t look like a CNIC front. Please choose a clearer photo of the front.',
-      ProviderDocumentSlot.cnicBack => 'That doesn\'t look like a CNIC back. Please choose a clearer photo of the back.',
-      ProviderDocumentSlot.policeVerification => 'Please choose a clearer photo.',
+      ProviderDocumentSlot.profilePhoto =>
+        'No face was detected in that photo. Please choose a clearer one.',
+      ProviderDocumentSlot.cnicFront =>
+        'That doesn\'t look like a CNIC front. Please choose a clearer photo of the front.',
+      ProviderDocumentSlot.cnicBack =>
+        'That doesn\'t look like a CNIC back. Please choose a clearer photo of the back.',
+      ProviderDocumentSlot.policeVerification =>
+        'Please choose a clearer photo.',
     };
-    await showMessageDialog(context, title: 'Photo Not Accepted', message: message, type: MessageDialogType.error);
+    await showMessageDialog(context,
+        title: 'Photo Not Accepted',
+        message: message,
+        type: MessageDialogType.error);
     return null;
   }
   return croppedFile;
@@ -150,7 +171,8 @@ Future<File?> _pickFromGalleryAndCrop(BuildContext context, ProviderDocumentSlot
 /// against a single already-cropped image, so a gallery upload can't skip
 /// validation entirely. Shows a brief non-dismissible progress indicator
 /// since on-device model inference can take a moment on a static image.
-Future<bool> _validateStaticImage(BuildContext context, ProviderDocumentSlot slot, File file) async {
+Future<bool> _validateStaticImage(
+    BuildContext context, ProviderDocumentSlot slot, File file) async {
   showDialog<void>(
     context: context,
     barrierDismissible: false,
@@ -169,7 +191,8 @@ Future<bool> _validateStaticImage(BuildContext context, ProviderDocumentSlot slo
     } else {
       final validator = CnicFrameValidator();
       try {
-        final result = await validator.validate(inputImage, isBack: slot == ProviderDocumentSlot.cnicBack);
+        final result = await validator.validate(inputImage,
+            isBack: slot == ProviderDocumentSlot.cnicBack);
         return result.isValid;
       } finally {
         await validator.close();

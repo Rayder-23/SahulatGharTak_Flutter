@@ -15,12 +15,19 @@ class InlineFieldError extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+          color: Colors.red.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12)),
       child: Row(
         children: [
           const Icon(Icons.error_outline_rounded, color: Colors.red, size: 18),
           const SizedBox(width: 8),
-          Expanded(child: Text(message, style: const TextStyle(color: Colors.red, fontSize: 12.5, fontWeight: FontWeight.w600))),
+          Expanded(
+              child: Text(message,
+                  style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600))),
           if (onRetry != null) ...[
             const SizedBox(width: 4),
             TextButton(
@@ -31,7 +38,8 @@ class InlineFieldError extends StatelessWidget {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 foregroundColor: Colors.red,
               ),
-              child: const Text('Retry', style: TextStyle(fontWeight: FontWeight.w700)),
+              child: const Text('Retry',
+                  style: TextStyle(fontWeight: FontWeight.w700)),
             ),
           ],
         ],

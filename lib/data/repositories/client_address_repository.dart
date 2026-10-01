@@ -5,11 +5,13 @@ import '../../services/client_address_api_service.dart';
 /// merging/filtering, so this repository exists purely to give
 /// `ClientAddressProvider` an injectable data-source seam for testing.
 class ClientAddressRepository {
-  ClientAddressRepository({ClientAddressApiService? apiService}) : _apiService = apiService ?? ClientAddressApiService();
+  ClientAddressRepository({ClientAddressApiService? apiService})
+      : _apiService = apiService ?? ClientAddressApiService();
 
   final ClientAddressApiService _apiService;
 
-  Future<List<ClientAddress>> fetchByClient(int clientUid) => _apiService.fetchByClient(clientUid);
+  Future<List<ClientAddress>> fetchByClient(int clientUid) =>
+      _apiService.fetchByClient(clientUid);
 
   Future<ClientAddress> create({
     required int clientUid,

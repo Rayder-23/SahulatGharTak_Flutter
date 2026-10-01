@@ -72,7 +72,8 @@ Future<bool?> showBookingCompletionDialog(
 }) {
   return showDialog<bool>(
     context: context,
-    builder: (dialogContext) => _CompletionDialog(booking: booking, provider: provider),
+    builder: (dialogContext) =>
+        _CompletionDialog(booking: booking, provider: provider),
   );
 }
 
@@ -89,7 +90,8 @@ class BookingDetailScreen extends StatefulWidget {
   /// requests that the provider can no longer act on.
   final bool readOnly;
 
-  const BookingDetailScreen({super.key, required this.booking, this.onClose, this.readOnly = false});
+  const BookingDetailScreen(
+      {super.key, required this.booking, this.onClose, this.readOnly = false});
 
   @override
   State<BookingDetailScreen> createState() => _BookingDetailScreenState();
@@ -106,7 +108,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     // no polling). Merges into ProviderBookingsProvider.bookings on success,
     // so this screen (via context.watch in build) and the list both pick it
     // up. Best-effort: on failure we just keep showing the cached snapshot.
-    context.read<ProviderBookingsProvider>().fetchBookingById(widget.booking.uid, widget.booking.providerUid).catchError((_) => widget.booking);
+    context
+        .read<ProviderBookingsProvider>()
+        .fetchBookingById(widget.booking.uid, widget.booking.providerUid)
+        .catchError((_) => widget.booking);
   }
 
   /// The freshest known copy of this booking — from the shared provider
@@ -114,18 +119,25 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   /// background refresh in [initState]), falling back to the snapshot this
   /// screen was opened with (e.g. read-only/rejected bookings, which aren't
   /// kept in the main list).
-  ServiceBooking get _currentBooking =>
-      context.read<ProviderBookingsProvider>().bookings.firstWhere((b) => b.uid == widget.booking.uid, orElse: () => widget.booking);
+  ServiceBooking get _currentBooking => context
+      .read<ProviderBookingsProvider>()
+      .bookings
+      .firstWhere((b) => b.uid == widget.booking.uid,
+          orElse: () => widget.booking);
 
   Future<void> _submit(String status, {String? reason}) async {
     setState(() => _submitting = true);
     final provider = context.read<ProviderBookingsProvider>();
     final booking = _currentBooking;
-    final success = await provider.updateStatus(booking, status, customerPaid: booking.customerPaid, reason: reason);
+    final success = await provider.updateStatus(booking, status,
+        customerPaid: booking.customerPaid, reason: reason);
     if (!mounted) return;
 
-    final message = success ? 'Booking marked as $status' : (provider.error ?? 'Failed to update booking');
-    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
+    final message = success
+        ? 'Booking marked as $status'
+        : (provider.error ?? 'Failed to update booking');
+    showAppToast(context, message,
+        type: success ? AppToastType.success : AppToastType.error);
     if (success) {
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     } else {
@@ -139,8 +151,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     final success = await provider.startJob(_currentBooking);
     if (!mounted) return;
 
-    final message = success ? 'Job started' : (provider.error ?? 'Failed to start job');
-    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
+    final message =
+        success ? 'Job started' : (provider.error ?? 'Failed to start job');
+    showAppToast(context, message,
+        type: success ? AppToastType.success : AppToastType.error);
     if (success) {
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     } else {
@@ -151,20 +165,25 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   Future<void> _respond(bool accept, {String? reason}) async {
     setState(() => _submitting = true);
     final provider = context.read<ProviderBookingsProvider>();
-    final success = await provider.respond(_currentBooking, accept, reason: reason);
+    final success =
+        await provider.respond(_currentBooking, accept, reason: reason);
     if (!mounted) return;
 
     if (success) {
-      showAppToast(context, accept ? 'Booking accepted' : 'Booking rejected', type: AppToastType.success);
+      showAppToast(context, accept ? 'Booking accepted' : 'Booking rejected',
+          type: AppToastType.success);
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     } else if (provider.lostRace) {
       // The booking no longer belongs to this provider (another provider won
       // the race and this one was auto-cancelled server-side) — leave the
       // now-stale detail view instead of letting the provider act on it further.
-      showAppToast(context, 'Sorry, this job was just taken by another provider', type: AppToastType.error);
+      showAppToast(
+          context, 'Sorry, this job was just taken by another provider',
+          type: AppToastType.error);
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     } else {
-      showAppToast(context, provider.error ?? 'Failed to respond to booking', type: AppToastType.error);
+      showAppToast(context, provider.error ?? 'Failed to respond to booking',
+          type: AppToastType.error);
       setState(() => _submitting = false);
     }
   }
@@ -173,7 +192,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     final reason = await showReasonDialog(
       context,
       title: 'Reject Booking',
-      message: 'Are you sure you want to reject this booking for "${_currentBooking.requestTitle}"? This cannot be undone.',
+      message:
+          'Are you sure you want to reject this booking for "${_currentBooking.requestTitle}"? This cannot be undone.',
       confirmLabel: 'Yes, Reject',
       reasons: kProviderCancelReasons,
       icon: Icons.cancel_outlined,
@@ -187,7 +207,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     final reason = await showReasonDialog(
       context,
       title: 'Cancel Booking',
-      message: 'Are you sure you want to cancel this booking for "${_currentBooking.requestTitle}"? This cannot be undone.',
+      message:
+          'Are you sure you want to cancel this booking for "${_currentBooking.requestTitle}"? This cannot be undone.',
       confirmLabel: 'Yes, Cancel',
       reasons: kProviderCancelReasons,
       icon: Icons.cancel_outlined,
@@ -199,7 +220,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
   Future<void> _openCompletionDialog() async {
     final provider = context.read<ProviderBookingsProvider>();
-    final result = await showBookingCompletionDialog(context, booking: _currentBooking, provider: provider);
+    final result = await showBookingCompletionDialog(context,
+        booking: _currentBooking, provider: provider);
     if (result == true && mounted) {
       (widget.onClose ?? () => Navigator.of(context).maybePop())();
     }
@@ -207,10 +229,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final booking = context.watch<ProviderBookingsProvider>().bookings.firstWhere((b) => b.uid == widget.booking.uid, orElse: () => widget.booking);
+    final booking = context
+        .watch<ProviderBookingsProvider>()
+        .bookings
+        .firstWhere((b) => b.uid == widget.booking.uid,
+            orElse: () => widget.booking);
     final isPending = !widget.readOnly && booking.status == 'Pending';
     final isAccepted = !widget.readOnly && booking.status == 'Accepted';
-    final canComplete = !widget.readOnly && (booking.status == 'Accepted' || booking.status == 'In Progress');
+    final canComplete = !widget.readOnly &&
+        (booking.status == 'Accepted' || booking.status == 'In Progress');
 
     return PopScope(
       canPop: widget.onClose == null,
@@ -230,17 +257,23 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                   children: [
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: statusColor(booking.status).withValues(alpha: 0.35), width: 1.2),
+                        border: Border.all(
+                            color: statusColor(booking.status)
+                                .withValues(alpha: 0.35),
+                            width: 1.2),
                       ),
                       child: StatusProgressBar(
                         steps: kBookingStatusSteps,
                         currentStep: bookingStatusStep(booking.status),
                         activeColor: statusColor(booking.status),
-                        terminalLabel: isBookingStatusTerminal(booking.status) ? '${booking.status} Booking' : null,
+                        terminalLabel: isBookingStatusTerminal(booking.status)
+                            ? '${booking.status} Booking'
+                            : null,
                         terminalColor: Colors.red,
                       ),
                     ),
@@ -249,7 +282,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       title: 'Client',
                       icon: Icons.person_rounded,
                       children: [
-                        _DetailRow(label: 'Name', value: booking.clientName, icon: Icons.badge_rounded),
+                        _DetailRow(
+                            label: 'Name',
+                            value: booking.clientName,
+                            icon: Icons.badge_rounded),
                         if (booking.clientMobileNo != null)
                           _DetailRow(
                             label: 'Contact Number',
@@ -261,23 +297,42 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                                   booking.clientMobileNo!,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0xFF1A2233), fontSize: 14, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(
+                                      color: Color(0xFF1A2233),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600),
                                 ),
                                 const SizedBox(height: 4),
                                 Wrap(
                                   spacing: 4,
                                   children: [
                                     TextButton.icon(
-                                      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), visualDensity: VisualDensity.compact),
-                                      onPressed: () => _callNumber(context, booking.clientMobileNo!),
-                                      icon: const Icon(Icons.call_rounded, size: 16, color: kAccentColor),
-                                      label: const Text('Call', style: TextStyle(color: kAccentColor, fontWeight: FontWeight.w700)),
+                                      style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          visualDensity: VisualDensity.compact),
+                                      onPressed: () => _callNumber(
+                                          context, booking.clientMobileNo!),
+                                      icon: const Icon(Icons.call_rounded,
+                                          size: 16, color: kAccentColor),
+                                      label: const Text('Call',
+                                          style: TextStyle(
+                                              color: kAccentColor,
+                                              fontWeight: FontWeight.w700)),
                                     ),
                                     TextButton.icon(
-                                      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), visualDensity: VisualDensity.compact),
-                                      onPressed: () => openWhatsApp(context, booking.clientMobileNo!),
-                                      icon: const Icon(Icons.chat, size: 16, color: Color(0xFF25D366)),
-                                      label: const Text('WhatsApp', style: TextStyle(color: Color(0xFF25D366), fontWeight: FontWeight.w700)),
+                                      style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          visualDensity: VisualDensity.compact),
+                                      onPressed: () => openWhatsApp(
+                                          context, booking.clientMobileNo!),
+                                      icon: const Icon(Icons.chat,
+                                          size: 16, color: Color(0xFF25D366)),
+                                      label: const Text('WhatsApp',
+                                          style: TextStyle(
+                                              color: Color(0xFF25D366),
+                                              fontWeight: FontWeight.w700)),
                                     ),
                                   ],
                                 ),
@@ -292,8 +347,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  [booking.clientFullAddress, booking.clientArea, booking.clientCity].whereType<String>().join(', '),
-                                  style: const TextStyle(color: Color(0xFF1A2233), fontSize: 14, fontWeight: FontWeight.w600),
+                                  [
+                                    booking.clientFullAddress,
+                                    booking.clientArea,
+                                    booking.clientCity
+                                  ].whereType<String>().join(', '),
+                                  style: const TextStyle(
+                                      color: Color(0xFF1A2233),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600),
                                 ),
                               ),
                               if (booking.hasClientLocation)
@@ -301,23 +363,35 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                                   visualDensity: VisualDensity.compact,
                                   padding: const EdgeInsets.only(left: 6),
                                   constraints: const BoxConstraints(),
-                                  icon: const Icon(Icons.map_rounded, color: kPrimaryColor, size: 20),
+                                  icon: const Icon(Icons.map_rounded,
+                                      color: kPrimaryColor, size: 20),
                                   tooltip: 'View on map',
-                                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                                  onPressed: () => Navigator.of(context)
+                                      .push(MaterialPageRoute(
                                     builder: (_) => ClientLocationMapScreen(
-                                      location: LatLng(booking.clientLatitude!, booking.clientLongitude!),
-                                      addressLabel: [booking.clientFullAddress, booking.clientArea, booking.clientCity].whereType<String>().join(', '),
+                                      location: LatLng(booking.clientLatitude!,
+                                          booking.clientLongitude!),
+                                      addressLabel: [
+                                        booking.clientFullAddress,
+                                        booking.clientArea,
+                                        booking.clientCity
+                                      ].whereType<String>().join(', '),
                                     ),
                                   )),
                                 ),
                             ],
                           ),
                         ),
-                        if (formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime) != null)
+                        if (formatScheduledDateTime(
+                                booking.preferredServiceDate,
+                                booking.preferredServiceTime) !=
+                            null)
                           _DetailRow(
                             label: 'Scheduled',
                             icon: Icons.event_rounded,
-                            value: formatScheduledDateTime(booking.preferredServiceDate, booking.preferredServiceTime)!,
+                            value: formatScheduledDateTime(
+                                booking.preferredServiceDate,
+                                booking.preferredServiceTime)!,
                           ),
                       ],
                     ),
@@ -326,15 +400,23 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       title: 'Service Details',
                       icon: Icons.build_rounded,
                       children: [
-                        _DetailRow(label: 'Request', value: booking.requestTitle, icon: Icons.assignment_rounded),
+                        _DetailRow(
+                            label: 'Request',
+                            value: booking.requestTitle,
+                            icon: Icons.assignment_rounded),
                         _DetailRow(
                           label: 'Details',
-                          value: booking.serviceDetail.trim().isEmpty ? 'No details provided' : booking.serviceDetail,
+                          value: booking.serviceDetail.trim().isEmpty
+                              ? 'No details provided'
+                              : booking.serviceDetail,
                           icon: Icons.notes_rounded,
                           muted: booking.serviceDetail.trim().isEmpty,
                         ),
                         if (booking.passcode != null)
-                          _DetailRow(label: 'Completion Passcode', value: booking.passcode!, icon: Icons.password_rounded),
+                          _DetailRow(
+                              label: 'Completion Passcode',
+                              value: booking.passcode!,
+                              icon: Icons.password_rounded),
                       ],
                     ),
                     const SizedBox(height: 14),
@@ -342,10 +424,22 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       title: 'Payment',
                       icon: Icons.payments_rounded,
                       children: [
-                        _DetailRow(label: 'Final Amount', value: formatCurrency(booking.finalAmount), icon: Icons.account_balance_wallet_rounded),
-                        _DetailRow(label: 'Customer Paid', value: formatCurrency(booking.customerPaid), icon: Icons.receipt_rounded),
-                        _DetailRow(label: 'Payment Mode', value: booking.paymentMode, icon: Icons.credit_card_rounded),
-                        _DetailRow(label: 'Your Earning', value: formatCurrency(booking.providerEarning), icon: Icons.savings_rounded),
+                        _DetailRow(
+                            label: 'Final Amount',
+                            value: formatCurrency(booking.finalAmount),
+                            icon: Icons.account_balance_wallet_rounded),
+                        _DetailRow(
+                            label: 'Customer Paid',
+                            value: formatCurrency(booking.customerPaid),
+                            icon: Icons.receipt_rounded),
+                        _DetailRow(
+                            label: 'Payment Mode',
+                            value: booking.paymentMode,
+                            icon: Icons.credit_card_rounded),
+                        _DetailRow(
+                            label: 'Your Earning',
+                            value: formatCurrency(booking.providerEarning),
+                            icon: Icons.savings_rounded),
                       ],
                     ),
                     const SizedBox(height: 14),
@@ -354,22 +448,32 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                       icon: Icons.info_outline_rounded,
                       compact: true,
                       children: [
-                        _DetailRow(label: 'Booking ID', value: '#${booking.uid}', icon: Icons.tag_rounded, compact: true),
+                        _DetailRow(
+                            label: 'Booking ID',
+                            value: '#${booking.uid}',
+                            icon: Icons.tag_rounded,
+                            compact: true),
                         _DetailRow(
                             label: 'Created On',
-                            value: formatLocalDateTime(booking.createdOn, kDatePattern, includeTime: true),
+                            value: formatLocalDateTime(
+                                booking.createdOn, kDatePattern,
+                                includeTime: true),
                             icon: Icons.schedule_rounded,
                             compact: true),
                         if (booking.acceptedOn != null)
                           _DetailRow(
                               label: 'Accepted On',
-                              value: formatLocalDateTime(booking.acceptedOn!, kDatePattern, includeTime: true),
+                              value: formatLocalDateTime(
+                                  booking.acceptedOn!, kDatePattern,
+                                  includeTime: true),
                               icon: Icons.thumb_up_rounded,
                               compact: true),
                         if (booking.completedOn != null)
                           _DetailRow(
                               label: 'Completed On',
-                              value: formatLocalDateTime(booking.completedOn!, kDatePattern, includeTime: true),
+                              value: formatLocalDateTime(
+                                  booking.completedOn!, kDatePattern,
+                                  includeTime: true),
                               icon: Icons.check_circle_rounded,
                               compact: true),
                       ],
@@ -389,9 +493,14 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                           Expanded(
                             child: ElevatedButton(
                               style: kProminentFilledButtonStyle(kAccentColor),
-                              onPressed: _submitting ? null : () => _respond(true),
+                              onPressed:
+                                  _submitting ? null : () => _respond(true),
                               child: _submitting
-                                  ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                  ? const SizedBox(
+                                      height: 18,
+                                      width: 18,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white))
                                   : const Text('Accept'),
                             ),
                           ),
@@ -413,9 +522,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                               style: kProminentFilledButtonStyle(kAccentColor),
                               onPressed: _submitting ? null : _startJob,
                               icon: _submitting
-                                  ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                                  : const Icon(Icons.play_arrow_rounded, size: 18),
-                              label: Text(_submitting ? 'Starting…' : 'Start Job'),
+                                  ? const SizedBox(
+                                      height: 18,
+                                      width: 18,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white))
+                                  : const Icon(Icons.play_arrow_rounded,
+                                      size: 18),
+                              label:
+                                  Text(_submitting ? 'Starting…' : 'Start Job'),
                             ),
                           ),
                         ],
@@ -434,7 +549,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                           Expanded(
                             child: ElevatedButton(
                               style: kProminentFilledButtonStyle(kPrimaryColor),
-                              onPressed: _submitting ? null : _openCompletionDialog,
+                              onPressed:
+                                  _submitting ? null : _openCompletionDialog,
                               child: const Text('Mark Completed'),
                             ),
                           ),
@@ -443,7 +559,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     else
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Text('Booking ${booking.status}', style: TextStyle(color: statusColor(booking.status), fontWeight: FontWeight.w600)),
+                        child: Text('Booking ${booking.status}',
+                            style: TextStyle(
+                                color: statusColor(booking.status),
+                                fontWeight: FontWeight.w600)),
                       ),
                   ],
                 ),
@@ -477,7 +596,10 @@ class _DetailHeader extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [_brandDark, _brandBlue]),
+            gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [_brandDark, _brandBlue]),
           ),
           child: Stack(
             children: [
@@ -487,7 +609,9 @@ class _DetailHeader extends StatelessWidget {
                 child: Container(
                   width: 110,
                   height: 110,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: _brandAccent.withValues(alpha: 0.14)),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _brandAccent.withValues(alpha: 0.14)),
                 ),
               ),
               Positioned(
@@ -496,7 +620,9 @@ class _DetailHeader extends StatelessWidget {
                 child: Container(
                   width: 90,
                   height: 90,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.06)),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.06)),
                 ),
               ),
               Positioned.fill(
@@ -513,21 +639,33 @@ class _DetailHeader extends StatelessWidget {
                             booking.requestTitle,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800, letterSpacing: -0.2, height: 1.1),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 19,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.2,
+                                height: 1.1),
                           ),
                           const SizedBox(height: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(20)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 9, vertical: 4),
+                            decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.16),
+                                borderRadius: BorderRadius.circular(20)),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(statusIcon(booking.status), size: 12, color: Colors.white),
+                                Icon(statusIcon(booking.status),
+                                    size: 12, color: Colors.white),
                                 const SizedBox(width: 4),
                                 Text(booking.status,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 11)),
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 11)),
                               ],
                             ),
                           ),
@@ -555,7 +693,11 @@ class _SectionCard extends StatelessWidget {
   final List<Widget> children;
   final bool compact;
 
-  const _SectionCard({required this.title, required this.icon, required this.children, this.compact = false});
+  const _SectionCard(
+      {required this.title,
+      required this.icon,
+      required this.children,
+      this.compact = false});
 
   @override
   Widget build(BuildContext context) {
@@ -564,21 +706,31 @@ class _SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+        boxShadow: [
+          BoxShadow(
+              color: _brandDark.withValues(alpha: 0.06),
+              blurRadius: 18,
+              offset: const Offset(0, 6))
+        ],
       ),
-      padding: EdgeInsets.fromLTRB(compact ? 14 : 16, compact ? 10 : 14, compact ? 14 : 16, compact ? 4 : 6),
+      padding: EdgeInsets.fromLTRB(compact ? 14 : 16, compact ? 10 : 14,
+          compact ? 14 : 16, compact ? 4 : 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: compact ? 14 : 17, color: compact ? Colors.grey[500] : _brandBlue),
+              Icon(icon,
+                  size: compact ? 14 : 17,
+                  color: compact ? Colors.grey[500] : _brandBlue),
               SizedBox(width: compact ? 6 : 8),
               Text(title,
                   style: TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: compact ? 12 : 14.5,
-                      color: compact ? Colors.grey[600] : const Color(0xFF1A2233))),
+                      color: compact
+                          ? Colors.grey[600]
+                          : const Color(0xFF1A2233))),
             ],
           ),
           SizedBox(height: compact ? 4 : 6),
@@ -598,7 +750,13 @@ class _DetailRow extends StatelessWidget {
   final bool muted;
   final bool compact;
 
-  const _DetailRow({required this.label, this.value, this.valueWidget, required this.icon, this.muted = false, this.compact = false});
+  const _DetailRow(
+      {required this.label,
+      this.value,
+      this.valueWidget,
+      required this.icon,
+      this.muted = false,
+      this.compact = false});
 
   @override
   Widget build(BuildContext context) {
@@ -612,7 +770,9 @@ class _DetailRow extends StatelessWidget {
             width: boxSize,
             height: boxSize,
             alignment: Alignment.center,
-            decoration: BoxDecoration(color: const Color(0xFFF6F8FC), borderRadius: BorderRadius.circular(compact ? 6 : 9)),
+            decoration: BoxDecoration(
+                color: const Color(0xFFF6F8FC),
+                borderRadius: BorderRadius.circular(compact ? 6 : 9)),
             child: Icon(icon, size: compact ? 11 : 15, color: kPrimaryColor),
           ),
           SizedBox(width: compact ? 8 : 12),
@@ -620,13 +780,18 @@ class _DetailRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(color: Colors.grey[500], fontSize: compact ? 10 : 11.5, fontWeight: FontWeight.w600)),
+                Text(label,
+                    style: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: compact ? 10 : 11.5,
+                        fontWeight: FontWeight.w600)),
                 SizedBox(height: compact ? 1 : 2),
                 valueWidget ??
                     Text(
                       value ?? '',
                       style: TextStyle(
-                        color: muted ? Colors.grey[400] : const Color(0xFF1A2233),
+                        color:
+                            muted ? Colors.grey[400] : const Color(0xFF1A2233),
                         fontSize: compact ? 12 : 14,
                         fontWeight: FontWeight.w600,
                         fontStyle: muted ? FontStyle.italic : FontStyle.normal,
@@ -653,10 +818,13 @@ class _CompletionDialog extends StatefulWidget {
 
 class _MaterialItemRow {
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController quantityController = TextEditingController(text: '1');
+  final TextEditingController quantityController =
+      TextEditingController(text: '1');
   final TextEditingController unitPriceController = TextEditingController();
 
-  bool get isBlank => nameController.text.trim().isEmpty && unitPriceController.text.trim().isEmpty;
+  bool get isBlank =>
+      nameController.text.trim().isEmpty &&
+      unitPriceController.text.trim().isEmpty;
 
   void dispose() {
     nameController.dispose();
@@ -678,7 +846,8 @@ class _CompletionDialogState extends State<_CompletionDialog> {
   void initState() {
     super.initState();
     _passcodeController = TextEditingController();
-    _amountController = TextEditingController(text: widget.booking.finalAmount.toStringAsFixed(0));
+    _amountController = TextEditingController(
+        text: widget.booking.finalAmount.toStringAsFixed(0));
     _labourController = TextEditingController();
   }
 
@@ -693,7 +862,8 @@ class _CompletionDialogState extends State<_CompletionDialog> {
     super.dispose();
   }
 
-  void _addMaterialRow() => setState(() => _materialRows.add(_MaterialItemRow()));
+  void _addMaterialRow() =>
+      setState(() => _materialRows.add(_MaterialItemRow()));
 
   void _removeMaterialRow(_MaterialItemRow row) {
     setState(() => _materialRows.remove(row));
@@ -704,7 +874,8 @@ class _CompletionDialogState extends State<_CompletionDialog> {
     final passcode = _passcodeController.text.trim();
     final amount = double.tryParse(_amountController.text.trim());
     if (passcode.isEmpty || amount == null || amount <= 0) {
-      setState(() => _error = 'Enter a valid passcode and an amount greater than 0 to close this job.');
+      setState(() => _error =
+          'Enter a valid passcode and an amount greater than 0 to close this job.');
       return;
     }
 
@@ -713,7 +884,8 @@ class _CompletionDialogState extends State<_CompletionDialog> {
     if (labourText.isNotEmpty) {
       labourAmount = double.tryParse(labourText);
       if (labourAmount == null || labourAmount < 0) {
-        setState(() => _error = 'Enter a valid labour charge, or leave it blank.');
+        setState(
+            () => _error = 'Enter a valid labour charge, or leave it blank.');
         return;
       }
     }
@@ -724,11 +896,17 @@ class _CompletionDialogState extends State<_CompletionDialog> {
       final name = row.nameController.text.trim();
       final quantity = int.tryParse(row.quantityController.text.trim());
       final unitPrice = double.tryParse(row.unitPriceController.text.trim());
-      if (name.isEmpty || quantity == null || quantity <= 0 || unitPrice == null || unitPrice < 0) {
-        setState(() => _error = 'Enter a valid name, quantity, and price for every material item, or remove the row.');
+      if (name.isEmpty ||
+          quantity == null ||
+          quantity <= 0 ||
+          unitPrice == null ||
+          unitPrice < 0) {
+        setState(() => _error =
+            'Enter a valid name, quantity, and price for every material item, or remove the row.');
         return;
       }
-      materialItems.add(MaterialItem(itemName: name, quantity: quantity, unitPrice: unitPrice));
+      materialItems.add(MaterialItem(
+          itemName: name, quantity: quantity, unitPrice: unitPrice));
     }
 
     setState(() {
@@ -747,7 +925,8 @@ class _CompletionDialogState extends State<_CompletionDialog> {
     if (!mounted) return;
 
     if (success) {
-      showAppToast(context, 'Booking marked as completed', type: AppToastType.success);
+      showAppToast(context, 'Booking marked as completed',
+          type: AppToastType.success);
       Navigator.of(context).pop(true);
     } else {
       setState(() {
@@ -769,7 +948,12 @@ class _CompletionDialogState extends State<_CompletionDialog> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.25), blurRadius: 30, offset: const Offset(0, 12))],
+            boxShadow: [
+              BoxShadow(
+                  color: _brandDark.withValues(alpha: 0.25),
+                  blurRadius: 30,
+                  offset: const Offset(0, 12))
+            ],
           ),
           clipBehavior: Clip.antiAlias,
           child: SingleChildScrollView(
@@ -781,7 +965,10 @@ class _CompletionDialogState extends State<_CompletionDialog> {
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
                   decoration: const BoxDecoration(
-                    gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [_brandDark, _brandBlue]),
+                    gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [_brandDark, _brandBlue]),
                   ),
                   child: Row(
                     children: [
@@ -789,8 +976,11 @@ class _CompletionDialogState extends State<_CompletionDialog> {
                         width: 44,
                         height: 44,
                         alignment: Alignment.center,
-                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(14)),
-                        child: const Icon(Icons.task_alt_rounded, color: Colors.white, size: 24),
+                        decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.16),
+                            borderRadius: BorderRadius.circular(14)),
+                        child: const Icon(Icons.task_alt_rounded,
+                            color: Colors.white, size: 24),
                       ),
                       const SizedBox(width: 14),
                       const Expanded(
@@ -798,9 +988,18 @@ class _CompletionDialogState extends State<_CompletionDialog> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('Complete Job', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.2)),
+                            Text('Complete Job',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.2)),
                             SizedBox(height: 2),
-                            Text('Verify with the customer to finish up', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
+                            Text('Verify with the customer to finish up',
+                                style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500)),
                           ],
                         ),
                       ),
@@ -812,80 +1011,140 @@ class _CompletionDialogState extends State<_CompletionDialog> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _FieldLabel(icon: Icons.password_rounded, text: 'Passcode from customer'),
+                      const _FieldLabel(
+                          icon: Icons.password_rounded,
+                          text: 'Passcode from customer'),
                       const SizedBox(height: 6),
                       TextField(
                         controller: _passcodeController,
                         keyboardType: TextInputType.number,
                         maxLength: 4,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, letterSpacing: 4),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            letterSpacing: 4),
                         decoration: _dialogFieldDecoration(
                           hint: '••••',
-                          hintStyle: TextStyle(color: Colors.grey.shade300, fontWeight: FontWeight.w700, fontSize: 16, letterSpacing: 4),
+                          hintStyle: TextStyle(
+                              color: Colors.grey.shade300,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              letterSpacing: 4),
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const _FieldLabel(icon: Icons.payments_rounded, text: 'Amount collected (Rs) *'),
+                      const _FieldLabel(
+                          icon: Icons.payments_rounded,
+                          text: 'Amount collected (Rs) *'),
                       const SizedBox(height: 6),
                       TextField(
                         controller: _amountController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$'))],
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d*\.?\d{0,2}$'))
+                        ],
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 15),
                         decoration: _dialogFieldDecoration(hint: '0'),
                       ),
                       const SizedBox(height: 14),
-                      const _FieldLabel(icon: Icons.credit_card_rounded, text: 'Payment mode'),
+                      const _FieldLabel(
+                          icon: Icons.credit_card_rounded,
+                          text: 'Payment mode'),
                       const SizedBox(height: 2),
-                      Text('Set by staff: ${booking.paymentMode}', style: TextStyle(color: Colors.grey[500], fontSize: 11.5, fontWeight: FontWeight.w500)),
+                      Text('Set by staff: ${booking.paymentMode}',
+                          style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500)),
                       const SizedBox(height: 6),
                       ThemedDropdownField<String?>(
                         value: _paymentModeOverride,
                         items: const [
-                          ThemedDropdownItem(value: null, label: 'Keep existing'),
-                          ThemedDropdownItem(value: 'CashToProvider', label: 'Cash to Provider'),
-                          ThemedDropdownItem(value: 'OnlineToCompany', label: 'Online to Company'),
+                          ThemedDropdownItem(
+                              value: null, label: 'Keep existing'),
+                          ThemedDropdownItem(
+                              value: 'CashToProvider',
+                              label: 'Cash to Provider'),
+                          ThemedDropdownItem(
+                              value: 'OnlineToCompany',
+                              label: 'Online to Company'),
                         ],
-                        onChanged: (value) => setState(() => _paymentModeOverride = value),
+                        onChanged: (value) =>
+                            setState(() => _paymentModeOverride = value),
                       ),
                       const SizedBox(height: 14),
-                      const _FieldLabel(icon: Icons.engineering_rounded, text: 'Labour charge (Rs, optional)'),
+                      const _FieldLabel(
+                          icon: Icons.engineering_rounded,
+                          text: 'Labour charge (Rs, optional)'),
                       const SizedBox(height: 6),
                       TextField(
                         controller: _labourController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$'))],
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-                        decoration: _dialogFieldDecoration(hint: 'Leave blank to use the full amount'),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d*\.?\d{0,2}$'))
+                        ],
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 15),
+                        decoration: _dialogFieldDecoration(
+                            hint: 'Leave blank to use the full amount'),
                       ),
                       const SizedBox(height: 14),
                       Row(
                         children: [
-                          const Expanded(child: _FieldLabel(icon: Icons.receipt_long_rounded, text: 'Material items (optional)')),
+                          const Expanded(
+                              child: _FieldLabel(
+                                  icon: Icons.receipt_long_rounded,
+                                  text: 'Material items (optional)')),
                           TextButton.icon(
                             onPressed: _addMaterialRow,
-                            icon: const Icon(Icons.add_circle_outline_rounded, size: 16),
-                            label: const Text('Add item', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
-                            style: TextButton.styleFrom(foregroundColor: _brandBlue, padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                            icon: const Icon(Icons.add_circle_outline_rounded,
+                                size: 16),
+                            label: const Text('Add item',
+                                style: TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700)),
+                            style: TextButton.styleFrom(
+                                foregroundColor: _brandBlue,
+                                padding: EdgeInsets.zero,
+                                minimumSize: Size.zero,
+                                tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap),
                           ),
                         ],
                       ),
                       for (final row in _materialRows) ...[
                         const SizedBox(height: 8),
-                        _MaterialItemRowField(row: row, onRemove: () => _removeMaterialRow(row)),
+                        _MaterialItemRowField(
+                            row: row, onRemove: () => _removeMaterialRow(row)),
                       ],
                       if (_error != null) ...[
                         const SizedBox(height: 12),
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12)),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline_rounded, size: 16, color: Colors.red),
+                              const Icon(Icons.error_outline_rounded,
+                                  size: 16, color: Colors.red),
                               const SizedBox(width: 8),
-                              Expanded(child: Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 12.5, fontWeight: FontWeight.w600))),
+                              Expanded(
+                                  child: Text(_error!,
+                                      style: const TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.w600))),
                             ],
                           ),
                         ),
@@ -895,11 +1154,17 @@ class _CompletionDialogState extends State<_CompletionDialog> {
                         children: [
                           Expanded(
                             child: OutlinedButton(
-                              style: kProminentOutlinedButtonStyle(Colors.grey.shade400).copyWith(
-                                foregroundColor: WidgetStateProperty.all(Colors.grey.shade700),
-                                side: WidgetStateProperty.all(BorderSide(color: Colors.grey.shade300, width: 1.5)),
+                              style: kProminentOutlinedButtonStyle(
+                                      Colors.grey.shade400)
+                                  .copyWith(
+                                foregroundColor: WidgetStateProperty.all(
+                                    Colors.grey.shade700),
+                                side: WidgetStateProperty.all(BorderSide(
+                                    color: Colors.grey.shade300, width: 1.5)),
                               ),
-                              onPressed: _submitting ? null : () => Navigator.of(context).pop(false),
+                              onPressed: _submitting
+                                  ? null
+                                  : () => Navigator.of(context).pop(false),
                               child: const Text('Cancel'),
                             ),
                           ),
@@ -910,9 +1175,16 @@ class _CompletionDialogState extends State<_CompletionDialog> {
                               style: kProminentFilledButtonStyle(kAccentColor),
                               onPressed: _submitting ? null : _submit,
                               icon: _submitting
-                                  ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                                  : const Icon(Icons.check_circle_rounded, size: 18),
-                              label: Text(_submitting ? 'Submitting…' : 'Mark Completed'),
+                                  ? const SizedBox(
+                                      height: 16,
+                                      width: 16,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white))
+                                  : const Icon(Icons.check_circle_rounded,
+                                      size: 18),
+                              label: Text(_submitting
+                                  ? 'Submitting…'
+                                  : 'Mark Completed'),
                             ),
                           ),
                         ],
@@ -965,14 +1237,17 @@ class _MaterialItemRowField extends StatelessWidget {
           child: TextField(
             controller: row.unitPriceController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$'))],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$'))
+            ],
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
             decoration: _dialogFieldDecoration(hint: 'Price'),
           ),
         ),
         IconButton(
           onPressed: onRemove,
-          icon: const Icon(Icons.remove_circle_outline_rounded, size: 20, color: Colors.red),
+          icon: const Icon(Icons.remove_circle_outline_rounded,
+              size: 20, color: Colors.red),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
         ),
@@ -989,9 +1264,13 @@ InputDecoration _dialogFieldDecoration({String? hint, TextStyle? hintStyle}) {
     filled: true,
     fillColor: const Color(0xFFF6F8FC),
     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: _brandBlue, width: 1.5)),
+    border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+    enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+    focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: _brandBlue, width: 1.5)),
     counterText: '',
   );
 }
@@ -1008,7 +1287,11 @@ class _FieldLabel extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: _brandBlue),
         const SizedBox(width: 6),
-        Text(text, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF1A2233))),
+        Text(text,
+            style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1A2233))),
       ],
     );
   }

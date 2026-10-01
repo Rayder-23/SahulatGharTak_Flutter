@@ -20,7 +20,9 @@ String _humanizeReason(String reason) {
       return 'Payout';
     default:
       // Fallback: split PascalCase into words for any reason not explicitly mapped.
-      return reason.replaceAllMapped(RegExp(r'(?<=[a-z])(?=[A-Z])'), (m) => ' ').trim();
+      return reason
+          .replaceAllMapped(RegExp(r'(?<=[a-z])(?=[A-Z])'), (m) => ' ')
+          .trim();
   }
 }
 
@@ -52,7 +54,8 @@ class _WalletTabState extends State<WalletTab> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
-      appBar: const ProviderTabHeader(title: 'Wallet', subtitle: 'Balance and payment history'),
+      appBar: const ProviderTabHeader(
+          title: 'Wallet', subtitle: 'Balance and payment history'),
       body: provider.loading && wallet == null
           ? const Center(child: CircularProgressIndicator())
           : provider.error != null && wallet == null
@@ -81,9 +84,15 @@ class _WalletTabState extends State<WalletTab> {
                                 children: [
                                   _BalanceCard(wallet: wallet),
                                   const SizedBox(height: 16),
-                                  Text('Transaction History', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                                  Text('Transaction History',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                              fontWeight: FontWeight.bold)),
                                   const SizedBox(height: 12),
-                                  if (wallet.transactions.isEmpty) const _EmptyTransactions(),
+                                  if (wallet.transactions.isEmpty)
+                                    const _EmptyTransactions(),
                                 ],
                               ),
                             ),
@@ -93,7 +102,10 @@ class _WalletTabState extends State<WalletTab> {
                               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                               sliver: SliverList.builder(
                                 itemCount: wallet.transactions.length,
-                                itemBuilder: (context, index) => _TransactionTile(transaction: wallet.transactions[index]),
+                                itemBuilder: (context, index) =>
+                                    _TransactionTile(
+                                        transaction:
+                                            wallet.transactions[index]),
                               ),
                             ),
                         ],
@@ -120,20 +132,27 @@ class _EmptyTransactions extends StatelessWidget {
           Container(
             width: 64,
             height: 64,
-            decoration: BoxDecoration(color: kPrimaryColor.withValues(alpha: 0.1), shape: BoxShape.circle),
-            child: const Icon(Icons.receipt_long_outlined, size: 30, color: kPrimaryColor),
+            decoration: BoxDecoration(
+                color: kPrimaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle),
+            child: const Icon(Icons.receipt_long_outlined,
+                size: 30, color: kPrimaryColor),
           ),
           const SizedBox(height: 16),
           const Text(
             'No transactions yet',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF1A2233)),
+            style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF1A2233)),
           ),
           const SizedBox(height: 6),
           Text(
             'Your earnings and payouts will show up here once you complete a job.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.grey[600], height: 1.4),
+            style:
+                TextStyle(fontSize: 13, color: Colors.grey[600], height: 1.4),
           ),
         ],
       ),
@@ -157,7 +176,12 @@ class _BalanceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: const Color(0xFF0A4FA8).withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 6))],
+        boxShadow: [
+          BoxShadow(
+              color: const Color(0xFF0A4FA8).withValues(alpha: 0.06),
+              blurRadius: 18,
+              offset: const Offset(0, 6))
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,18 +191,29 @@ class _BalanceCard extends StatelessWidget {
               CircleAvatar(
                 backgroundColor: balanceColor.withValues(alpha: 0.15),
                 radius: 22,
-                child: Icon(isOwed ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded, color: balanceColor),
+                child: Icon(
+                    isOwed
+                        ? Icons.arrow_downward_rounded
+                        : Icons.arrow_upward_rounded,
+                    color: balanceColor),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(balanceLabel, style: TextStyle(color: Colors.grey[600], fontSize: 12.5, fontWeight: FontWeight.w600)),
+                    Text(balanceLabel,
+                        style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600)),
                     const SizedBox(height: 2),
                     Text(
                       formatCurrency(wallet.balance.abs()),
-                      style: TextStyle(color: balanceColor, fontSize: 26, fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                          color: balanceColor,
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800),
                     ),
                   ],
                 ),
@@ -190,11 +225,18 @@ class _BalanceCard extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Icon(Icons.hourglass_top_rounded, color: Colors.grey[500], size: 18),
+              Icon(Icons.hourglass_top_rounded,
+                  color: Colors.grey[500], size: 18),
               const SizedBox(width: 8),
-              Text('Pending Payout', style: TextStyle(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w600)),
+              Text('Pending Payout',
+                  style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600)),
               const Spacer(),
-              Text(formatCurrency(wallet.pendingPayoutTotal), style: const TextStyle(fontWeight: FontWeight.w700, color: kPrimaryColor)),
+              Text(formatCurrency(wallet.pendingPayoutTotal),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, color: kPrimaryColor)),
             ],
           ),
         ],
@@ -220,36 +262,48 @@ class _TransactionTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: const Color(0xFF0A4FA8).withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+              color: const Color(0xFF0A4FA8).withValues(alpha: 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4))
+        ],
       ),
       child: Row(
         children: [
           CircleAvatar(
             backgroundColor: amountColor.withValues(alpha: 0.12),
             radius: 18,
-            child: Icon(isCredit ? Icons.add_rounded : Icons.remove_rounded, color: amountColor, size: 18),
+            child: Icon(isCredit ? Icons.add_rounded : Icons.remove_rounded,
+                color: amountColor, size: 18),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_humanizeReason(transaction.reason), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                Text(_humanizeReason(transaction.reason),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 13.5)),
                 const SizedBox(height: 2),
                 Text(
-                  formatLocalDateTime(transaction.createdOn, kCompactDatePattern, includeTime: true, timeSeparator: ' • '),
+                  formatLocalDateTime(
+                      transaction.createdOn, kCompactDatePattern,
+                      includeTime: true, timeSeparator: ' • '),
                   style: TextStyle(color: Colors.grey[500], fontSize: 11.5),
                 ),
                 if (transaction.bookingUid != null) ...[
                   const SizedBox(height: 2),
-                  Text('Booking #${transaction.bookingUid}', style: TextStyle(color: Colors.grey[400], fontSize: 11)),
+                  Text('Booking #${transaction.bookingUid}',
+                      style: TextStyle(color: Colors.grey[400], fontSize: 11)),
                 ],
               ],
             ),
           ),
           Text(
             '$sign ${formatCurrency(transaction.signedAmount.abs())}',
-            style: TextStyle(color: amountColor, fontWeight: FontWeight.w800, fontSize: 14),
+            style: TextStyle(
+                color: amountColor, fontWeight: FontWeight.w800, fontSize: 14),
           ),
         ],
       ),

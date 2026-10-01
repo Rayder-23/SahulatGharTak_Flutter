@@ -47,11 +47,16 @@ class CompactAppHeader extends StatelessWidget implements PreferredSizeWidget {
           end: Alignment.bottomRight,
           colors: [_brandDark, _brandBlue],
         ),
-        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(18), bottomRight: Radius.circular(18)),
-        boxShadow: [BoxShadow(color: Color(0x330A4FA8), blurRadius: 12, offset: Offset(0, 4))],
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(18), bottomRight: Radius.circular(18)),
+        boxShadow: [
+          BoxShadow(
+              color: Color(0x330A4FA8), blurRadius: 12, offset: Offset(0, 4))
+        ],
       ),
       child: ClipRRect(
-        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(18), bottomRight: Radius.circular(18)),
+        borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(18), bottomRight: Radius.circular(18)),
         child: SafeArea(
           bottom: false,
           child: SizedBox(
@@ -67,7 +72,11 @@ class CompactAppHeader extends StatelessWidget implements PreferredSizeWidget {
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.2),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2),
                   ),
                 ),
                 if (actions != null) ...actions!,

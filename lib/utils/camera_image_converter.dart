@@ -52,15 +52,18 @@ class CameraImageConverter {
     DeviceOrientation deviceOrientation,
   ) {
     if (Platform.isIOS) {
-      return InputImageRotationValue.fromRawValue(description.sensorOrientation);
+      return InputImageRotationValue.fromRawValue(
+          description.sensorOrientation);
     }
     if (Platform.isAndroid) {
       var rotationCompensation = _orientations[deviceOrientation];
       if (rotationCompensation == null) return null;
       if (description.lensDirection == CameraLensDirection.front) {
-        rotationCompensation = (description.sensorOrientation + rotationCompensation) % 360;
+        rotationCompensation =
+            (description.sensorOrientation + rotationCompensation) % 360;
       } else {
-        rotationCompensation = (description.sensorOrientation - rotationCompensation + 360) % 360;
+        rotationCompensation =
+            (description.sensorOrientation - rotationCompensation + 360) % 360;
       }
       return InputImageRotationValue.fromRawValue(rotationCompensation);
     }

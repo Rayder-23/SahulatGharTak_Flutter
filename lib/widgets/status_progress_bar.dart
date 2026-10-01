@@ -31,7 +31,8 @@ class StatusProgressBar extends StatelessWidget {
       final color = terminalColor ?? Colors.red;
       return Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: compact ? 6 : 9, horizontal: 12),
+        padding:
+            EdgeInsets.symmetric(vertical: compact ? 6 : 9, horizontal: 12),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(compact ? 8 : 10),
@@ -43,7 +44,10 @@ class StatusProgressBar extends StatelessWidget {
             Icon(Icons.cancel_rounded, size: compact ? 13 : 15, color: color),
             const SizedBox(width: 6),
             Text(terminalLabel!,
-                style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: compact ? 11 : 12.5)),
+                style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w700,
+                    fontSize: compact ? 11 : 12.5)),
           ],
         ),
       );
@@ -63,7 +67,9 @@ class StatusProgressBar extends StatelessWidget {
           return Expanded(
             child: Padding(
               padding: EdgeInsets.only(top: circleSize / 2 - lineHeight / 2),
-              child: Container(height: lineHeight, color: filled ? activeColor : Colors.grey.shade300),
+              child: Container(
+                  height: lineHeight,
+                  color: filled ? activeColor : Colors.grey.shade300),
             ),
           );
         }
@@ -81,15 +87,18 @@ class StatusProgressBar extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: done ? activeColor : Colors.white,
-                border: Border.all(color: borderColor, width: compact ? 1.5 : 2),
+                border:
+                    Border.all(color: borderColor, width: compact ? 1.5 : 2),
               ),
               child: done
-                  ? Icon(Icons.check, size: compact ? 10 : 15, color: Colors.white)
+                  ? Icon(Icons.check,
+                      size: compact ? 10 : 15, color: Colors.white)
                   : active
                       ? Container(
                           width: compact ? 6 : 9,
                           height: compact ? 6 : 9,
-                          decoration: BoxDecoration(shape: BoxShape.circle, color: activeColor),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle, color: activeColor),
                         )
                       : null,
             ),
@@ -111,7 +120,9 @@ class StatusProgressBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: labelSize,
                     fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                    color: done || active ? const Color(0xFF1A2233) : Colors.grey[400],
+                    color: done || active
+                        ? const Color(0xFF1A2233)
+                        : Colors.grey[400],
                   ),
                 ),
               ),

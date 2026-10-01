@@ -2,7 +2,8 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 
 const _brandBlue = Color(0xFF016EE3);
-const _itemTextStyle = TextStyle(color: Color(0xFF1A2233), fontSize: 14.5, fontWeight: FontWeight.w600);
+const _itemTextStyle = TextStyle(
+    color: Color(0xFF1A2233), fontSize: 14.5, fontWeight: FontWeight.w600);
 
 /// A single dropdown option: [label] is what's shown (and measured to size
 /// the popup), [value] is what's returned via [ThemedDropdownField.onChanged].
@@ -60,7 +61,8 @@ class _ThemedDropdownFieldState<T> extends State<ThemedDropdownField<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final menuWidth = _measureMenuWidth(context, widget.items.map((e) => e.label));
+    final menuWidth =
+        _measureMenuWidth(context, widget.items.map((e) => e.label));
 
     return DropdownButtonFormField2<T>(
       valueListenable: _selected,
@@ -72,7 +74,10 @@ class _ThemedDropdownFieldState<T> extends State<ThemedDropdownField<T>> {
       isExpanded: true,
       isDense: false,
       style: _itemTextStyle,
-      decoration: themedDropdownDecoration(hint: widget.hint, accentColor: widget.accentColor, fillColor: widget.fillColor),
+      decoration: themedDropdownDecoration(
+          hint: widget.hint,
+          accentColor: widget.accentColor,
+          fillColor: widget.fillColor),
       // DropdownButtonFormField2 gives the button zero built-in padding when
       // paired with a form decoration, which squashes the selected-value
       // text against the field edges; restore a little breathing room here.
@@ -80,21 +85,30 @@ class _ThemedDropdownFieldState<T> extends State<ThemedDropdownField<T>> {
       // ~24px-tall SizedBox sized only from font/icon size (ignoring this
       // padding), which clips the text instead of just squeezing it. Kept
       // small since decoration's contentPadding also applies on top of this.
-      buttonStyleData: const FormFieldButtonStyleData(padding: EdgeInsets.symmetric(vertical: 2)),
-      iconStyleData: IconStyleData(icon: Icon(Icons.keyboard_arrow_down_rounded, color: widget.accentColor)),
+      buttonStyleData: const FormFieldButtonStyleData(
+          padding: EdgeInsets.symmetric(vertical: 2)),
+      iconStyleData: IconStyleData(
+          icon: Icon(Icons.keyboard_arrow_down_rounded,
+              color: widget.accentColor)),
       dropdownStyleData: DropdownStyleData(
         width: menuWidth,
         maxHeight: 320,
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(16)),
       ),
-      menuItemStyleData: const MenuItemStyleData(padding: EdgeInsets.symmetric(horizontal: 16)),
+      menuItemStyleData: const MenuItemStyleData(
+          padding: EdgeInsets.symmetric(horizontal: 16)),
       items: widget.items
           .map((item) => DropdownItem<T>(
                 value: item.value,
                 intrinsicHeight: true,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text(item.label, style: _itemTextStyle, softWrap: true, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  child: Text(item.label,
+                      style: _itemTextStyle,
+                      softWrap: true,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis),
                 ),
               ))
           .toList(),
@@ -131,14 +145,21 @@ InputDecoration themedDropdownDecoration({
 }) {
   return InputDecoration(
     hintText: hint,
-    hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14, fontWeight: FontWeight.w500),
+    hintStyle: TextStyle(
+        color: Colors.grey[500], fontSize: 14, fontWeight: FontWeight.w500),
     isDense: true,
     filled: true,
     fillColor: fillColor,
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: accentColor, width: 1.5)),
-    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Colors.redAccent)),
+    border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+    enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+    focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: accentColor, width: 1.5)),
+    errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Colors.redAccent)),
   );
 }

@@ -11,15 +11,19 @@ enum CameraPermissionResult { granted, denied, permanentlyDenied }
 /// `ProviderDocumentProvider` so that provider stays unaware of *how* a
 /// permission was granted.
 class CameraPermissionService {
-  Future<CameraPermissionResult> ensureCameraPermission() => _ensure(Permission.camera);
+  Future<CameraPermissionResult> ensureCameraPermission() =>
+      _ensure(Permission.camera);
 
   Future<CameraPermissionResult> _ensure(Permission permission) async {
     var status = await permission.status;
-    if (status.isGranted || status.isLimited) return CameraPermissionResult.granted;
+    if (status.isGranted || status.isLimited)
+      return CameraPermissionResult.granted;
 
     status = await permission.request();
-    if (status.isGranted || status.isLimited) return CameraPermissionResult.granted;
-    if (status.isPermanentlyDenied) return CameraPermissionResult.permanentlyDenied;
+    if (status.isGranted || status.isLimited)
+      return CameraPermissionResult.granted;
+    if (status.isPermanentlyDenied)
+      return CameraPermissionResult.permanentlyDenied;
     return CameraPermissionResult.denied;
   }
 

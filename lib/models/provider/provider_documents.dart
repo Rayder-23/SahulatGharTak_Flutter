@@ -33,11 +33,17 @@ class ProviderDocumentsModel {
       cnicBackImagePath: json['cnicBackImagePath'] as String?,
       policeVerificationPath: json['policeVerificationPath'] as String?,
       isVerified: json['isVerified'] as bool? ?? false,
-      verifiedOn: json['verifiedOn'] != null ? DateTime.parse(json['verifiedOn'] as String) : null,
+      verifiedOn: json['verifiedOn'] != null
+          ? DateTime.parse(json['verifiedOn'] as String)
+          : null,
       verifiedBy: json['verifiedBy'] as int?,
       verificationRemarks: json['verificationRemarks'] as String?,
-      createdOn: json['createdOn'] != null ? DateTime.parse(json['createdOn'] as String) : null,
-      updatedOn: json['updatedOn'] != null ? DateTime.parse(json['updatedOn'] as String) : null,
+      createdOn: json['createdOn'] != null
+          ? DateTime.parse(json['createdOn'] as String)
+          : null,
+      updatedOn: json['updatedOn'] != null
+          ? DateTime.parse(json['updatedOn'] as String)
+          : null,
     );
   }
 }

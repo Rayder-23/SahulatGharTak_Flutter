@@ -18,5 +18,5 @@ const double kAppLogoMaxWidthFraction = 0.4;
 
 /// Shared by `landing_screen.dart` and `splash_screen.dart`, which render the
 /// same asset at the same size.
-double appLogoSize(BuildContext context) =>
-    math.min(kAppLogoSize, MediaQuery.sizeOf(context).width * kAppLogoMaxWidthFraction);
+double appLogoSize(BuildContext context) => math.min(
+    kAppLogoSize, MediaQuery.sizeOf(context).width * kAppLogoMaxWidthFraction);

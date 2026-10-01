@@ -111,7 +111,8 @@ class _ServiceRequestsScreenState extends State<ServiceRequestsScreen> {
     final message = success
         ? 'Request deleted'
         : (requestProvider.error ?? 'Failed to delete request');
-    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
+    showAppToast(context, message,
+        type: success ? AppToastType.success : AppToastType.error);
   }
 
   Future<void> _cancelRequest(CustomerServiceRequest request) async {
@@ -134,7 +135,8 @@ class _ServiceRequestsScreenState extends State<ServiceRequestsScreen> {
     final message = success
         ? 'Request cancelled'
         : (requestProvider.error ?? 'Failed to cancel request');
-    showAppToast(context, message, type: success ? AppToastType.success : AppToastType.error);
+    showAppToast(context, message,
+        type: success ? AppToastType.success : AppToastType.error);
   }
 
   static const _brandDark = Color(0xFF0A4FA8);
@@ -406,7 +408,10 @@ class _RequestCard extends StatelessWidget {
                                 const SizedBox(height: 6),
                                 _InfoRow(
                                   icon: Icons.event_rounded,
-                                  text: formatScheduledDateTime(request.preferredServiceDate, request.preferredServiceTime) ?? 'Not specified',
+                                  text: formatScheduledDateTime(
+                                          request.preferredServiceDate,
+                                          request.preferredServiceTime) ??
+                                      'Not specified',
                                   trailing: request.isUrgent
                                       ? Container(
                                           margin:
@@ -472,7 +477,8 @@ class _RequestCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          if (request.providerMobileNo != null || request.passcode != null) ...[
+                          if (request.providerMobileNo != null ||
+                              request.passcode != null) ...[
                             const SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -480,12 +486,19 @@ class _RequestCard extends StatelessWidget {
                                 if (request.passcode != null)
                                   TextButton.icon(
                                     style: TextButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
                                         visualDensity: VisualDensity.compact,
-                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                                    onPressed: () => showRequestPasscodeDialog(context, request),
-                                    icon: const Icon(Icons.password_rounded, size: 16, color: _brandBlue),
-                                    label: const Text('Passcode', style: TextStyle(color: _brandBlue, fontWeight: FontWeight.w700)),
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap),
+                                    onPressed: () => showRequestPasscodeDialog(
+                                        context, request),
+                                    icon: const Icon(Icons.password_rounded,
+                                        size: 16, color: _brandBlue),
+                                    label: const Text('Passcode',
+                                        style: TextStyle(
+                                            color: _brandBlue,
+                                            fontWeight: FontWeight.w700)),
                                   )
                                 else
                                   const SizedBox.shrink(),
@@ -495,21 +508,37 @@ class _RequestCard extends StatelessWidget {
                                     children: [
                                       TextButton.icon(
                                         style: TextButton.styleFrom(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                                            visualDensity: VisualDensity.compact,
-                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                                        onPressed: () => callNumber(context, request.providerMobileNo!),
-                                        icon: const Icon(Icons.call_rounded, size: 16, color: kAccentColor),
-                                        label: const Text('Call', style: TextStyle(color: kAccentColor, fontWeight: FontWeight.w700)),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            visualDensity:
+                                                VisualDensity.compact,
+                                            tapTargetSize: MaterialTapTargetSize
+                                                .shrinkWrap),
+                                        onPressed: () => callNumber(
+                                            context, request.providerMobileNo!),
+                                        icon: const Icon(Icons.call_rounded,
+                                            size: 16, color: kAccentColor),
+                                        label: const Text('Call',
+                                            style: TextStyle(
+                                                color: kAccentColor,
+                                                fontWeight: FontWeight.w700)),
                                       ),
                                       TextButton.icon(
                                         style: TextButton.styleFrom(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                                            visualDensity: VisualDensity.compact,
-                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                                        onPressed: () => openWhatsApp(context, request.providerMobileNo!),
-                                        icon: const Icon(Icons.chat, size: 16, color: Color(0xFF25D366)),
-                                        label: const Text('WhatsApp', style: TextStyle(color: Color(0xFF25D366), fontWeight: FontWeight.w700)),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            visualDensity:
+                                                VisualDensity.compact,
+                                            tapTargetSize: MaterialTapTargetSize
+                                                .shrinkWrap),
+                                        onPressed: () => openWhatsApp(
+                                            context, request.providerMobileNo!),
+                                        icon: const Icon(Icons.chat,
+                                            size: 16, color: Color(0xFF25D366)),
+                                        label: const Text('WhatsApp',
+                                            style: TextStyle(
+                                                color: Color(0xFF25D366),
+                                                fontWeight: FontWeight.w700)),
                                       ),
                                     ],
                                   ),
@@ -694,12 +723,17 @@ class _BouncedBackNotice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline_rounded, size: 17, color: Colors.orange),
+          const Icon(Icons.info_outline_rounded,
+              size: 17, color: Colors.orange),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Your provider had to cancel — we\'re finding you a new one.',
-              style: TextStyle(color: Colors.orange.shade900, fontSize: 12.5, fontWeight: FontWeight.w600, height: 1.3),
+              style: TextStyle(
+                  color: Colors.orange.shade900,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  height: 1.3),
             ),
           ),
         ],

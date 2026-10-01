@@ -86,7 +86,11 @@ class _CategoryPickerScreenState extends State<CategoryPickerScreen> {
     final query = _query.trim().toLowerCase();
     final filtered = query.isEmpty
         ? _categories
-        : _categories.where((c) => c.name.toLowerCase().contains(query) || c.serviceName.toLowerCase().contains(query)).toList();
+        : _categories
+            .where((c) =>
+                c.name.toLowerCase().contains(query) ||
+                c.serviceName.toLowerCase().contains(query))
+            .toList();
 
     final groups = <String, List<Category>>{};
     for (final category in filtered) {
@@ -100,7 +104,9 @@ class _CategoryPickerScreenState extends State<CategoryPickerScreen> {
       if (_selectedIds.contains(category.id)) {
         _selectedIds.remove(category.id);
       } else if (_selectedIds.length >= kMaxProviderCategories) {
-        showAppToast(context, 'You can select up to $kMaxProviderCategories categories', type: AppToastType.error);
+        showAppToast(
+            context, 'You can select up to $kMaxProviderCategories categories',
+            type: AppToastType.error);
       } else {
         _selectedIds.add(category.id);
       }
@@ -108,7 +114,8 @@ class _CategoryPickerScreenState extends State<CategoryPickerScreen> {
   }
 
   void _done() {
-    final selected = _categories.where((c) => _selectedIds.contains(c.id)).toList();
+    final selected =
+        _categories.where((c) => _selectedIds.contains(c.id)).toList();
     Navigator.of(context).pop(selected);
   }
 
@@ -143,7 +150,8 @@ class _CategoryPickerScreenState extends State<CategoryPickerScreen> {
                             itemCount: groupNames.length,
                             itemBuilder: (context, index) {
                               final serviceName = groupNames[index];
-                              final style = styleForServiceName(serviceName, index);
+                              final style =
+                                  styleForServiceName(serviceName, index);
                               return _CategoryGroupSection(
                                 serviceName: serviceName,
                                 style: style,
@@ -164,9 +172,12 @@ class _CategoryPickerScreenState extends State<CategoryPickerScreen> {
             backgroundColor: _brandBlue,
             foregroundColor: Colors.white,
             minimumSize: const Size(double.infinity, 48),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
-          child: Text(_selectedIds.isEmpty ? 'Select 1 to $kMaxProviderCategories categories' : 'Done (${_selectedIds.length} of $kMaxProviderCategories selected)'),
+          child: Text(_selectedIds.isEmpty
+              ? 'Select 1 to $kMaxProviderCategories categories'
+              : 'Done (${_selectedIds.length} of $kMaxProviderCategories selected)'),
         ),
       ),
     );
@@ -194,23 +205,33 @@ class _PickerHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [_brandDark, _brandBlue]),
-        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
-        boxShadow: [BoxShadow(color: Color(0x330A4FA8), blurRadius: 16, offset: Offset(0, 6))],
+        gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [_brandDark, _brandBlue]),
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+              color: Color(0x330A4FA8), blurRadius: 16, offset: Offset(0, 6))
+        ],
       ),
       child: ClipRRect(
-        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
+        borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
         child: Stack(
           children: [
             Positioned(
               top: -30,
               right: -20,
-              child: DecorativeGlowCircle(baseSize: 110, color: _brandAccent.withValues(alpha: 0.14)),
+              child: DecorativeGlowCircle(
+                  baseSize: 110, color: _brandAccent.withValues(alpha: 0.14)),
             ),
             const Positioned(
               bottom: -40,
               left: -16,
-              child: DecorativeGlowCircle(baseSize: 90, color: Color.fromRGBO(255, 255, 255, 0.06)),
+              child: DecorativeGlowCircle(
+                  baseSize: 90, color: Color.fromRGBO(255, 255, 255, 0.06)),
             ),
             SafeArea(
               bottom: false,
@@ -222,12 +243,17 @@ class _PickerHeader extends StatelessWidget {
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          icon:
+                              const Icon(Icons.arrow_back, color: Colors.white),
                           onPressed: () => Navigator.of(context).maybePop(),
                         ),
                         const Text(
                           'Select Your Category',
-                          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.2),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.2),
                         ),
                       ],
                     ),
@@ -238,7 +264,12 @@ class _PickerHeader extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(14),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 10, offset: const Offset(0, 4))],
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.12),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4))
+                          ],
                         ),
                         child: TextField(
                           controller: controller,
@@ -247,15 +278,18 @@ class _PickerHeader extends StatelessWidget {
                           decoration: InputDecoration(
                             hintText: 'Search categories...',
                             hintStyle: TextStyle(color: Colors.grey.shade500),
-                            prefixIcon: const Icon(Icons.search_rounded, color: _brandBlue),
+                            prefixIcon: const Icon(Icons.search_rounded,
+                                color: _brandBlue),
                             suffixIcon: query.isEmpty
                                 ? null
                                 : IconButton(
-                                    icon: Icon(Icons.close_rounded, color: Colors.grey.shade500, size: 20),
+                                    icon: Icon(Icons.close_rounded,
+                                        color: Colors.grey.shade500, size: 20),
                                     onPressed: onClear,
                                   ),
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
@@ -300,7 +334,9 @@ class _CategoryGroupSection extends StatelessWidget {
                 Container(
                   width: 32,
                   height: 32,
-                  decoration: BoxDecoration(color: style.color.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(9)),
+                  decoration: BoxDecoration(
+                      color: style.color.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(9)),
                   child: Icon(style.icon, size: 17, color: style.color),
                 ),
                 const SizedBox(width: 10),
@@ -309,7 +345,10 @@ class _CategoryGroupSection extends StatelessWidget {
                     serviceName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF14213D)),
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF14213D)),
                   ),
                 ),
               ],
@@ -319,7 +358,12 @@ class _CategoryGroupSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))],
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2))
+              ],
             ),
             child: Column(
               children: [
@@ -347,7 +391,11 @@ class _CategoryTile extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _CategoryTile({required this.category, required this.color, required this.selected, required this.onTap});
+  const _CategoryTile(
+      {required this.category,
+      required this.color,
+      required this.selected,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -360,17 +408,26 @@ class _CategoryTile extends StatelessWidget {
             Container(
               width: 38,
               height: 38,
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(11)),
-              child: Icon(getCategoryIcon(category.name), size: 19, color: color),
+              decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(11)),
+              child:
+                  Icon(getCategoryIcon(category.name), size: 19, color: color),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 category.name,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF14213D)),
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF14213D)),
               ),
             ),
-            if (selected) Icon(Icons.check_circle_rounded, color: color, size: 22) else const Icon(Icons.chevron_right_rounded, color: Colors.black26),
+            if (selected)
+              Icon(Icons.check_circle_rounded, color: color, size: 22)
+            else
+              const Icon(Icons.chevron_right_rounded, color: Colors.black26),
           ],
         ),
       ),
@@ -389,9 +446,12 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off_rounded, size: 48, color: Colors.grey.shade400),
+            Icon(Icons.search_off_rounded,
+                size: 48, color: Colors.grey.shade400),
             const SizedBox(height: 12),
-            Text('No categories found', style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+            Text('No categories found',
+                style: TextStyle(
+                    color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
           ],
         ),
       ),
@@ -415,9 +475,13 @@ class _ErrorState extends StatelessWidget {
           children: [
             Icon(Icons.wifi_off_rounded, size: 48, color: Colors.red.shade300),
             const SizedBox(height: 12),
-            Text('Couldn\'t load categories', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.grey.shade800)),
+            Text('Couldn\'t load categories',
+                style: TextStyle(
+                    fontWeight: FontWeight.w700, color: Colors.grey.shade800)),
             const SizedBox(height: 6),
-            Text(message, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+            Text(message,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
             const SizedBox(height: 16),
             ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
           ],

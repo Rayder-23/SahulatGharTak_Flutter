@@ -7,18 +7,23 @@ import '../utils/constants.dart';
 
 class ProviderServiceRequestApiService {
   Future<List<ServiceRequest>> fetchByProvider(int providerId) async {
-    final response = await http.get(Uri.parse('$kApiBaseUrl/providers/$providerId/service-requests')).timeout(kApiTimeout);
+    final response = await http
+        .get(Uri.parse('$kApiBaseUrl/providers/$providerId/service-requests'))
+        .timeout(kApiTimeout);
 
     // 404 means no requests found for this provider - a normal empty state,
     // not a failure.
     if (response.statusCode == 404) return [];
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to load service requests (status ${response.statusCode})');
+      throw Exception(
+          'Failed to load service requests (status ${response.statusCode})');
     }
 
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     final List<dynamic> data = json['data'] as List<dynamic>? ?? [];
-    return data.map((item) => ServiceRequest.fromJson(item as Map<String, dynamic>)).toList();
+    return data
+        .map((item) => ServiceRequest.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 }

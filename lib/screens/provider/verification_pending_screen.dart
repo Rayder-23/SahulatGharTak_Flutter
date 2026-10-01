@@ -21,7 +21,8 @@ class VerificationPendingScreen extends StatefulWidget {
   const VerificationPendingScreen({super.key});
 
   @override
-  State<VerificationPendingScreen> createState() => _VerificationPendingScreenState();
+  State<VerificationPendingScreen> createState() =>
+      _VerificationPendingScreenState();
 }
 
 class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
@@ -53,7 +54,9 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
     if (documents.isVerified) {
       Navigator.of(context).pushReplacementNamed(ProviderRoutes.dashboard);
     } else {
-      showAppToast(context, 'Still pending verification. Please check back later.', type: AppToastType.info);
+      showAppToast(
+          context, 'Still pending verification. Please check back later.',
+          type: AppToastType.info);
     }
   }
 
@@ -78,39 +81,57 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                       Container(
                         width: 96,
                         height: 96,
-                        decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.12), shape: BoxShape.circle),
-                        child: const Icon(Icons.hourglass_top_rounded, size: 48, color: Colors.orange),
+                        decoration: BoxDecoration(
+                            color: Colors.orange.withValues(alpha: 0.12),
+                            shape: BoxShape.circle),
+                        child: const Icon(Icons.hourglass_top_rounded,
+                            size: 48, color: Colors.orange),
                       ),
                       const SizedBox(height: 24),
                       const Text(
                         'Pending Verification',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF1A2233)),
+                        style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF1A2233)),
                       ),
                       const SizedBox(height: 10),
                       Text(
                         'Your provider account is under review. Our team is verifying your profile photo and CNIC - this usually takes a short while. '
                         'You\'ll be able to access the Provider Dashboard as soon as you\'re verified.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600], height: 1.5),
+                        style: TextStyle(
+                            fontSize: 14, color: Colors.grey[600], height: 1.5),
                       ),
                       if (remarks != null && remarks.isNotEmpty) ...[
                         const SizedBox(height: 20),
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14)),
+                          decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(14)),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Row(
                                 children: [
-                                  Icon(Icons.info_outline_rounded, color: Colors.red, size: 18),
+                                  Icon(Icons.info_outline_rounded,
+                                      color: Colors.red, size: 18),
                                   SizedBox(width: 8),
-                                  Text('Feedback from our team', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.red, fontSize: 13)),
+                                  Text('Feedback from our team',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.red,
+                                          fontSize: 13)),
                                 ],
                               ),
                               const SizedBox(height: 6),
-                              Text(remarks, style: TextStyle(color: Colors.red.shade700, fontSize: 13, height: 1.4)),
+                              Text(remarks,
+                                  style: TextStyle(
+                                      color: Colors.red.shade700,
+                                      fontSize: 13,
+                                      height: 1.4)),
                             ],
                           ),
                         ),
@@ -126,7 +147,8 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                   style: kProminentFilledButtonStyle(providerBrandBlue),
                   icon: const Icon(Icons.badge_outlined),
                   label: const Text('Update Documents'),
-                  onPressed: () => Navigator.of(context).pushNamed(ProviderRoutes.verificationDocuments),
+                  onPressed: () => Navigator.of(context)
+                      .pushNamed(ProviderRoutes.verificationDocuments),
                 ),
               ),
               const SizedBox(height: 12),
@@ -135,7 +157,10 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                 child: OutlinedButton.icon(
                   style: kProminentOutlinedButtonStyle(providerBrandBlue),
                   icon: _checking
-                      ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                      ? const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2))
                       : const Icon(Icons.refresh_rounded),
                   label: const Text('Check Verification Status'),
                   onPressed: _checking ? null : _checkStatus,
@@ -146,8 +171,13 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                 width: double.infinity,
                 child: TextButton.icon(
                   icon: Icon(Icons.home_outlined, color: Colors.grey[700]),
-                  label: Text('Go to Customer Dashboard', style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w600)),
-                  onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false),
+                  label: Text('Go to Customer Dashboard',
+                      style: TextStyle(
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.w600)),
+                  onPressed: () => Navigator.of(context)
+                      .pushNamedAndRemoveUntil(
+                          HomeScreen.routeName, (route) => false),
                 ),
               ),
             ],

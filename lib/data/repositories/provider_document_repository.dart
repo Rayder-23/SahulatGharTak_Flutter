@@ -9,11 +9,13 @@ import '../../utils/constants.dart';
 /// full URL. `ProviderDocumentProvider` should keep only UI state (freshly
 /// picked `File`s, loading/progress flags) and call through to this class.
 class ProviderDocumentRepository {
-  ProviderDocumentRepository({ProviderDocumentApiService? apiService}) : _apiService = apiService ?? ProviderDocumentApiService();
+  ProviderDocumentRepository({ProviderDocumentApiService? apiService})
+      : _apiService = apiService ?? ProviderDocumentApiService();
 
   final ProviderDocumentApiService _apiService;
 
-  Future<ProviderDocumentsModel?> fetchDocuments(int providerUid) => _apiService.fetchDocuments(providerUid);
+  Future<ProviderDocumentsModel?> fetchDocuments(int providerUid) =>
+      _apiService.fetchDocuments(providerUid);
 
   /// Each file is optional - omitting one leaves that slot's already-stored
   /// image untouched server-side (see api.txt). The provider's first-ever

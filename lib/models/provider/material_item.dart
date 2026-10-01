@@ -6,7 +6,8 @@ class MaterialItem {
   final int quantity;
   final double unitPrice;
 
-  const MaterialItem({required this.itemName, this.quantity = 1, required this.unitPrice});
+  const MaterialItem(
+      {required this.itemName, this.quantity = 1, required this.unitPrice});
 
   Map<String, dynamic> toJson() => {
         'itemName': itemName,

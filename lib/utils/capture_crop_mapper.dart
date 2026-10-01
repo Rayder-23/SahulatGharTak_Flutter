@@ -32,14 +32,16 @@ class CaptureCropMapper {
       // was actually shown in the (always-upright) preview.
       decoded = img.bakeOrientation(decoded);
 
-      final imageSize = Size(decoded.width.toDouble(), decoded.height.toDouble());
+      final imageSize =
+          Size(decoded.width.toDouble(), decoded.height.toDouble());
       if (imageSize.width <= 0 || imageSize.height <= 0) return null;
 
       final scale = math.max(
         previewWidgetSize.width / imageSize.width,
         previewWidgetSize.height / imageSize.height,
       );
-      final scaledImageSize = Size(imageSize.width * scale, imageSize.height * scale);
+      final scaledImageSize =
+          Size(imageSize.width * scale, imageSize.height * scale);
       final dx = (scaledImageSize.width - previewWidgetSize.width) / 2;
       final dy = (scaledImageSize.height - previewWidgetSize.height) / 2;
 
@@ -62,7 +64,8 @@ class CaptureCropMapper {
       );
 
       final dir = await getTemporaryDirectory();
-      final outFile = File('${dir.path}/${DateTime.now().microsecondsSinceEpoch}_cropped.jpg');
+      final outFile = File(
+          '${dir.path}/${DateTime.now().microsecondsSinceEpoch}_cropped.jpg');
       await outFile.writeAsBytes(img.encodeJpg(cropped, quality: 90));
       return outFile;
     } catch (_) {

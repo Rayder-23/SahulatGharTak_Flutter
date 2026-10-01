@@ -5,7 +5,8 @@ import '../../services/category_api_service.dart';
 /// merging/filtering — exists to give `CategoryProvider` an injectable
 /// data-source seam for testing.
 class CategoryRepository {
-  CategoryRepository({CategoryApiService? apiService}) : _apiService = apiService ?? CategoryApiService();
+  CategoryRepository({CategoryApiService? apiService})
+      : _apiService = apiService ?? CategoryApiService();
 
   final CategoryApiService _apiService;
 

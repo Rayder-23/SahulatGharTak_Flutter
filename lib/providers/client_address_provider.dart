@@ -5,7 +5,8 @@ import '../models/client_address.dart';
 import '../utils/api_error.dart';
 
 class ClientAddressProvider extends ChangeNotifier {
-  ClientAddressProvider({required ClientAddressRepository repository}) : _repository = repository;
+  ClientAddressProvider({required ClientAddressRepository repository})
+      : _repository = repository;
 
   final ClientAddressRepository _repository;
 
@@ -98,7 +99,8 @@ class ClientAddressProvider extends ChangeNotifier {
         latitude: latitude,
         longitude: longitude,
       );
-      _addresses = _addresses.map((a) => a.uid == updated.uid ? updated : a).toList();
+      _addresses =
+          _addresses.map((a) => a.uid == updated.uid ? updated : a).toList();
       return true;
     } catch (e) {
       _error = friendlyErrorMessage(e);

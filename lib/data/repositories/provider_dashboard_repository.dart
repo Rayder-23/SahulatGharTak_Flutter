@@ -16,18 +16,25 @@ class ProviderDashboardRepository {
     ProviderAvailabilityApiService? availabilityApiService,
     ProviderServiceRequestApiService? serviceRequestApiService,
   })  : _profileApiService = profileApiService ?? ProviderProfileApiService(),
-        _availabilityApiService = availabilityApiService ?? ProviderAvailabilityApiService(),
-        _serviceRequestApiService = serviceRequestApiService ?? ProviderServiceRequestApiService();
+        _availabilityApiService =
+            availabilityApiService ?? ProviderAvailabilityApiService(),
+        _serviceRequestApiService =
+            serviceRequestApiService ?? ProviderServiceRequestApiService();
 
   final ProviderProfileApiService _profileApiService;
   final ProviderAvailabilityApiService _availabilityApiService;
   final ProviderServiceRequestApiService _serviceRequestApiService;
 
-  Future<ProviderDetailModel> fetchProviderDetail(int providerUid) => _profileApiService.fetchDetail(providerUid);
+  Future<ProviderDetailModel> fetchProviderDetail(int providerUid) =>
+      _profileApiService.fetchDetail(providerUid);
 
-  Future<ProviderDetailModel> updateProviderDetail(ProviderDetailModel updated) => _profileApiService.updateDetail(updated);
+  Future<ProviderDetailModel> updateProviderDetail(
+          ProviderDetailModel updated) =>
+      _profileApiService.updateDetail(updated);
 
-  Future<ProviderAvailabilityStatus?> fetchAvailabilityStatus(int providerUid) => _availabilityApiService.fetchStatus(providerUid);
+  Future<ProviderAvailabilityStatus?> fetchAvailabilityStatus(
+          int providerUid) =>
+      _availabilityApiService.fetchStatus(providerUid);
 
   Future<ProviderAvailabilityStatus> setAvailabilityStatus({
     required int providerUid,
@@ -51,5 +58,6 @@ class ProviderDashboardRepository {
           );
   }
 
-  Future<List<ServiceRequest>> fetchIncomingRequests(int providerId) => _serviceRequestApiService.fetchByProvider(providerId);
+  Future<List<ServiceRequest>> fetchIncomingRequests(int providerId) =>
+      _serviceRequestApiService.fetchByProvider(providerId);
 }

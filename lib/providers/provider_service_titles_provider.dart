@@ -5,7 +5,9 @@ import '../models/provider/provider_service_title.dart';
 import '../utils/api_error.dart';
 
 class ProviderServiceTitlesProvider extends ChangeNotifier {
-  ProviderServiceTitlesProvider({required ProviderServiceTitlesRepository repository}) : _repository = repository;
+  ProviderServiceTitlesProvider(
+      {required ProviderServiceTitlesRepository repository})
+      : _repository = repository;
 
   final ProviderServiceTitlesRepository _repository;
 
@@ -14,7 +16,8 @@ class ProviderServiceTitlesProvider extends ChangeNotifier {
   bool _isSaving = false;
   String? _error;
 
-  List<ProviderServiceTitle> get serviceTitles => List.unmodifiable(_serviceTitles);
+  List<ProviderServiceTitle> get serviceTitles =>
+      List.unmodifiable(_serviceTitles);
   bool get isLoading => _isLoading;
   bool get isSaving => _isSaving;
   String? get error => _error;
@@ -34,13 +37,15 @@ class ProviderServiceTitlesProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> save(int providerUid, {required List<int> serviceTitleIds}) async {
+  Future<bool> save(int providerUid,
+      {required List<int> serviceTitleIds}) async {
     _isSaving = true;
     _error = null;
     notifyListeners();
 
     try {
-      _serviceTitles = await _repository.replaceServiceTitles(providerUid, serviceTitleIds: serviceTitleIds);
+      _serviceTitles = await _repository.replaceServiceTitles(providerUid,
+          serviceTitleIds: serviceTitleIds);
       return true;
     } catch (e) {
       _error = friendlyErrorMessage(e);

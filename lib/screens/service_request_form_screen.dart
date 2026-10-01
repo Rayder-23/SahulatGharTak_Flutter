@@ -35,7 +35,8 @@ class ServiceRequestFormScreen extends StatefulWidget {
   const ServiceRequestFormScreen({super.key});
 
   @override
-  State<ServiceRequestFormScreen> createState() => _ServiceRequestFormScreenState();
+  State<ServiceRequestFormScreen> createState() =>
+      _ServiceRequestFormScreenState();
 }
 
 /// Sentinel dropdown value for "my job isn't listed" — when selected, the
@@ -72,7 +73,8 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
     if (_initialized) return;
     _initialized = true;
 
-    final args = ModalRoute.of(context)!.settings.arguments as ServiceRequestFormArgs;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as ServiceRequestFormArgs;
     _category = args.category;
     _accentColor = args.color;
 
@@ -92,7 +94,10 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
 
       final clientUid = context.read<AuthProvider>().clientUid;
       if (clientUid != null) {
-        context.read<ClientAddressProvider>().loadAddresses(clientUid).then((_) {
+        context
+            .read<ClientAddressProvider>()
+            .loadAddresses(clientUid)
+            .then((_) {
           if (!mounted) return;
           final addresses = context.read<ClientAddressProvider>().addresses;
           if (addresses.isNotEmpty) {
@@ -103,7 +108,8 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
     });
   }
 
-  bool get _isOtherServiceTitle => _selectedServiceTitle == _otherServiceTitleValue;
+  bool get _isOtherServiceTitle =>
+      _selectedServiceTitle == _otherServiceTitleValue;
 
   void _selectServiceTitle(String? value, List<ServiceTitle> titles) {
     ServiceTitle? match;
@@ -132,16 +138,21 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
 
   Future<void> _pickDate() async {
     final now = DateTime.now();
-    final date = await showPlatformDatePicker(context, initialDate: now, firstDate: now, lastDate: now.add(const Duration(days: 365)));
+    final date = await showPlatformDatePicker(context,
+        initialDate: now,
+        firstDate: now,
+        lastDate: now.add(const Duration(days: 365)));
     if (date != null) setState(() => _selectedDate = date);
   }
 
   Future<void> _pickTime() async {
-    final t = await showPlatformTimePicker(context, initialTime: TimeOfDay.now());
+    final t =
+        await showPlatformTimePicker(context, initialTime: TimeOfDay.now());
     if (t != null) setState(() => _selectedTime = t);
   }
 
-  String _formatTime(TimeOfDay t) => '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+  String _formatTime(TimeOfDay t) =>
+      '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
 
   void _toggleUseOwnContact(bool value) {
     setState(() {
@@ -160,7 +171,8 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedAddress == null) {
-      showAppToast(context, 'Please select an address', type: AppToastType.error);
+      showAppToast(context, 'Please select an address',
+          type: AppToastType.error);
       return;
     }
     final clientUid = context.read<AuthProvider>().clientUid;
@@ -171,21 +183,29 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
       clientUid: clientUid,
       categoryUid: _category!.id,
       clientAddressUid: _selectedAddress!.uid,
-      serviceTitle: _isOtherServiceTitle ? _otherTitleController.text.trim() : _selectedServiceTitle!,
+      serviceTitle: _isOtherServiceTitle
+          ? _otherTitleController.text.trim()
+          : _selectedServiceTitle!,
       serviceDescription: _descriptionController.text.trim(),
-      preferredServiceDate: _selectedDate == null ? '' : DateFormat('yyyy-MM-dd').format(_selectedDate!),
-      preferredServiceTime: _selectedTime == null ? '' : _formatTime(_selectedTime!),
+      preferredServiceDate: _selectedDate == null
+          ? ''
+          : DateFormat('yyyy-MM-dd').format(_selectedDate!),
+      preferredServiceTime:
+          _selectedTime == null ? '' : _formatTime(_selectedTime!),
       isUrgent: _isUrgent,
       contactPerson: _contactPersonController.text.trim(),
       contactNo: digitsOnlyMobile(_contactNoController.text),
       serviceTitleUid: _selectedServiceTitleUid,
-      remarks: _remarksController.text.trim().isEmpty ? null : _remarksController.text.trim(),
+      remarks: _remarksController.text.trim().isEmpty
+          ? null
+          : _remarksController.text.trim(),
     );
 
     if (!mounted) return;
 
     if (success) {
-      Navigator.of(context).pushReplacementNamed(ServiceRequestsScreen.routeName);
+      Navigator.of(context)
+          .pushReplacementNamed(ServiceRequestsScreen.routeName);
     } else {
       await showMessageDialog(
         context,
@@ -234,7 +254,9 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: _selectedBasePrice != null ? Colors.black87 : Colors.black54,
+                        color: _selectedBasePrice != null
+                            ? Colors.black87
+                            : Colors.black54,
                       ),
                     ),
                   ),
@@ -247,7 +269,9 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
             else if (addressState.addresses.isEmpty)
               Container(
                 padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: Colors.amber[50], borderRadius: BorderRadius.circular(14)),
+                decoration: BoxDecoration(
+                    color: Colors.amber[50],
+                    borderRadius: BorderRadius.circular(14)),
                 child: Row(
                   children: [
                     const Icon(Icons.location_off, color: Colors.orange),
@@ -256,13 +280,17 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('No saved addresses', style: TextStyle(fontWeight: FontWeight.w600)),
-                          Text('Add an address to continue', style: TextStyle(fontSize: 12, color: Colors.black54)),
+                          Text('No saved addresses',
+                              style: TextStyle(fontWeight: FontWeight.w600)),
+                          Text('Add an address to continue',
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.black54)),
                         ],
                       ),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.of(context).pushNamed(AddAddressScreen.routeName),
+                      onPressed: () => Navigator.of(context)
+                          .pushNamed(AddAddressScreen.routeName),
                       child: const Text('Add'),
                     ),
                   ],
@@ -275,7 +303,9 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
                 hint: 'Select an address',
                 items: addressState.addresses
                     .map((a) => ThemedDropdownItem(
-                        value: a, label: '${a.addressTitle} — ${a.fullAddress}, ${a.area}, ${a.city}'))
+                        value: a,
+                        label:
+                            '${a.addressTitle} — ${a.fullAddress}, ${a.area}, ${a.city}'))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedAddress = v),
                 validator: (v) => v == null ? 'Required' : null,
@@ -288,20 +318,27 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
                 padding: EdgeInsets.symmetric(vertical: 12),
                 child: Center(child: CircularProgressIndicator()),
               )
-            else if (titleState.error != null && titleState.serviceTitles.isEmpty)
+            else if (titleState.error != null &&
+                titleState.serviceTitles.isEmpty)
               InlineFieldError(
                 message: titleState.error!,
-                onRetry: () => context.read<ServiceTitleProvider>().loadServiceTitles(_category!.id),
+                onRetry: () => context
+                    .read<ServiceTitleProvider>()
+                    .loadServiceTitles(_category!.id),
               )
             else
               ThemedDropdownField<String>(
                 value: _selectedServiceTitle,
                 hint: 'Select a service title',
                 items: [
-                  ...titleState.serviceTitles.map((t) => ThemedDropdownItem(value: t.title, label: t.title)),
-                  const ThemedDropdownItem(value: _otherServiceTitleValue, label: 'Other (not listed)'),
+                  ...titleState.serviceTitles.map((t) =>
+                      ThemedDropdownItem(value: t.title, label: t.title)),
+                  const ThemedDropdownItem(
+                      value: _otherServiceTitleValue,
+                      label: 'Other (not listed)'),
                 ],
-                onChanged: (v) => _selectServiceTitle(v, titleState.serviceTitles),
+                onChanged: (v) =>
+                    _selectServiceTitle(v, titleState.serviceTitles),
                 validator: (v) => v == null ? 'Required' : null,
               ),
             if (_isOtherServiceTitle) ...[
@@ -309,19 +346,25 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
               authFieldLabel('Specify Service'),
               TextFormField(
                 controller: _otherTitleController,
-                decoration: authFieldDecoration(hint: 'What job do you need done?'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                decoration:
+                    authFieldDecoration(hint: 'What job do you need done?'),
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Required' : null,
               ),
             ],
             const SizedBox(height: 20),
-            authFieldLabel(_isOtherServiceTitle ? 'Service Description' : 'Service Description (optional)'),
+            authFieldLabel(_isOtherServiceTitle
+                ? 'Service Description'
+                : 'Service Description (optional)'),
             TextFormField(
               controller: _descriptionController,
               decoration: authFieldDecoration(hint: 'Describe what you need'),
               minLines: 2,
               maxLines: 4,
               validator: _isOtherServiceTitle
-                  ? (v) => (v == null || v.trim().isEmpty) ? 'Please describe the job so staff can assign a provider' : null
+                  ? (v) => (v == null || v.trim().isEmpty)
+                      ? 'Please describe the job so staff can assign a provider'
+                      : null
                   : null,
             ),
             const SizedBox(height: 20),
@@ -332,7 +375,8 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
               clipBehavior: Clip.antiAlias,
               child: SwitchListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                title: const Text('Mark as Urgent', style: TextStyle(fontWeight: FontWeight.w600)),
+                title: const Text('Mark as Urgent',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
                 value: _isUrgent,
                 activeThumbColor: _accentColor,
                 onChanged: (v) => setState(() => _isUrgent = v),
@@ -354,9 +398,12 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
               clipBehavior: Clip.antiAlias,
               child: SwitchListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                title: const Text('Same as my account', style: TextStyle(fontWeight: FontWeight.w600)),
+                title: const Text('Same as my account',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
                 subtitle: Text(
-                  _useOwnContact ? 'Provider will contact you: $_ownContactPerson, $_ownContactNo' : 'Enter a different contact below',
+                  _useOwnContact
+                      ? 'Provider will contact you: $_ownContactPerson, $_ownContactNo'
+                      : 'Enter a different contact below',
                   style: const TextStyle(fontSize: 12),
                 ),
                 value: _useOwnContact,
@@ -369,8 +416,10 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
             TextFormField(
               controller: _contactPersonController,
               enabled: !_useOwnContact,
-              decoration: authFieldDecoration(hint: 'Enter contact person name'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+              decoration:
+                  authFieldDecoration(hint: 'Enter contact person name'),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 20),
             authFieldLabel('On-site Contact Number'),
@@ -397,7 +446,9 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
                 Expanded(
                   child: _PickerField(
                     icon: Icons.calendar_today,
-                    label: _selectedDate == null ? 'Preferred Date' : DateFormat.yMMMd().format(_selectedDate!),
+                    label: _selectedDate == null
+                        ? 'Preferred Date'
+                        : DateFormat.yMMMd().format(_selectedDate!),
                     onTap: _pickDate,
                   ),
                 ),
@@ -405,14 +456,20 @@ class _ServiceRequestFormScreenState extends State<ServiceRequestFormScreen> {
                 Expanded(
                   child: _PickerField(
                     icon: Icons.access_time,
-                    label: _selectedTime == null ? 'Preferred Time' : _selectedTime!.format(context),
+                    label: _selectedTime == null
+                        ? 'Preferred Time'
+                        : _selectedTime!.format(context),
                     onTap: _pickTime,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 28),
-            AuthPrimaryButton(label: 'Submit Request', isLoading: saving, onPressed: _submit, color: _accentColor),
+            AuthPrimaryButton(
+                label: 'Submit Request',
+                isLoading: saving,
+                onPressed: _submit,
+                color: _accentColor),
           ],
         ),
       ),
@@ -425,7 +482,8 @@ class _PickerField extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _PickerField({required this.icon, required this.label, required this.onTap});
+  const _PickerField(
+      {required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -434,12 +492,17 @@ class _PickerField extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(color: const Color(0xFFF5F5F7), borderRadius: BorderRadius.circular(14)),
+        decoration: BoxDecoration(
+            color: const Color(0xFFF5F5F7),
+            borderRadius: BorderRadius.circular(14)),
         child: Row(
           children: [
             Icon(icon, size: 18, color: Colors.black54),
             const SizedBox(width: 8),
-            Expanded(child: Text(label, style: const TextStyle(color: Colors.black87), overflow: TextOverflow.ellipsis)),
+            Expanded(
+                child: Text(label,
+                    style: const TextStyle(color: Colors.black87),
+                    overflow: TextOverflow.ellipsis)),
           ],
         ),
       ),

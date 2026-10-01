@@ -5,7 +5,8 @@ import '../models/provider/provider_wallet.dart';
 import '../utils/api_error.dart';
 
 class ProviderWalletProvider extends ChangeNotifier {
-  ProviderWalletProvider({required ProviderWalletRepository repository}) : _repository = repository;
+  ProviderWalletProvider({required ProviderWalletRepository repository})
+      : _repository = repository;
 
   final ProviderWalletRepository _repository;
 

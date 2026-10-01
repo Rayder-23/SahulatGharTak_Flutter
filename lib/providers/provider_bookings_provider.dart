@@ -6,7 +6,8 @@ import '../models/provider/service_booking.dart';
 import '../utils/api_error.dart';
 
 class ProviderBookingsProvider extends ChangeNotifier {
-  ProviderBookingsProvider({required ProviderBookingsRepository repository}) : _repository = repository;
+  ProviderBookingsProvider({required ProviderBookingsRepository repository})
+      : _repository = repository;
 
   final ProviderBookingsRepository _repository;
 
@@ -102,26 +103,33 @@ class ProviderBookingsProvider extends ChangeNotifier {
   /// watching this provider stay in sync — mirrors
   /// `CustomerServiceRequestProvider.fetchRequestById`'s fix for the same
   /// "detail page refreshed, list still stale" gap.
-  Future<ServiceBooking> fetchBookingById(int bookingUid, int providerUid) async {
-    final booking = await _repository.fetchById(bookingUid, providerUid: providerUid);
+  Future<ServiceBooking> fetchBookingById(
+      int bookingUid, int providerUid) async {
+    final booking =
+        await _repository.fetchById(bookingUid, providerUid: providerUid);
     if (_bookings.any((b) => b.uid == booking.uid)) {
-      _bookings = _bookings.map((b) => b.uid == booking.uid ? booking : b).toList();
+      _bookings =
+          _bookings.map((b) => b.uid == booking.uid ? booking : b).toList();
       notifyListeners();
     }
     return booking;
   }
 
-  static const _lostRaceMessage = 'This job has already been assigned to another provider.';
+  static const _lostRaceMessage =
+      'This job has already been assigned to another provider.';
 
-  Future<bool> respond(ServiceBooking booking, bool accept, {String? reason}) async {
+  Future<bool> respond(ServiceBooking booking, bool accept,
+      {String? reason}) async {
     _updatingUid = booking.uid;
     _error = null;
     _lostRace = false;
     notifyListeners();
 
     try {
-      final updated = await _repository.respond(booking: booking, accept: accept, reason: reason);
-      _bookings = _bookings.map((b) => b.uid == updated.uid ? updated : b).toList();
+      final updated = await _repository.respond(
+          booking: booking, accept: accept, reason: reason);
+      _bookings =
+          _bookings.map((b) => b.uid == updated.uid ? updated : b).toList();
       return true;
     } catch (e) {
       _error = friendlyErrorMessage(e);
@@ -146,7 +154,8 @@ class ProviderBookingsProvider extends ChangeNotifier {
 
     try {
       final updated = await _repository.startJob(booking);
-      _bookings = _bookings.map((b) => b.uid == updated.uid ? updated : b).toList();
+      _bookings =
+          _bookings.map((b) => b.uid == updated.uid ? updated : b).toList();
       return true;
     } catch (e) {
       _error = friendlyErrorMessage(e);
@@ -178,7 +187,8 @@ class ProviderBookingsProvider extends ChangeNotifier {
         labourAmount: labourAmount,
         materialItems: materialItems,
       );
-      _bookings = _bookings.map((b) => b.uid == updated.uid ? updated : b).toList();
+      _bookings =
+          _bookings.map((b) => b.uid == updated.uid ? updated : b).toList();
       return true;
     } catch (e) {
       _error = friendlyErrorMessage(e);
@@ -189,14 +199,17 @@ class ProviderBookingsProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateStatus(ServiceBooking booking, String status, {required double customerPaid, String? reason}) async {
+  Future<bool> updateStatus(ServiceBooking booking, String status,
+      {required double customerPaid, String? reason}) async {
     _updatingUid = booking.uid;
     _error = null;
     notifyListeners();
 
     try {
-      final updated = await _repository.updateStatus(booking, status, customerPaid: customerPaid, reason: reason);
-      _bookings = _bookings.map((b) => b.uid == updated.uid ? updated : b).toList();
+      final updated = await _repository.updateStatus(booking, status,
+          customerPaid: customerPaid, reason: reason);
+      _bookings =
+          _bookings.map((b) => b.uid == updated.uid ? updated : b).toList();
       return true;
     } catch (e) {
       _error = friendlyErrorMessage(e);

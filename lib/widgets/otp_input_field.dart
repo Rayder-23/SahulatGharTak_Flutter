@@ -29,7 +29,8 @@ class OtpInputField extends StatefulWidget {
 class _OtpInputFieldState extends State<OtpInputField> {
   late final List<TextEditingController> _controllers =
       List.generate(widget.length, (_) => TextEditingController());
-  late final List<FocusNode> _focusNodes = List.generate(widget.length, (_) => FocusNode());
+  late final List<FocusNode> _focusNodes =
+      List.generate(widget.length, (_) => FocusNode());
 
   @override
   void didUpdateWidget(covariant OtpInputField oldWidget) {
@@ -67,7 +68,8 @@ class _OtpInputFieldState extends State<OtpInputField> {
   /// even when the field is empty, so catching it here (rather than relying
   /// on a text change) is what makes continuous backspacing work.
   void _onKeyEvent(int index, KeyEvent event) {
-    if (event is! KeyDownEvent || event.logicalKey != LogicalKeyboardKey.backspace) return;
+    if (event is! KeyDownEvent ||
+        event.logicalKey != LogicalKeyboardKey.backspace) return;
     if (_controllers[index].text.isEmpty && index > 0) {
       _controllers[index - 1].clear();
       _focusNodes[index - 1].requestFocus();
@@ -96,9 +98,15 @@ class _OtpInputFieldState extends State<OtpInputField> {
             filled: true,
             fillColor: const Color(0xFFF5F5F7),
             contentPadding: EdgeInsets.zero,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: kPrimaryColor, width: 1.5)),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: kPrimaryColor, width: 1.5)),
           ),
           onChanged: (value) {
             // Deliberately does NOT move focus back when a filled box is

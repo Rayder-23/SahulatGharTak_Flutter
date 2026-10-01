@@ -9,6 +9,7 @@ Future<void> openPrivacyPolicy(BuildContext context) async {
   final uri = Uri.parse(kPrivacyPolicyUrl);
   final launched = await launchUrl(uri);
   if (!launched && context.mounted) {
-    showAppToast(context, 'Could not open Privacy Policy.', type: AppToastType.error);
+    showAppToast(context, 'Could not open Privacy Policy.',
+        type: AppToastType.error);
   }
 }

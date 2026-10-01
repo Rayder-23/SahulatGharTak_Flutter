@@ -27,7 +27,9 @@ class CurvedProfileHeader extends StatelessWidget {
   Widget _blob(double size) => Container(
         width: size,
         height: size,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.08)),
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white.withValues(alpha: 0.08)),
       );
 
   @override
@@ -37,19 +39,24 @@ class CurvedProfileHeader extends StatelessWidget {
         color: headerColors == null ? color : null,
         gradient: headerColors == null
             ? null
-            : LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: headerColors!),
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: headerColors!),
       ),
       child: Stack(
         children: [
           Positioned(top: -70, left: -50, child: _blob(180)),
           Positioned(top: -30, right: -60, child: _blob(160)),
-          Positioned(bottom: headerHeight * 0.15, right: -40, child: _blob(120)),
+          Positioned(
+              bottom: headerHeight * 0.15, right: -40, child: _blob(120)),
           Column(
             children: [
               SizedBox(height: headerHeight),
               Expanded(
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(36)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(36)),
                   child: Container(color: Colors.white, child: child),
                 ),
               ),
@@ -66,7 +73,12 @@ class CurvedProfileHeader extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 12, offset: const Offset(0, 4))],
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4))
+                  ],
                 ),
                 padding: const EdgeInsets.all(6),
                 child: avatar,
@@ -120,7 +132,9 @@ class ProfileStatBadge extends StatelessWidget {
             children: [
               Icon(icon, size: 16, color: color),
               const SizedBox(width: 6),
-              Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+              Text(label,
+                  style: TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w600, color: color)),
             ],
           ),
           const SizedBox(height: 6),
@@ -130,7 +144,10 @@ class ProfileStatBadge extends StatelessWidget {
               Flexible(
                 child: Text(
                   value,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -138,11 +155,17 @@ class ProfileStatBadge extends StatelessWidget {
               if (badgeText != null) ...[
                 const SizedBox(width: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: color.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(8)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(8)),
                   child: Text(
                     badgeText!,
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color),
+                    style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: color),
                   ),
                 ),
               ],

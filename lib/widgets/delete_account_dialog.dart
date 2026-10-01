@@ -50,7 +50,12 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [BoxShadow(color: _brandDark.withValues(alpha: 0.22), blurRadius: 28, offset: const Offset(0, 12))],
+            boxShadow: [
+              BoxShadow(
+                  color: _brandDark.withValues(alpha: 0.22),
+                  blurRadius: 28,
+                  offset: const Offset(0, 12))
+            ],
           ),
           padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
           child: Form(
@@ -62,25 +67,40 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
                   width: 56,
                   height: 56,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.12), shape: BoxShape.circle),
-                  child: const Icon(Icons.delete_forever_rounded, color: Colors.red, size: 28),
+                  decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.12),
+                      shape: BoxShape.circle),
+                  child: const Icon(Icons.delete_forever_rounded,
+                      color: Colors.red, size: 28),
                 ),
                 const SizedBox(height: 16),
                 const Text(
                   'Delete Account',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF1A2233), letterSpacing: -0.2),
+                  style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1A2233),
+                      letterSpacing: -0.2),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'This will permanently delete your account and personal data. This action cannot be undone. Enter your password to confirm.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13.5, color: Colors.grey[600], height: 1.4, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                      fontSize: 13.5,
+                      color: Colors.grey[600],
+                      height: 1.4,
+                      fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 18),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Password', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.grey[800])),
+                  child: Text('Password',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          color: Colors.grey[800])),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -90,11 +110,17 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
                   decoration: authFieldDecoration(
                     hint: 'Enter your password',
                     suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: Colors.black45),
-                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color: Colors.black45),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                     ),
                   ),
-                  validator: (v) => (v == null || v.isEmpty) ? 'Password is required' : null,
+                  validator: (v) =>
+                      (v == null || v.isEmpty) ? 'Password is required' : null,
                   onFieldSubmitted: (_) => _confirm(),
                 ),
                 const SizedBox(height: 22),
@@ -104,9 +130,11 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.grey.shade700,
-                          side: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                          side: BorderSide(
+                              color: Colors.grey.shade300, width: 1.5),
                           padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                         onPressed: () => Navigator.of(context).pop(),
                         child: const Text('Cancel'),
@@ -120,10 +148,12 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
                           foregroundColor: Colors.white,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                         onPressed: _confirm,
-                        child: const Text('Delete Account', style: TextStyle(fontWeight: FontWeight.w700)),
+                        child: const Text('Delete Account',
+                            style: TextStyle(fontWeight: FontWeight.w700)),
                       ),
                     ),
                   ],

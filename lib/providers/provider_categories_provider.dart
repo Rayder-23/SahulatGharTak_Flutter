@@ -5,7 +5,8 @@ import '../models/provider/provider_category.dart';
 import '../utils/api_error.dart';
 
 class ProviderCategoriesProvider extends ChangeNotifier {
-  ProviderCategoriesProvider({required ProviderCategoriesRepository repository}) : _repository = repository;
+  ProviderCategoriesProvider({required ProviderCategoriesRepository repository})
+      : _repository = repository;
 
   final ProviderCategoriesRepository _repository;
 
@@ -34,13 +35,15 @@ class ProviderCategoriesProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> save(int providerUid, {required List<int> categoryIds, required int primaryCategoryId}) async {
+  Future<bool> save(int providerUid,
+      {required List<int> categoryIds, required int primaryCategoryId}) async {
     _isSaving = true;
     _error = null;
     notifyListeners();
 
     try {
-      _categories = await _repository.replaceCategories(providerUid, categoryIds: categoryIds, primaryCategoryId: primaryCategoryId);
+      _categories = await _repository.replaceCategories(providerUid,
+          categoryIds: categoryIds, primaryCategoryId: primaryCategoryId);
       return true;
     } catch (e) {
       _error = friendlyErrorMessage(e);

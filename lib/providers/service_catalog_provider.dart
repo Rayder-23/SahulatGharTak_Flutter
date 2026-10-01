@@ -7,7 +7,8 @@ import '../models/service_catalog.dart';
 import '../utils/api_error.dart';
 
 class ServiceCatalogProvider extends ChangeNotifier {
-  ServiceCatalogProvider({required ServiceCatalogRepository repository}) : _repository = repository {
+  ServiceCatalogProvider({required ServiceCatalogRepository repository})
+      : _repository = repository {
     // Deferred: lazy ChangeNotifierProvider construction can happen mid-build
     // (first context.watch/read call), and notifyListeners() firing
     // synchronously from a constructor while a widget's build() is still on

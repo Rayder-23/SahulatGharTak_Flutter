@@ -51,15 +51,21 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   void initState() {
     super.initState();
     final existing = widget.existing;
-    _titleController = TextEditingController(text: existing?.addressTitle ?? '');
-    _fullAddressController = TextEditingController(text: existing?.fullAddress ?? '');
+    _titleController =
+        TextEditingController(text: existing?.addressTitle ?? '');
+    _fullAddressController =
+        TextEditingController(text: existing?.fullAddress ?? '');
     _areaController = TextEditingController(text: existing?.area ?? '');
     _selectedCity = existing?.city;
-    if (existing != null && existing.hasLocation && existing.latitude != null && existing.longitude != null) {
+    if (existing != null &&
+        existing.hasLocation &&
+        existing.latitude != null &&
+        existing.longitude != null) {
       _pin = LatLng(existing.latitude!, existing.longitude!);
     }
     context.read<CityProvider>().loadCities();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _centerOnDeviceLocationIfNoPin());
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _centerOnDeviceLocationIfNoPin());
   }
 
   @override
@@ -79,7 +85,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
     try {
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+        locationSettings:
+            const LocationSettings(accuracy: LocationAccuracy.medium),
       );
       if (!mounted || _pin != null) return;
       final target = LatLng(position.latitude, position.longitude);
@@ -110,11 +117,14 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     setState(() => _resolvingPin = true);
 
     try {
-      final result = await _geocodingApiService.reverseGeocode(latitude: _pin!.latitude, longitude: _pin!.longitude);
+      final result = await _geocodingApiService.reverseGeocode(
+          latitude: _pin!.latitude, longitude: _pin!.longitude);
       if (!mounted) return;
       setState(() {
-        _areaController.text = result.area.isNotEmpty ? result.area : _areaController.text;
-        _fullAddressController.text = result.road.isNotEmpty ? result.road : _fullAddressController.text;
+        _areaController.text =
+            result.area.isNotEmpty ? result.area : _areaController.text;
+        _fullAddressController.text =
+            result.road.isNotEmpty ? result.road : _fullAddressController.text;
       });
       if (result.city.isNotEmpty) {
         final cities = context.read<CityProvider>().cities;
@@ -125,7 +135,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         if (match.isNotEmpty) setState(() => _selectedCity = match);
       }
       if (!mounted) return;
-      showAppToast(context, 'Pin saved — review the details below', type: AppToastType.success);
+      showAppToast(context, 'Pin saved — review the details below',
+          type: AppToastType.success);
     } catch (e) {
       if (!mounted) return;
       showAppToast(context, friendlyErrorMessage(e), type: AppToastType.error);
@@ -171,7 +182,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     if (!mounted) return;
 
     if (success) {
-      showAppToast(context, _isEditing ? 'Address updated' : 'Address added', type: AppToastType.success);
+      showAppToast(context, _isEditing ? 'Address updated' : 'Address added',
+          type: AppToastType.success);
       Navigator.of(context).pop();
     } else {
       final error = addressProvider.error ?? 'Failed to save address';
@@ -185,7 +197,9 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
     return AuthCardScaffold(
       title: _isEditing ? 'Edit Address' : 'Add Address',
-      subtitle: _isEditing ? 'Update your saved address details' : 'Save an address for faster bookings',
+      subtitle: _isEditing
+          ? 'Update your saved address details'
+          : 'Save an address for faster bookings',
       avatarIcon: Icons.location_on_outlined,
       child: Form(
         key: _formKey,
@@ -228,37 +242,45 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             OutlinedButton.icon(
               onPressed: _pin == null || _resolvingPin ? null : _savePin,
               icon: _resolvingPin
-                  ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2))
                   : const Icon(Icons.push_pin_outlined, size: 18),
               label: Text(_resolvingPin ? 'Resolving address...' : 'Save Pin'),
             ),
             if (_pin == null)
               Padding(
                 padding: const EdgeInsets.only(top: 6),
-                child: Text('Tap the map to drop a pin', style: TextStyle(color: Colors.grey[600], fontSize: 12.5)),
+                child: Text('Tap the map to drop a pin',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12.5)),
               ),
             const SizedBox(height: 20),
             authFieldLabel('Address Title'),
             TextFormField(
               controller: _titleController,
               decoration: authFieldDecoration(hint: 'e.g. Home, Office'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 20),
             authFieldLabel('Full Address'),
             TextFormField(
               controller: _fullAddressController,
-              decoration: authFieldDecoration(hint: 'House no, street, landmark'),
+              decoration:
+                  authFieldDecoration(hint: 'House no, street, landmark'),
               minLines: 2,
               maxLines: 4,
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 20),
             authFieldLabel('Area'),
             TextFormField(
               controller: _areaController,
               decoration: authFieldDecoration(hint: 'Enter area'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 20),
             authFieldLabel('City'),
@@ -271,18 +293,25 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   );
                 }
                 if (cityProvider.error != null && cityProvider.cities.isEmpty) {
-                  return InlineFieldError(message: cityProvider.error!, onRetry: cityProvider.loadCities);
+                  return InlineFieldError(
+                      message: cityProvider.error!,
+                      onRetry: cityProvider.loadCities);
                 }
                 return ThemedDropdownField<String>(
                   value: _selectedCity,
                   hint: 'Select your city',
-                  items: cityProvider.cities.map((c) => ThemedDropdownItem(value: c, label: c)).toList(),
+                  items: cityProvider.cities
+                      .map((c) => ThemedDropdownItem(value: c, label: c))
+                      .toList(),
                   onChanged: (v) => setState(() => _selectedCity = v),
                 );
               },
             ),
             const SizedBox(height: 28),
-            AuthPrimaryButton(label: _isEditing ? 'Save Changes' : 'Save Address', isLoading: saving, onPressed: _save),
+            AuthPrimaryButton(
+                label: _isEditing ? 'Save Changes' : 'Save Address',
+                isLoading: saving,
+                onPressed: _save),
           ],
         ),
       ),
