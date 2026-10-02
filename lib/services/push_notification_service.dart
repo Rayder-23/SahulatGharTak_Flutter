@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart' show Color;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../models/push_event.dart';
@@ -20,13 +21,56 @@ class PushNotificationService {
   PushNotificationService._();
   static final PushNotificationService instance = PushNotificationService._();
 
-  static const _channelId = 'high_importance_channel';
-  static const _channel = AndroidNotificationChannel(
-    _channelId,
-    'Important notifications',
-    description: 'Job requests, bookings and request updates.',
-    importance: Importance.high,
-  );
+  static const _accent = Color(0xFF003366);
+  static const _fallbackChannelId = 'booking_updates_v2';
+
+  // An Android channel's sound is fixed once the channel exists on a device,
+  // so the sounded channels are new `_v2` ids and the earlier silent ones are
+  // deleted in init(). If a sound ever changes, mint a new id again.
+  // high_importance_channel stays: it is the manifest default and what the
+  // backend uses until Notifications:AndroidChannelsEnabled is switched on.
+  static const _channels = [
+    AndroidNotificationChannel(
+      'high_importance_channel',
+      'Important notifications',
+      description: 'Job requests, bookings and request updates.',
+      importance: Importance.high,
+    ),
+    AndroidNotificationChannel(
+      'job_requests_v2',
+      'Job requests',
+      description: 'New job requests for providers.',
+      importance: Importance.high,
+      playSound: true,
+      sound: RawResourceAndroidNotificationSound('job_request'),
+    ),
+    AndroidNotificationChannel(
+      'booking_updates_v2',
+      'Booking updates',
+      description: 'Accepted, started, completed and cancelled bookings.',
+      importance: Importance.high,
+      playSound: true,
+      sound: RawResourceAndroidNotificationSound('booking_update'),
+    ),
+    AndroidNotificationChannel(
+      'announcements_v2',
+      'Announcements',
+      description: 'App updates and announcements.',
+      importance: Importance.defaultImportance,
+      playSound: true,
+      sound: RawResourceAndroidNotificationSound('announcement'),
+    ),
+  ];
+
+  // Silent channels from the earlier build.
+  static const _retiredChannelIds = [
+    'job_requests',
+    'booking_updates',
+    'announcements',
+  ];
+
+  /// Used only when a push has neither booking_id nor request_id.
+  int _anonymousCounter = 0;
 
   final _local = FlutterLocalNotificationsPlugin();
   final _events = StreamController<PushEvent>.broadcast();
@@ -48,7 +92,7 @@ class PushNotificationService {
 
     await _local.initialize(
       settings: const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/launcher_icon'),
+        android: AndroidInitializationSettings('ic_notification'),
         iOS: DarwinInitializationSettings(
           requestAlertPermission: false,
           requestBadgePermission: false,
@@ -65,10 +109,14 @@ class PushNotificationService {
       },
     );
 
-    await _local
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(_channel);
+    final androidPlugin = _local.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    for (final id in _retiredChannelIds) {
+      await androidPlugin?.deleteNotificationChannel(channelId: id);
+    }
+    for (final channel in _channels) {
+      await androidPlugin?.createNotificationChannel(channel);
+    }
 
     // iOS shows its own banner for foreground notification messages.
     await FirebaseMessaging.instance
@@ -123,21 +171,62 @@ class PushNotificationService {
 
     final notification = message.notification;
     if (notification == null || !Platform.isAndroid) return;
+
+    final data = message.data;
+    // Accept the backend's id with or without the _v2 suffix.
+    final requested = (data['channel_id'] ?? '').toString();
+    final wanted = requested.endsWith('_v2') ? requested : '${requested}_v2';
+    final channel = _channels.firstWhere(
+      (c) => c.id == requested || c.id == wanted,
+      orElse: () => _channels.firstWhere((c) => c.id == _fallbackChannelId),
+    );
+    // Event time from the backend, never the time this device received it.
+    final sentAt = DateTime.tryParse(data['sent_at'] ?? '');
+
     _local.show(
-      id: message.hashCode,
+      id: _notificationId(data),
       title: notification.title,
       body: notification.body,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
-          _channel.id,
-          _channel.name,
-          channelDescription: _channel.description,
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/launcher_icon',
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          importance: channel.importance,
+          playSound: channel.playSound,
+          sound: channel.sound,
+          priority: channel.importance == Importance.high
+              ? Priority.high
+              : Priority.defaultPriority,
+          icon: 'ic_notification',
+          color: _accent,
+          styleInformation: BigTextStyleInformation(notification.body ?? ''),
+          when: sentAt?.millisecondsSinceEpoch,
+          showWhen: sentAt != null,
         ),
       ),
-      payload: jsonEncode(message.data),
+      payload: jsonEncode(data),
     );
+  }
+
+  /// Stable per booking (else per request) so a newer push for the same
+  /// booking replaces the earlier banner, like background pushes do via the
+  /// Android tag.
+  int _notificationId(Map<String, dynamic> data) {
+    final booking = (data['booking_id'] ?? '').toString();
+    final request = (data['request_id'] ?? '').toString();
+    if (booking.isNotEmpty) return _stableId('booking-$booking');
+    if (request.isNotEmpty) return _stableId('request-$request');
+    return 0x40000000 + (_anonymousCounter++ & 0xFFFFFF);
+  }
+
+  // FNV-1a, masked to a positive 30-bit int (String.hashCode isn't guaranteed
+  // stable across runs, and notification ids must fit in 32 bits).
+  static int _stableId(String key) {
+    var h = 0x811c9dc5;
+    for (final c in key.codeUnits) {
+      h = ((h ^ c) * 0x01000193) & 0xFFFFFFFF;
+    }
+    return h & 0x3FFFFFFF;
   }
 }

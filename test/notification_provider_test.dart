@@ -24,7 +24,11 @@ class _FakeApi extends NotificationApiService {
   final markedRead = <int>[];
 
   @override
-  Future<NotificationPage> fetchInbox({required int userId, required String userType, int page = 1, int pageSize = 20}) async {
+  Future<NotificationPage> fetchInbox(
+      {required int userId,
+      required String userType,
+      int page = 1,
+      int pageSize = 20}) async {
     final start = (page - 1) * pageSize;
     final items = all.skip(start).take(pageSize).toList();
     return NotificationPage(
@@ -37,7 +41,8 @@ class _FakeApi extends NotificationApiService {
   }
 
   @override
-  Future<int> fetchUnreadCount({required int userId, required String userType}) async =>
+  Future<int> fetchUnreadCount(
+          {required int userId, required String userType}) async =>
       all.where((n) => !n.isRead).length;
 
   @override
@@ -47,7 +52,8 @@ class _FakeApi extends NotificationApiService {
   }
 
   @override
-  Future<void> markAllRead({required int userId, required String userType}) async {
+  Future<void> markAllRead(
+      {required int userId, required String userType}) async {
     all = all.map((n) => n.copyWith(isRead: true)).toList();
   }
 }
@@ -58,7 +64,8 @@ void main() {
 
   setUp(() {
     api = _FakeApi();
-    provider = NotificationProvider(repository: NotificationRepository(apiService: api), pageSize: 2);
+    provider = NotificationProvider(
+        repository: NotificationRepository(apiService: api), pageSize: 2);
   });
 
   test('bind loads the badge and loadInbox paginates', () async {
@@ -119,6 +126,33 @@ void main() {
     expect(n.bookingUid, 88);
     expect(n.requestUid, isNull);
     expect(n.createdAt.isUtc, isTrue);
+  });
+
+  test('syncLatest prepends new inbox rows without a reload', () async {
+    provider.bind(userId: 1, userType: 'Client');
+    await provider.loadInbox();
+    expect(provider.items.first.id, 1);
+
+    api.all = [_n(9), ...api.all];
+    await provider.syncLatest();
+    expect(provider.items.first.id, 9);
+    expect(provider.items.where((n) => n.id == 9), hasLength(1));
+    expect(provider.unreadCount, 6);
+  });
+
+  test('createdAt without a zone is still read as UTC', () {
+    final n = AppNotification.fromJson({
+      'id': 1,
+      'userType': 'Client',
+      'type': 'x',
+      'title': 't',
+      'body': 'b',
+      'screen': '',
+      'isRead': false,
+      'createdAt': '2026-10-01T09:30:12',
+    });
+    expect(n.createdAt.isUtc, isTrue);
+    expect(n.createdAt.hour, 9);
   });
 
   test('PushEvent.fromData turns empty strings into null ids', () {

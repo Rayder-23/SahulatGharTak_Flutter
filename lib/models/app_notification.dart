@@ -37,7 +37,7 @@ class AppNotification {
         bookingUid: json['bookingUid'] as int?,
         requestUid: json['requestUid'] as int?,
         isRead: json['isRead'] as bool? ?? false,
-        createdAt: DateTime.parse(json['createdAt'] as String),
+        createdAt: _parseUtc(json['createdAt'] as String),
       );
 
   AppNotification copyWith({bool? isRead}) => AppNotification(
@@ -80,4 +80,11 @@ class NotificationPage {
         totalCount: json['totalCount'] as int? ?? 0,
         unreadCount: json['unreadCount'] as int? ?? 0,
       );
+}
+
+/// The API sends UTC with a `Z`; treat a zone-less value as UTC too so it is
+/// never misread as device-local time.
+DateTime _parseUtc(String value) {
+  final hasZone = RegExp(r'(Z|[+-]\d{2}:?\d{2})$').hasMatch(value);
+  return DateTime.parse(hasZone ? value : '${value}Z');
 }

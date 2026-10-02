@@ -67,7 +67,7 @@ class _PushHostState extends State<PushHost> with WidgetsBindingObserver {
     } else {
       refreshForPush(context, event);
     }
-    _notifications.refreshUnread();
+    _notifications.syncLatest();
   }
 
   void _sync({bool force = false}) {
@@ -125,7 +125,7 @@ class _PushHostState extends State<PushHost> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _notifications.refreshUnread();
+    if (state == AppLifecycleState.resumed) _notifications.syncLatest();
   }
 
   @override

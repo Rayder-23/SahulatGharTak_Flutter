@@ -95,6 +95,28 @@ class NotificationProvider extends ChangeNotifier {
     }
   }
 
+  /// Quietly pulls the newest page and prepends anything not yet shown, so an
+  /// open inbox picks up a push that just arrived without a manual refresh.
+  /// No-op until the inbox has been loaded once; never shows a spinner.
+  Future<void> syncLatest() async {
+    if (!isBound) return;
+    if (_page == 0) return refreshUnread();
+    if (_isLoading) return;
+    final gen = _generation;
+    try {
+      final result = await _repository.fetchInbox(
+          userId: _userId!, userType: _userType!, page: 1, pageSize: pageSize);
+      if (gen != _generation) return;
+      final known = {for (final n in _items) n.id};
+      final fresh = result.items.where((n) => !known.contains(n.id)).toList();
+      if (fresh.isNotEmpty) _items = [...fresh, ..._items];
+      _unreadCount = result.unreadCount;
+      notifyListeners();
+    } catch (_) {
+      // Best-effort; the next refresh will catch up.
+    }
+  }
+
   Future<void> loadMore() async {
     if (!isBound || _isLoading || _isLoadingMore || !_hasMore) return;
     final gen = _generation;
