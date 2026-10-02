@@ -16,8 +16,10 @@ findings: `docs/flutter-changes.md`.
 - Local API running (`https://localhost:7265`) with `Firebase:ServiceAccountPath` pointing at the service-account key
   (`HomeServicesPortal/secrets/`, git-ignored) and `Notifications:BookingPushEnabled = true`.
 - Android emulator with a **Google Play** system image, app installed and logged in, `POST_NOTIFICATIONS` allowed.
-  Test backgrounded banners with **Home** or screen lock. Do not swipe the app away: Android does not deliver FCM to a
-  force-stopped app. iOS cannot be tested on a simulator (needs a physical device and an APNs key).
+  Test backgrounded banners with **Home** or screen lock. Swiping the app away from recents (cold start) still receives
+  pushes; only a **Force stop** from Android settings blocks FCM until the app is opened again. Cold-start checks need
+  the app launched outside `flutter run` (or a physical device), since killing the run session drops the debugger.
+  iOS cannot be tested on a simulator (needs a physical device and an APNs key).
 - A test account that is both a client and a provider (here user 76 = Client 74 + Provider 35), so one device can play
   both roles. A second provider (here 64) is only needed for the "taken by another provider" test.
 - Admin portal login for the staff-only steps (assign, staff cancel). Credentials live in
@@ -36,6 +38,15 @@ Flip it (if the app has not):  POST /api/notifications/register-token {userId, u
 
 The app re-registers on login and on a role switch ("switch to customer" in the app moved the row to Client).
 Check the row's `UserType` before each group of tests; do not print the token itself.
+
+### Push Tester page (on-demand sends)
+
+`/Admin/PushTester` (Setup menu, Admin / Super Admin) fires any booking notification without driving the whole flow:
+pick one user, one registered device, or every Client/Provider device, then a booking event (real template wording,
+with editable service/provider/reason text) or a fully custom title, message, type, screen and extra `key=value`
+data. "Deliver to any role" (on by default) ignores the token's role; untick it to test the real role filtering.
+"Also save to inbox" writes the inbox row too. Use it for quick banner, tap and wording checks; the matrix in section 5
+is still the way to test the real state transitions.
 
 ## 3. Baseline and cleanup
 
@@ -106,6 +117,10 @@ row per recipient and that repeating an accept/start/complete adds none (idempot
 Accept and start notify the client only, and "new job" notifies the provider only, so the same flow needs the token on
 the matching role at each step. Steps that notify the other role still write their inbox row but show no banner.
 
+**Cold start (app swiped away from recents, 2026-10-02, physical Android device, sent from the Push Tester):** the push
+is delivered and the banner shows, and works correctly. Not separately confirmed: that tapping it from this state
+routes to the screen named in `screen` / `booking_id` (the Flutter agent's `getInitialMessage` handling).
+
 ## 6. Findings from this run
 
 1. **Tap did nothing (backend, fixed).** Android pushes carried `AndroidNotification.ClickAction =
@@ -120,11 +135,65 @@ the matching role at each step. Steps that notify the other role still write the
    booking as active ("Request not found, not initiated, or already assigned"). The three guards in `BookingService`
    (`GetAssignProviderFormAsync`, `AssignProviderAsync`) and `ServiceBookingApiService` now ignore Cancelled bookings.
    `ServiceBookings` has no unique constraint on `RequestUID`, so a second booking row on the same request is allowed.
-   Re-test: provider cancel, then assign the same request again in the portal.
+   Verified after the fix: a provider-cancelled request (booking Cancelled, request Initiated) opened the assign form and
+   took a second booking alongside the cancelled one.
+4. **Banner showed "2032y" (backend, fixed).** The Android payload had no event time, so the device-derived stamp was
+   wrong (seen on a physical phone too). `BuildAndroid` now sets `EventTimestamp` to the server UTC time; the banner
+   reads "Now". Every push also carries `sent_at` (ISO UTC) in its data for any in-app timestamp.
+5. **Inbox `CreatedAt` had no `Z` (backend, fixed).** The value is UTC but was read back as Unspecified, so clients
+   parsed it as local time. `UserNotificationApiDto.CreatedAt` is now marked UTC.
+
+6. **Inbox limits added (backend).** Per user and role, rows older than `Inbox.RetentionDays` (90) are deleted and
+   only the newest `Inbox.MaxPerRole` (200) are kept; both are editable under Admin > Configurations (validated 7-365
+   and 20-1000). Pruning runs after each new inbox row is saved. To check it, lower the values in Configurations,
+   send enough notifications to one user (Push Tester with "save to inbox" does not prune; real booking events do) and
+   confirm `UserNotifications` shrinks for that user and role only.
+
+7. **Appearance changes (backend, built, not yet tested on a device).** Titles/bodies reworded (one emoji only on new
+   job, accepted, cancelled, completed), Android accent colour, a per-booking tag so a newer push replaces the earlier
+   banner (iOS: thread id), and `channel_id` in the data payload. Android channels (`job_requests`, `booking_updates`,
+   `announcements`) are only named in the push when `Notifications:AndroidChannelsEnabled` is on (default off), because
+   an app build without those channels would drop the pop-up banner. Test with the Push Tester's "Send on the type's
+   Android channel" box on a build that creates them. Sounds are prepared but not chosen: `docs/notification-sounds.md`.
 
 ## 7. Not covered
 
 - Real delivery on iOS (needs a physical device, APNs key uploaded to Firebase).
+- **The App Update notification was not tested.** This covers the `app_update` push (staff broadcast from
+  `/Admin/PushBroadcast`, `screen = app_update`) and how the app reacts to it, plus the in-app version gate
+  (`GET /api/v1/app/config`: update prompt, forced update, `minimum_required_version`). Only the booking-lifecycle
+  pushes were exercised on the emulator.
 - The admin "Push Broadcast" page (`/Admin/PushBroadcast`) sending to real devices.
-- Cold-start tap routing (`getInitialMessage`): the Flutter `run` session cannot be killed without losing the debugger.
+- Sounds on a real device (section 8, item B) and one-banner-per-booking stacking driven by a real booking (section 8,
+  items C7/C8).
 - Scheduled reminders and payout notifications are not built.
+
+## 8. Android build with icon, channels, live inbox and sounds (2026-10-02, emulator)
+
+Device checklist run on the Android emulator against the new Flutter build (`ic_notification` icon, `_v2` channels,
+foreground banners, live colour-coded inbox, bundled sounds). Pushes were sent from the Push Tester. Next round: the
+same list on a physical device.
+
+| # | Check | Result |
+|---|---|---|
+| A1 | System settings lists exactly the four channels (Important notifications, Job requests, Booking updates, Announcements), no old silent duplicates | confirmed |
+| A2 | Small icon is the white glyph (not a blank blob), accent colour applied | confirmed, in both the pop-up and the status bar |
+| B3-B5 | Job request / booking update / announcement each play their own sound, in foreground, background and swiped away | **not tested**: the emulator has no sound; test on a physical device |
+| C6 | Foreground push (app open on the client or provider home) | notification arrives and the unread badge increments. ("On the right channel" in the checklist only meant the banner is posted on the channel named by `channel_id`; it is visible in system settings, not in the UI.) |
+| C7, C8 | Several pushes for the same booking leave one banner | **not conclusive**: all three stayed as separate notifications. The Push Tester sends no `booking_id` / `request_id`, so there is no stacking key. Re-test with a real booking (accept, start, complete) |
+| D9 | Banner time is the event time, not "now" | confirmed |
+| D10 | Inbox time matches the local clock | confirmed |
+| E11 | Leading emoji in a title renders in the inbox | confirmed |
+| E12 | New push appears in an open inbox without a manual refresh, with unread styling | confirmed |
+| E13 | Rows are colour-coded by type | confirmed |
+| E14 | Client and provider inboxes are separate | confirmed |
+| F16, F17 | Tap routing from foreground, background and cold start lands on the screen named by `screen` | confirmed |
+| G18 | After logout, no pushes arrive | confirmed |
+| G19 | After a role switch, pushes for the old role are not delivered | confirmed |
+
+**Still open from this round**
+- Sounds (B3-B5): physical device, with the volume up.
+- Stacking (C7/C8): drive a real booking through accept, start and complete (admin portal assign, then the app or the
+  API calls in section 4) and confirm one banner remains per booking. The backend agent can script this: create a test
+  booking from the admin portal and send the booking events in order.
+- Everything in this list is still to repeat on a physical device.
