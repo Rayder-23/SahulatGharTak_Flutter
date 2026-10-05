@@ -1,5 +1,6 @@
 ---
 status: current
+version: 1.6.0
 ---
 
 # Push notification test routine
@@ -19,7 +20,9 @@ findings: `docs/flutter-changes.md`.
   Test backgrounded banners with **Home** or screen lock. Swiping the app away from recents (cold start) still receives
   pushes; only a **Force stop** from Android settings blocks FCM until the app is opened again. Cold-start checks need
   the app launched outside `flutter run` (or a physical device), since killing the run session drops the debugger.
-  iOS cannot be tested on a simulator (needs a physical device and an APNs key).
+  The emulator plays no sound, so sounds need a physical device. iOS cannot be tested on a simulator (needs a physical
+  device and an APNs key). Test **release** builds for anything involving sounds or resources: a debug build can hide
+  release-only problems (section 10).
 - A test account that is both a client and a provider (here user 76 = Client 74 + Provider 35), so one device can play
   both roles. A second provider (here 64) is only needed for the "taken by another provider" test.
 - Admin portal login for the staff-only steps (assign, staff cancel). Credentials live in
@@ -67,7 +70,10 @@ delete by "everything after the baseline". Delete by explicit ids, in one transa
 2. `BookingMaterialItems` for the test bookings
 3. `ServiceBookings`, then `CustomerServiceRequests` (FK order)
 4. `UserNotifications` where `RequestUid` is a test request
-5. `AdminNotifications` whose `RelatedEntityUID` is a test request or booking
+5. `AdminNotifications` whose `RelatedEntityUID` is a test request or booking, **and** whose `Type` matches
+   (`ServiceRequestCreated` for the request, `ProviderBookingCancelled` for the booking). `RelatedEntityUID` alone is
+   ambiguous (request and booking ids share one number space), and an id-only delete removed one unrelated row on
+   2026-10-02 (see section 9).
 
 Leave the device token row alone.
 
@@ -118,8 +124,8 @@ Accept and start notify the client only, and "new job" notifies the provider onl
 the matching role at each step. Steps that notify the other role still write their inbox row but show no banner.
 
 **Cold start (app swiped away from recents, 2026-10-02, physical Android device, sent from the Push Tester):** the push
-is delivered and the banner shows, and works correctly. Not separately confirmed: that tapping it from this state
-routes to the screen named in `screen` / `booking_id` (the Flutter agent's `getInitialMessage` handling).
+is delivered and the banner shows. Tap routing from this state (`getInitialMessage`) was confirmed on 2026-10-05
+(section 10).
 
 ## 6. Findings from this run
 
@@ -151,10 +157,12 @@ routes to the screen named in `screen` / `booking_id` (the Flutter agent's `getI
 
 7. **Appearance changes (backend, built, not yet tested on a device).** Titles/bodies reworded (one emoji only on new
    job, accepted, cancelled, completed), Android accent colour, a per-booking tag so a newer push replaces the earlier
-   banner (iOS: thread id), and `channel_id` in the data payload. Android channels (`job_requests`, `booking_updates`,
-   `announcements`) are only named in the push when `Notifications:AndroidChannelsEnabled` is on (default off), because
-   an app build without those channels would drop the pop-up banner. Test with the Push Tester's "Send on the type's
-   Android channel" box on a build that creates them. Sounds are prepared but not chosen: `docs/notification-sounds.md`.
+   banner (iOS: thread id), and `channel_id` in the data payload. Android channels (now `job_requests_v2`,
+   `booking_updates_v2`, `announcements_v2`, each with its own sound) are only named in the push when
+   `Notifications:AndroidChannelsEnabled` is on (default off), because an app build without those channels would drop
+   the pop-up banner. Test with the Push Tester's "Send on the type's Android channel" box on a build that creates
+   them: **off** = `high_importance_channel` (device default sound, by design), **on** = the type's `_v2` channel
+   (custom sound). Sounds: `docs/notification-sounds.md`. Appearance and sounds are tested on a device: section 10.
 
 ## 7. Not covered
 
@@ -164,8 +172,9 @@ routes to the screen named in `screen` / `booking_id` (the Flutter agent's `getI
   (`GET /api/v1/app/config`: update prompt, forced update, `minimum_required_version`). Only the booking-lifecycle
   pushes were exercised on the emulator.
 - The admin "Push Broadcast" page (`/Admin/PushBroadcast`) sending to real devices.
-- Sounds on a real device (section 8, item B) and one-banner-per-booking stacking driven by a real booking (section 8,
-  items C7/C8).
+- **Sounds and push delivery on iOS** (physical iPhone, APNs key in Firebase, Xcode steps in section 10).
+- **Stacking** (one banner per booking) fails on a physical Android device: three banners for accept, start and complete
+  (section 9). Accepted as a known issue and not pursued; see `docs/flutter-changes.md`.
 - Scheduled reminders and payout notifications are not built.
 
 ## 8. Android build with icon, channels, live inbox and sounds (2026-10-02, emulator)
@@ -178,9 +187,9 @@ same list on a physical device.
 |---|---|---|
 | A1 | System settings lists exactly the four channels (Important notifications, Job requests, Booking updates, Announcements), no old silent duplicates | confirmed |
 | A2 | Small icon is the white glyph (not a blank blob), accent colour applied | confirmed, in both the pop-up and the status bar |
-| B3-B5 | Job request / booking update / announcement each play their own sound, in foreground, background and swiped away | **not tested**: the emulator has no sound; test on a physical device |
+| B3-B5 | Job request / booking update / announcement each play their own sound, in foreground, background and swiped away | **not tested**: the emulator has no sound; tested on a physical device on 2026-10-05 (section 10) |
 | C6 | Foreground push (app open on the client or provider home) | notification arrives and the unread badge increments. ("On the right channel" in the checklist only meant the banner is posted on the channel named by `channel_id`; it is visible in system settings, not in the UI.) |
-| C7, C8 | Several pushes for the same booking leave one banner | **not conclusive**: all three stayed as separate notifications. The Push Tester sends no `booking_id` / `request_id`, so there is no stacking key. Re-test with a real booking (accept, start, complete) |
+| C7, C8 | Several pushes for the same booking leave one banner | **not conclusive**: all three stayed as separate notifications. The Push Tester sends no `booking_id` / `request_id`, so there is no stacking key. Re-tested with a real booking on a physical device: still fails (sections 9 and 10) |
 | D9 | Banner time is the event time, not "now" | confirmed |
 | D10 | Inbox time matches the local clock | confirmed |
 | E11 | Leading emoji in a title renders in the inbox | confirmed |
@@ -191,9 +200,76 @@ same list on a physical device.
 | G18 | After logout, no pushes arrive | confirmed |
 | G19 | After a role switch, pushes for the old role are not delivered | confirmed |
 
-**Still open from this round**
-- Sounds (B3-B5): physical device, with the volume up.
-- Stacking (C7/C8): drive a real booking through accept, start and complete (admin portal assign, then the app or the
-  API calls in section 4) and confirm one banner remains per booking. The backend agent can script this: create a test
-  booking from the admin portal and send the booking events in order.
-- Everything in this list is still to repeat on a physical device.
+**Follow-up:** sounds were verified on a physical device and stacking was re-driven with a real booking; both are
+recorded in section 10.
+
+## 9. Stacking run with a real booking (2026-10-02, production)
+
+Scripted in `scripts/test-push-stacking.sh` (credentials via `ADMIN_*` / `DB*` environment variables, nothing stored).
+Run against `https://sahulatghartak.com` for the dual-role account (user 76 = Client 74 + Provider 35), token registered
+as Client.
+
+| Step | Action | Result |
+|---|---|---|
+| 1 | `POST /api/customer-service-requests` "NOTIF TEST stacking" | request UID 396 |
+| 2 | admin portal assign to provider 35 | booking UID 228 (provider-role push, no banner on a Client token) |
+| 3 | `respond` accept, then wait 10 s | success, client inbox row "Provider accepted" |
+| 4 | `start`, then wait 10 s | success, client inbox row "Job started" |
+| 5 | `verify-completion` (passcode read from the DB) | success, client inbox row "Job completed" |
+
+Backend side: all three calls succeeded and the client got exactly three inbox rows in order (booking_accepted,
+job_started, job_completed), so every push carried `booking_id` / `request_id` and so the `booking-228` tag.
+**Expected on the device:** one banner for the booking, showing "Job completed".
+**Device result (tester): FAIL.** Three separate banners, one per stage, did not merge. Not yet diagnosed. The backend
+code sets `AndroidNotification.Tag = booking-{id}` whenever `booking_id` is in the data and `NotifyUserAsync` always sends
+it, and the Flutter foreground path uses a stable id from the same key, so merging was expected on both paths. Open
+questions, in order: (1) was the production build running the tag code (deploy of 208c42e) when the test ran;
+(2) was the app foreground or background for each push (a system-drawn banner has the tag but id 0, a Flutter-drawn one
+has an id but no tag, so a mix never merges); (3) does the device's launcher/OEM group or ignore tags. Next step: Push
+Tester with the same `booking_id` filled in on two sends, once with the app in the background and once in the
+foreground, which isolates the tag from the real flow.
+
+Cleanup removed the test rows by explicit ids and counts returned to baseline for requests (15), bookings (7), ledger (7)
+and inbox (38). **One side effect:** `AdminNotifications` went from 66 to 65 instead of staying level. The script's
+cleanup matched `RelatedEntityUID IN (request, booking)` without the `Type`, and booking 228 collides with an older
+request-228 bell row, which was deleted too (not recoverable). The script and section 3 now filter by `Type`.
+
+## 10. Physical Android device round (2026-10-05, release APK)
+
+| Check | Result |
+|---|---|
+| Install the new build **over** the published one (secure-storage upgrade) | pass: still logged in, no data loss seen |
+| Cold-start tap routing (`getInitialMessage`) | pass: lands on the screen named by `screen` / `booking_id` |
+| Custom sounds, channel toggle **off** (`high_importance_channel`) | device default sound, as designed |
+| Custom sounds, channel toggle **on** (`_v2` channels), first release APK | **fail: silence**. Release resource shrinking had stripped `res/raw/*.ogg`; the channels pointed at missing files. `aapt2 dump resources` on the APK showed no `raw/` entries. |
+| Same, after the fix (`android/app/src/main/res/raw/keep.xml`) | **pass: each channel plays its own sound** |
+| Stacking with a real booking (accept, start, complete) | **fail**: three banners, again after the app-side tag change. Known issue, accepted, not pursued |
+
+Notes for repeating this:
+- **Test the release build.** The debug APK contained the sounds; only release stripped them (`docs/android-build-notes.md`
+  section 4 has the cause, the fix and the `aapt2` check).
+- **Uninstall the old app before re-testing sounds.** Android never changes a channel after it is created, so phones that
+  ran the broken build keep `_v2` channels pointing at missing files until the app is uninstalled (or the channels are
+  deleted in system settings).
+- Stacking: the foreground path now posts keyed pushes with the same tag and id 0 the system uses for background pushes,
+  but the three banners still did not merge. Untested leftovers if it is ever revisited: whether the production backend
+  was running the tag code (commit 208c42e) during the test, and whether the device launcher ignores tags. Every stage
+  still gets its own banner and inbox row, so nothing is lost.
+
+### iOS test checklist (physical iPhone, not yet run)
+Prerequisites (Mac): `flutter pub get`, `cd ios && pod install` (the secure-storage upgrade swapped
+`flutter_secure_storage_macos` for `flutter_secure_storage_darwin`), open `ios/Runner.xcworkspace`, confirm
+`job_request.wav`, `booking_update.wav`, `announcement.wav` are listed under Runner target > Build Phases > Copy Bundle
+Resources (they were registered in `project.pbxproj` by hand), and confirm Push Notifications and Background Modes
+(Remote notifications) under Signing & Capabilities. The APNs key must be uploaded in Firebase. `aps-environment` is
+`production` for every build configuration, so a debug build from Xcode may not get a token: test via TestFlight / an
+archive build, or set a development environment for Debug and Profile.
+
+1. Log in, allow notifications, and confirm the device token row exists (`UserDeviceTokens`, platform `ios`).
+2. Each push type plays its **own sound** (`job_request.wav`, `booking_update.wav`, `announcement.wav`; the sound name
+   comes from the push) in the foreground, the background and the locked state.
+3. Foreground push: the system banner shows (the app draws no local notifications on iOS) and the unread badge updates.
+4. Tap routing from foreground, background and cold start.
+5. Several pushes for one real booking group under one thread (`thread-id` = `booking-{id}`).
+6. Logout stops pushes; a role switch moves them to the other role.
+7. The `app_update` broadcast and the version gate (still untested on any platform, section 7).
