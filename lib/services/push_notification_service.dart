@@ -8,12 +8,14 @@ import 'package:flutter/painting.dart' show Color;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../models/push_event.dart';
+import '../utils/update_block.dart';
 
 /// Runs in its own isolate while the app is backgrounded/terminated. The OS
 /// already renders the banner for notification messages, so this stays
 /// data-only (no UI, no provider access).
 @pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {}
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) =>
+    UpdateBlock.persistFromData(message.data);
 
 /// The only place that touches `FirebaseMessaging` / local notifications.
 /// Screens and providers consume [events] and never import Firebase.
@@ -127,11 +129,14 @@ class PushNotificationService {
     );
 
     FirebaseMessaging.onMessage.listen(_onForegroundMessage);
-    FirebaseMessaging.onMessageOpenedApp
-        .listen((m) => _events.add(PushEvent.fromData(m.data, fromTap: true)));
+    FirebaseMessaging.onMessageOpenedApp.listen((m) {
+      updateBlock.record(m.data, message: m.notification?.body);
+      _events.add(PushEvent.fromData(m.data, fromTap: true));
+    });
 
     final initial = await FirebaseMessaging.instance.getInitialMessage();
     if (initial != null) {
+      updateBlock.record(initial.data, message: initial.notification?.body);
       _initialEvent = PushEvent.fromData(initial.data, fromTap: true);
     }
   }
@@ -167,6 +172,7 @@ class PushNotificationService {
   }
 
   void _onForegroundMessage(RemoteMessage message) {
+    updateBlock.record(message.data, message: message.notification?.body);
     _events.add(PushEvent.fromData(message.data));
 
     final notification = message.notification;

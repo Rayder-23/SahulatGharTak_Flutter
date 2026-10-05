@@ -65,7 +65,9 @@ import 'data/repositories/notification_repository.dart';
 import 'firebase_options.dart';
 import 'providers/notification_provider.dart';
 import 'services/push_notification_service.dart';
+import 'utils/update_block.dart';
 import 'widgets/push_host.dart';
+import 'widgets/update_block_host.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -89,6 +91,7 @@ void main() async {
     // Push is non-critical; the app must still start if Firebase can't.
     debugPrint('Firebase init failed: $e');
   }
+  updateBlock.load();
   runApp(const SahulatApp());
 }
 
@@ -144,6 +147,8 @@ class SahulatApp extends StatelessWidget {
           navigatorKey: navigatorKey,
           navigatorObservers: [RoleNavigatorObserver(activeRoleTracker)],
           title: 'Sahulat Ghar Tak',
+          builder: (context, child) => UpdateBlockHost(
+              block: updateBlock, navigatorKey: navigatorKey, child: child),
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: kPrimaryColor),
             useMaterial3: true,

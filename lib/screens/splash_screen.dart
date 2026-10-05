@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../data/repositories/notification_repository.dart';
 import '../models/app_config.dart';
 import '../utils/notification_router.dart';
+import '../utils/update_block.dart';
 import '../utils/version_compare.dart';
 import 'update_required_screen.dart';
 
@@ -77,8 +78,11 @@ class _SplashScreenState extends State<SplashScreen> {
           update.$1 == AppUpdateKind.optional &&
           ctx != null &&
           ctx.mounted) {
+        // Mark it so a matching non-forced push does not repeat the dialog.
+        updateBlock.markPrompted(update.$2.latestVersion);
         showUpdatePrompt(ctx, update.$2);
       }
+      updateBlock.setUiReady();
     });
   }
 
