@@ -69,7 +69,7 @@ class PushNotificationService {
     'announcements',
   ];
 
-  /// Used only when a push has neither booking_id nor request_id.
+  /// Unique ids for pushes with neither booking_id nor request_id.
   int _anonymousCounter = 0;
 
   final _local = FlutterLocalNotificationsPlugin();
@@ -183,8 +183,15 @@ class PushNotificationService {
     // Event time from the backend, never the time this device received it.
     final sentAt = DateTime.tryParse(data['sent_at'] ?? '');
 
+    // Android replaces a notification only when BOTH tag and id match. The
+    // system draws background pushes with the backend's tag and id 0, so a
+    // keyed foreground banner must use that same tag and id 0, otherwise a
+    // background push and a foreground one for the same booking never merge.
+    // Pushes with no key get a unique id and no tag, so they just stack.
+    final stackKey = _stackKey(data);
+
     _local.show(
-      id: _notificationId(data),
+      id: stackKey != null ? 0 : 0x40000000 + (_anonymousCounter++ & 0xFFFFFF),
       title: notification.title,
       body: notification.body,
       notificationDetails: NotificationDetails(
@@ -198,6 +205,7 @@ class PushNotificationService {
           priority: channel.importance == Importance.high
               ? Priority.high
               : Priority.defaultPriority,
+          tag: stackKey,
           icon: 'ic_notification',
           color: _accent,
           styleInformation: BigTextStyleInformation(notification.body ?? ''),
@@ -209,24 +217,13 @@ class PushNotificationService {
     );
   }
 
-  /// Stable per booking (else per request) so a newer push for the same
-  /// booking replaces the earlier banner, like background pushes do via the
-  /// Android tag.
-  int _notificationId(Map<String, dynamic> data) {
+  /// The stacking key the backend also sends as the Android tag on
+  /// background pushes: `booking-{id}`, else `request-{id}`, else none.
+  static String? _stackKey(Map<String, dynamic> data) {
     final booking = (data['booking_id'] ?? '').toString();
     final request = (data['request_id'] ?? '').toString();
-    if (booking.isNotEmpty) return _stableId('booking-$booking');
-    if (request.isNotEmpty) return _stableId('request-$request');
-    return 0x40000000 + (_anonymousCounter++ & 0xFFFFFF);
-  }
-
-  // FNV-1a, masked to a positive 30-bit int (String.hashCode isn't guaranteed
-  // stable across runs, and notification ids must fit in 32 bits).
-  static int _stableId(String key) {
-    var h = 0x811c9dc5;
-    for (final c in key.codeUnits) {
-      h = ((h ^ c) * 0x01000193) & 0xFFFFFFFF;
-    }
-    return h & 0x3FFFFFFF;
+    if (booking.isNotEmpty) return 'booking-$booking';
+    if (request.isNotEmpty) return 'request-$request';
+    return null;
   }
 }
