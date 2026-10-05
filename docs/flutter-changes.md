@@ -1,6 +1,6 @@
 ---
 status: current
-version: 1.6.0
+version: 1.8.0
 ---
 
 # Flutter App Changes Tracker
@@ -15,6 +15,47 @@ Legend:
 - **Available now** — backend is live, app can adopt whenever convenient (non-breaking, optional).
 - **Held for approval** — a genuinely breaking change to a live endpoint contract (not just optional-field additions) that hasn't been implemented at all yet; listed here so the scope is visible ahead of time. Per the constraint above, when these are eventually implemented they should also default to an optional/additive interim contract rather than a hard break, unless explicitly decided otherwise at that time.
 - **TODO(remove after old app retired)** — inline code/doc comments marking legacy-fallback branches that exist ONLY to support currently-published app builds. Once the new app version is confirmed live on both stores (i.e. no meaningfully active install base still hits these code paths), these branches can be deleted — grep the codebase for this exact marker to find all of them. Do not remove any of these until that confirmation, even if it looks safe.
+
+---
+
+## Forced-update block from the `app_update` push - app done, backend delivered (api.txt v3.34), device test pending
+
+The backend now sends `latest_version`, `store_url` and an informational `platform` per platform (api.txt "Push payload
+contract"; test cases in `docs/notification-testing.md` section 11). The app implements this as described below and
+does not read `platform`.
+
+**`force_update` (api.txt, always `"true"` or `"false"` on `app_update`):** `"true"` or a missing key blocks as
+described below. `"false"` shows the dismissable "Update available" dialog instead (body = the notification body,
+"Update now" opens the store, "Maybe later" dismisses) and persists nothing. The dialog is shown when the push arrives
+in the foreground or is tapped (also cold start, once the first real screen is up), only if installed < `latest_version`,
+at most once per version per launch (the splash config check and the push do not repeat each other), and never over
+an existing block. Test cases 14 to 21 in `docs/notification-testing.md` section 11.
+
+The app now blocks itself (full-screen, non-dismissable, single "Update Now" button that opens the store) when an
+`app_update` push announces a version newer than the installed one. The comparison is done on the device, so the push
+must **carry the version in its FCM data map**. New optional data keys, only on `type = app_update` (channel
+`announcements_v2`):
+
+| Key | Required | Example | Meaning |
+|---|---|---|---|
+| `latest_version` | yes | `1.0.5` | The version users must be on. The app blocks only if installed < this (numeric per segment, `+build` ignored). Absent or empty: the app ignores the push for blocking purposes. |
+| `store_url` | no | `https://play.google.com/...` | Store listing for this platform. If empty the app falls back to `store_url` from `GET /api/v1/app/config`. |
+
+Behaviour to know about:
+- Android and iOS are told apart by who receives the push (the broadcast is already per platform), so send each
+  platform its own `store_url`.
+- The requirement is persisted on the device, so an old install stays blocked across restarts until it is updated. It is
+  recorded when the push arrives in the foreground, when it is tapped (including a cold start) and, on Android, from the
+  data-only background handler. If the user never taps and the OS does not wake the handler (iOS without
+  `content-available`), the existing splash check against `GET /api/v1/app/config` is still the safety net.
+- Installs already on `latest_version` or newer are never blocked, and the stored requirement is cleared once the app
+  updates.
+- Builds without this change ignore the extra data keys, so sending them early is safe (additive).
+- Code: `lib/utils/update_block.dart`, `lib/widgets/update_block_host.dart` (wraps the navigator via
+  `MaterialApp.builder`), tests in `test/update_block_test.dart`.
+
+Still to verify on a device: send an `app_update` with a higher `latest_version` to a build on a lower version (blocks,
+button opens the store, survives a restart) and to a build on the same version (does nothing).
 
 ---
 

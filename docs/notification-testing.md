@@ -1,6 +1,6 @@
 ---
 status: current
-version: 1.6.0
+version: 1.8.0
 ---
 
 # Push notification test routine
@@ -273,3 +273,44 @@ archive build, or set a development environment for Debug and Profile.
 5. Several pushes for one real booking group under one thread (`thread-id` = `booking-{id}`).
 6. Logout stops pushes; a role switch moves them to the other role.
 7. The `app_update` broadcast and the version gate (still untested on any platform, section 7).
+
+## 11. app_update carries per-platform version info (added 2026-10-05, not yet run)
+
+An `app_update` push now carries `latest_version`, `store_url` and an informational `platform` in its data map, resolved
+per platform (api.txt v3.34). The Push Broadcast form has one editable version field per platform, pre-filled from `AppConfig:Android` / `AppConfig:Ios` plus any saved version (what `GET /api/v1/app/config` returns); a typed version applies to that push only, and the store links come from `AppConfig`. Each field has a **Check store for update** button that reads the store listing and saves the version it finds (cases 9 to 12).
+The app blocks itself when the installed version is older than `latest_version`. Other push types must not carry these keys.
+
+Setup: type different versions per platform in the form (e.g. Android `1.0.5`, iOS `1.0.3`) and register at
+least one Android and one iOS token (or use two Android devices and check the log). Use **Admin > Push Broadcast**. The Push Tester's `app_update` entry follows the same rule (per-token platform).
+Check what arrived with a debug build / `adb logcat` / the FCM data shown in the app, not only the banner.
+
+| # | Case | Expected |
+|---|---|---|
+| 1 | Android-only broadcast | Android tokens receive `latest_version` = Android value and the Play Store `store_url`; iOS tokens receive nothing |
+| 2 | iOS-only broadcast | The reverse: iOS value and App Store URL; Android receives nothing |
+| 3 | All platforms, different versions (Android 1.0.5, iOS 1.0.3) | Each platform gets its own version and URL. The server log shows two separate sends (the broadcast result adds both). |
+| 4 | Targeted platform's version field is empty or malformed (`1.0`, `1.0.5+3`) | The form shows a clear error naming the platform and **nothing is sent**, also for "All" when only one platform is missing |
+| 5 | `app_update` has no inbox row | `UserNotifications` unchanged (count before and after); `notification_id` is empty |
+| 6 | Other push types (`booking_accepted`, `job_started`, ...) | No `latest_version`, `store_url` or `platform` key in the data map |
+| 7 | Edited version differs from `AppConfig` | The push carries the typed value; `GET /api/v1/app/config` still returns the configured one |
+| 8 | `store_url` blank in config | The key is sent as `""` and the app falls back to `GET /api/v1/app/config?platform=...` |
+| 9 | Check store for update, App Store | Field fills with the listing's version cut to major.minor.patch (listing "1.0.6 - GPS" -> `1.0.6`); `GET /api/v1/app/config?platform=ios` returns it as `latest_version`; the `Configurations` row `AppConfig.Ios.LatestVersion` exists |
+| 10 | Check store for update, Google Play | Same for Android (`AppConfig.Android.LatestVersion`). Best-effort: it reads the Play page, so a Google page change shows an error and saves nothing |
+| 11 | Store unreachable / app not found / blank store URL | Red message under the field, field and saved value unchanged |
+| 12 | Delete the `AppConfig.*.LatestVersion` rows in Admin > Configurations | The app config and the form fall back to the appsettings value |
+| 13 | Installed version vs `latest_version` | Older: full-screen block, Update Now opens the store link, survives a restart. Same or newer: ignored. |
+
+### force_update (added 2026-10-05, not yet run)
+
+`app_update` also carries `force_update`, exactly `"true"` or `"false"`, set per platform with the **Force update** checkbox next to each version field (default ticked). Unticked, the app shows a dismissable "Update available" dialog (the body is its message) instead of the block. Not saved; `GET /api/v1/app/config` is unchanged.
+
+| # | Case | Expected |
+|---|---|---|
+| 14 | Broadcast with Force update ticked | the push data has `force_update` = `"true"`; the app blocks |
+| 15 | Broadcast with it unticked | `force_update` = `"false"`; the app shows the dismissable dialog with the body as its text, and "Maybe later" leaves the app usable |
+| 16 | All platforms, Android ticked and iOS unticked | two separate sends: Android `"true"`, iOS `"false"` |
+| 17 | Every `app_update` push (broadcast and Push Tester) | `force_update` present and exactly `"true"` or `"false"`, never missing or empty |
+| 18 | Other types (`booking_accepted`, `job_started`, ...) | no `force_update` key |
+| 19 | Push Tester `app_update` | its "force the update" checkbox (default ticked) sets the value the same way |
+| 20 | `GET /api/v1/app/config?platform=...` | unchanged, still returns its own `force_update` |
+| 21 | Installed version same or newer than `latest_version` | nothing shown, whatever `force_update` says |
