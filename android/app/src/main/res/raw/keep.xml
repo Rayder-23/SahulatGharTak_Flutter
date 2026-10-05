@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The notification sounds are only referenced by name at runtime
+     (RawResourceAndroidNotificationSound -> getIdentifier), so release
+     resource shrinking would otherwise strip them and every channel would
+     fall back to the device's default sound. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/job_request,@raw/booking_update,@raw/announcement" />
