@@ -27,6 +27,10 @@ Future<String> resolveProviderEntryRoute(BuildContext context) async {
 
   final documents = context.read<ProviderDocumentProvider>();
   await documents.loadDocuments(providerUid);
+  // A failed fetch leaves isVerified at its default (false), which is "could
+  // not check", not "not verified". Retry once before giving up; the pending
+  // screen then retries and says so instead of claiming the review is open.
+  if (documents.loadError != null) await documents.loadDocuments(providerUid);
 
   return documents.isVerified
       ? ProviderDashboardScreen.routeName

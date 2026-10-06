@@ -100,7 +100,10 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     // only reflects the authoritative server value once that finishes.
     // Reacting mid-fetch previously bounced providers out of screens they'd
     // just opened even though nothing was actually revoked.
-    if (!documents.isVerified && !documents.isLoadingExisting) {
+    // A failed reload (loadError) is "unknown", not a revocation.
+    if (!documents.isVerified &&
+        !documents.isLoadingExisting &&
+        documents.loadError == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted)
           Navigator.of(context)

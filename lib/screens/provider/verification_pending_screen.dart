@@ -34,10 +34,15 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
-  void _load() {
+  Future<void> _load() async {
     final providerUid = context.read<AuthProvider>().currentUser?.providerUid;
-    if (providerUid != null) {
-      context.read<ProviderDocumentProvider>().loadDocuments(providerUid);
+    if (providerUid == null) return;
+    final documents = context.read<ProviderDocumentProvider>();
+    await documents.loadDocuments(providerUid);
+    // The gate may have sent a verified provider here after a failed check;
+    // once the real status arrives, continue to the dashboard.
+    if (mounted && documents.isVerified) {
+      Navigator.of(context).pushReplacementNamed(ProviderRoutes.dashboard);
     }
   }
 
@@ -53,6 +58,10 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
 
     if (documents.isVerified) {
       Navigator.of(context).pushReplacementNamed(ProviderRoutes.dashboard);
+    } else if (documents.loadError != null) {
+      showAppToast(
+          context, 'Could not check your status. ${documents.loadError}',
+          type: AppToastType.info);
     } else {
       showAppToast(
           context, 'Still pending verification. Please check back later.',
@@ -103,6 +112,18 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                         style: TextStyle(
                             fontSize: 14, color: Colors.grey[600], height: 1.5),
                       ),
+                      if (documents.loadError != null) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          'We could not check your verification status. '
+                          'Tap "Check Verification Status" to try again.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.orange.shade800,
+                              height: 1.4),
+                        ),
+                      ],
                       if (remarks != null && remarks.isNotEmpty) ...[
                         const SizedBox(height: 20),
                         Container(
