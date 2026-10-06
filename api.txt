@@ -1,6 +1,6 @@
 ================================================================================
 SahulatGharTak API Reference
-Version: 3.38 | Last Updated: 2026-10-06
+Version: 3.39 | Last Updated: 2026-10-06
 Database: SahulatAppDB
 Local Base URL:    https://localhost:7265/api/
 Deployed Base URL:  https://sahulatghartak.com/api/
@@ -3309,7 +3309,7 @@ Fail (400):
 }
 
 --------------------------------------------------------------------------------
-Admin release of update blocks - silent app_unblock push (v3.38; BACKEND NOT BUILT YET, app side done)
+Admin release of update blocks - silent app_unblock push (v3.39; BUILT 2026-10-06, backend and app side both done)
 --------------------------------------------------------------------------------
 Why: an app_update push with force_update "true" blocks a device until it installs latest_version. The block is
 stored ON the device (secure storage) and survives restarts, so a wrong or test announcement (a version the store does
@@ -3363,6 +3363,22 @@ titled "Release blocked devices" below the broadcast form and its history:
   Table (e.g. UpdateBlockReleases): Id, Scope, Platform?, UserId?, DeviceTokenId?, ReleasedAtUtc, ReleasedBy,
   Reason, Recipients, Sent, Failed. ReleasedAtUtc is the same instant that is sent as sent_at.
   Rejected with a clear message and nothing sent/written: empty Reason, unknown user/device, no matching devices.
+
+Backend (built 2026-10-06, contract above unchanged):
+  - Admin portal only, Admin / Super Admin, anti-forgery on every POST, no mobile endpoint:
+      POST /Admin/PushBroadcast/Release       sends the release (Scope, UserId?, TokenId?, Reason)
+      POST /Admin/PushBroadcast/ReleaseReach  counts the devices a scope would reach (confirm step), sends nothing
+      POST /Admin/PushBroadcast/PeekStore     reads the store's listed version WITHOUT saving it (used by the
+                                              "forced version is ahead of the store" warning on the broadcast form)
+  - INotificationService.SendUpdateUnblockAsync sends the data-only push (one multicast per platform, same sent_at);
+    stale tokens are removed like other pushes; it does not read Notifications:BookingPushEnabled.
+  - Every send is recorded in dbo.UpdateBlockReleases (db.txt; scripts/create-update-block-releases.sql, applied
+    2026-10-06) and logged with the admin username. ReleasedAtUtc is the instant sent as sent_at.
+  - No UserNotifications / AdminNotifications rows are written. latest_version, minimum_required_version and AppConfig
+    are never touched.
+  - Rejected with a message, nothing sent or written: empty or >200-char Reason, unknown user, unknown device, no
+    matching devices, bad scope.
+  - Android verified on the emulator (docs/notification-testing.md section 12). iOS not yet verified on a device.
 
 Compatibility: fully additive. A build without this change ignores the unknown push type (it keeps its block and
 needs an update, clear data, or a build at or above the pushed version). Ship the backend first, the extra push is
