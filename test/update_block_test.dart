@@ -4,6 +4,13 @@ import 'package:sahulat_ghar_tak/utils/update_block.dart';
 class _FakeStore extends UpdateBlockStore {
   String? version;
   String? url;
+  DateTime? clearedAt;
+
+  @override
+  Future<DateTime?> readClearedAt() async => clearedAt;
+
+  @override
+  Future<void> writeClearedAt(DateTime at) async => clearedAt = at;
 
   @override
   Future<(String?, String?)> read() async => (version, url);
@@ -22,9 +29,13 @@ class _FakeStore extends UpdateBlockStore {
 }
 
 Map<String, dynamic> _push(
-        {String version = '1.0.5', String url = '', String? force}) =>
+        {String version = '1.0.5',
+        String url = '',
+        String? force,
+        String? sentAt}) =>
     {
       'type': 'app_update',
+      if (sentAt != null) 'sent_at': sentAt,
       'latest_version': version,
       'store_url': url,
       if (force != null) 'force_update': force,
@@ -185,5 +196,67 @@ void main() {
     expect(store.version, isNull);
     await UpdateBlock.persistFromData(_push(), store: store);
     expect(store.version, '1.0.5');
+  });
+
+  group('admin release (app_unblock)', () {
+    const release = {'type': 'app_unblock', 'sent_at': '2026-10-06T08:00:00Z'};
+
+    test('clears a stored block and records the release time', () async {
+      final block = make();
+      await block.record(_push(sentAt: '2026-10-06T07:00:00Z'));
+      expect(block.isBlocked, isTrue);
+      await block.record(release);
+      expect(block.isBlocked, isFalse);
+      expect(store.version, isNull);
+      expect(store.clearedAt, DateTime.utc(2026, 10, 6, 8));
+    });
+
+    test('an announcement sent before the release is ignored', () async {
+      final block = make();
+      await block.record(release);
+      await block.record(_push(sentAt: '2026-10-06T07:59:00Z'));
+      expect(block.isBlocked, isFalse);
+      expect(store.version, isNull);
+    });
+
+    test('an announcement sent after the release blocks again', () async {
+      final block = make();
+      await block.record(release);
+      await block.record(_push(sentAt: '2026-10-06T08:01:00Z'));
+      expect(block.isBlocked, isTrue);
+    });
+
+    test('a push without sent_at is never voided', () async {
+      final block = make();
+      await block.record(release);
+      await block.record(_push());
+      expect(block.isBlocked, isTrue);
+    });
+
+    test('release also drops a queued prompt', () async {
+      final block = make()..setUiReady();
+      await block.record(_push(force: 'false', sentAt: '2026-10-06T07:00:00Z'));
+      await block.record(release);
+      expect(block.takePrompt(), isNull);
+    });
+
+    test('background handler clears the block and records the release',
+        () async {
+      await UpdateBlock.persistFromData(_push(), store: store);
+      expect(store.version, '1.0.5');
+      await UpdateBlock.persistFromData(release, store: store);
+      expect(store.version, isNull);
+      await UpdateBlock.persistFromData(_push(sentAt: '2026-10-06T07:00:00Z'),
+          store: store);
+      expect(store.version, isNull);
+    });
+
+    test('an older release does not move the cleared time back', () async {
+      final block = make();
+      await block.record(release);
+      await block
+          .record({'type': 'app_unblock', 'sent_at': '2026-10-05T00:00:00Z'});
+      expect(store.clearedAt, DateTime.utc(2026, 10, 6, 8));
+    });
   });
 }

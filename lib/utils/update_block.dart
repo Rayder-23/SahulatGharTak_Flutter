@@ -12,6 +12,11 @@ const _typeKey = 'type';
 const _versionKey = 'latest_version';
 const _storeUrlKey = 'store_url';
 const _forceKey = 'force_update';
+const _sentAtKey = 'sent_at';
+
+/// Silent admin push that voids every block created at or before its
+/// `sent_at` (see `api.txt`, "Admin release of update blocks").
+const _unblockType = 'app_unblock';
 
 class _Announcement {
   const _Announcement(this.version, this.storeUrl, {required this.force});
@@ -35,6 +40,7 @@ class UpdateBlockStore {
   static const _storage = FlutterSecureStorage();
   static const _versionStorageKey = 'pending_update_version';
   static const _urlStorageKey = 'pending_update_store_url';
+  static const _clearedStorageKey = 'update_block_cleared_at';
 
   Future<(String?, String?)> read() async => (
         await _storage.read(key: _versionStorageKey),
@@ -50,6 +56,14 @@ class UpdateBlockStore {
     await _storage.delete(key: _versionStorageKey);
     await _storage.delete(key: _urlStorageKey);
   }
+
+  /// Latest admin release seen (server `sent_at`). Announcements sent at or
+  /// before it are ignored, so one still in flight cannot re-block.
+  Future<DateTime?> readClearedAt() async =>
+      DateTime.tryParse(await _storage.read(key: _clearedStorageKey) ?? '');
+
+  Future<void> writeClearedAt(DateTime at) => _storage.write(
+      key: _clearedStorageKey, value: at.toUtc().toIso8601String());
 }
 
 /// Blocks the whole app while the installed version is older than the version
@@ -96,8 +110,13 @@ class UpdateBlock extends ChangeNotifier {
   /// a block (see [takePrompt]); "true" or a missing key blocks.
   Future<void> record(Map<String, dynamic> data, {String? message}) async {
     try {
+      if (data[_typeKey]?.toString() == _unblockType) {
+        await _release(data);
+        return;
+      }
       final parsed = _parse(data);
       if (parsed == null) return;
+      if (await _voided(data, _store)) return;
       // A push for a version we already have must not clear a still-valid
       // pending block for a newer one; only load() clears stale state.
       if (compareVersions(await _installedVersion(), parsed.version) >= 0) {
@@ -119,12 +138,48 @@ class UpdateBlock extends ChangeNotifier {
   static Future<void> persistFromData(Map<String, dynamic> data,
       {UpdateBlockStore store = const UpdateBlockStore()}) async {
     try {
+      if (data[_typeKey]?.toString() == _unblockType) {
+        await _storeRelease(data, store);
+        return;
+      }
       final parsed = _parse(data);
-      if (parsed != null && parsed.force) {
+      if (parsed != null && parsed.force && !await _voided(data, store)) {
         await store.write(parsed.version, parsed.storeUrl);
       }
     } catch (e) {
       debugPrint('Update block persist failed: $e');
+    }
+  }
+
+  static DateTime _sentAt(Map<String, dynamic> data) =>
+      DateTime.tryParse((data[_sentAtKey] ?? '').toString())?.toUtc() ??
+      DateTime.now().toUtc();
+
+  /// True when an admin release at or after this push's `sent_at` already
+  /// voided it. A push with no usable `sent_at` is never voided.
+  static Future<bool> _voided(
+      Map<String, dynamic> data, UpdateBlockStore store) async {
+    final sent = DateTime.tryParse((data[_sentAtKey] ?? '').toString());
+    if (sent == null) return false;
+    final cleared = await store.readClearedAt();
+    return cleared != null && !sent.toUtc().isAfter(cleared);
+  }
+
+  static Future<void> _storeRelease(
+      Map<String, dynamic> data, UpdateBlockStore store) async {
+    final at = _sentAt(data);
+    final cleared = await store.readClearedAt();
+    if (cleared == null || at.isAfter(cleared)) await store.writeClearedAt(at);
+    await store.clear();
+  }
+
+  /// Admin release: forget the block and any queued prompt, show nothing.
+  Future<void> _release(Map<String, dynamic> data) async {
+    await _storeRelease(data, _store);
+    _pendingPrompt = null;
+    if (_requiredVersion != null) {
+      _requiredVersion = null;
+      notifyListeners();
     }
   }
 

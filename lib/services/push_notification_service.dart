@@ -173,6 +173,8 @@ class PushNotificationService {
 
   void _onForegroundMessage(RemoteMessage message) {
     updateBlock.record(message.data, message: message.notification?.body);
+    // Silent admin release: nothing to show, route or count.
+    if (message.data['type'] == 'app_unblock') return;
     _events.add(PushEvent.fromData(message.data));
 
     final notification = message.notification;
